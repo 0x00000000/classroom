@@ -75,8 +75,30 @@ abstract class ModelDatabase extends Model {
         
         if ($this->getDatabase()) {
             if ($this->_table) {
-                $result = $this->getDatabase()->getList($this->_table, $conditionsList,
-        $limit, $offset);
+                $result = $this->getDatabase()->getList(
+                    $this->_table,
+                    $conditionsList,
+                    $limit,
+                    $offset
+                );
+            }
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Gets count of records.
+     */
+    public function getCount(array $conditionsList): int {
+        $result = false;
+        
+        if ($this->getDatabase()) {
+            if ($this->_table) {
+                $result = $this->getDatabase()->getCount(
+                    $this->_table,
+                    $conditionsList
+                );
             }
         }
         

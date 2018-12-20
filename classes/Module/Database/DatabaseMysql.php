@@ -98,6 +98,38 @@ class DatabaseMysql extends Database {
     }
     
     /**
+     * Gets count of records.
+     */
+    public function getCount(string $table, array $conditionsList): int {
+        $count = 0;
+        
+        $conditionQuery = '';
+        if (count($conditionsList)) {
+            $conditionQueryList = array();
+            foreach ($conditionsList as $key => $value) {
+                $conditionQueryList[] = '`' . $this->_mysqli->escape_string((string) $key) . '` = "'
+                    . $this->_mysqli->escape_string((string) $value) . '"';
+            }
+            
+            $conditionQuery = ' where (' . implode(' and ', $conditionQueryList) . ')';
+        }
+        
+        $query = 'select count(*) as count from `' . $this->_mysqli->escape_string($this->_prefix . $table) . '`'
+            . $conditionQuery;
+        $this->_lastQuery = $query;
+        
+        $res = $this->_mysqli->query($query);
+        if ($res) {
+            $row = $res->fetch_assoc();
+            if (array_key_exists('count', $row)) {
+                $count = (int) $row['count'];
+            }
+        }
+        
+        return $count;
+    }
+    
+    /**
      * Gets data by key.
      */
     public function getByKey(string $table, string $key, string $value): ?array {

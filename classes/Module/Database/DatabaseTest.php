@@ -96,6 +96,31 @@ class DatabaseTest extends Database {
     }
     
     /**
+     * Gets count of records.
+     */
+    public function getCount(string $table, array $conditionsList): int {
+        $count = 0;
+        
+        if (array_key_exists($table, $this->_data)) {
+            foreach ($this->_data[$table] as $id => $record) {
+                $fit = true;
+                foreach ($conditionsList as $key => $value) {
+                    if (! array_key_exists($key, $record) || $record[$key] !== $value) {
+                        $fit = false;
+                        break;
+                    }
+                }
+                
+                if ($fit) {
+                    $count++;
+                }
+            }
+        }
+        
+        return $count;
+    }
+    
+    /**
      * Saves the record in the database.
      */
     public function addRecord(string $table, array $data): ?string {

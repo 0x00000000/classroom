@@ -28,6 +28,11 @@ abstract class DatabaseAbstract {
     ): ?array;
     
     /**
+     * Gets count of records.
+     */
+    abstract public function getCount(string $table, array $conditionsList): int;
+    
+    /**
      * Saves the record in the database.
      */
     abstract public function addRecord(string $table, array $data): ?string;
