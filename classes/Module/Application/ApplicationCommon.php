@@ -34,6 +34,8 @@ class ApplicationCommon extends ApplicationBase {
         
         $router->setRule('/admin/vocabulary/images/fill', 'Admin/ControllerVocabulary', 'imagesAdd');
         
+        $router->setRule('/admin/vocabulary/images/fill/<page>', 'Admin/ControllerVocabulary', 'imagesAdd');
+        
         $router->setDefaultRule('Client/ControllerClient', 'index');
         
     }

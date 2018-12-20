@@ -21,7 +21,44 @@ class ControllerVocabulary extends ControllerAdminBase {
     }
     
     protected function actionImagesAdd() {
-        $content = 'Fill render content images page.';
+        $view = Factory::instance()->createView();
+        $view->setTemplate('Admin/Vocabulary/FillImages');
+        
+        $get = $this->getRequest()->get;
+        $currentPage = array_key_exists('page', $get) ? $get['page'] : '1';
+        $itemsPerPage = 10;
+        
+        $modelWord = Factory::instance()->createModelWord();
+        $wordsList = $modelWord->getList(
+            array('image' => '0'),
+            $itemsPerPage,
+            ((int) $currentPage - 1) * (int) $itemsPerPage
+        );
+        
+        $pagesCount = $modelWord->getCount(
+            array('image' => '0')
+        );
+        
+        $pagesList = array();
+        if ($pagesCount > 1) {
+            $pagesCount = floor(($pagesCount - 1) / $itemsPerPage);
+            for ($i = 1; $i <= $pagesCount; $i++) {
+                $pagesList[] = (string) $i;
+            }
+        } else {
+            $pagesCount = 1;
+        }
+        
+        $baseLink = $this->getRequest()->url;
+        $baseLink = preg_replace('/\/images\/fill\/(\w+)$/', '/images/fill', $baseLink);
+        $view->set('baseLink', $baseLink);
+        
+        $view->set('wordsList', $wordsList);
+        $view->set('currentPage', $currentPage);
+        $view->set('pagesCount', $pagesCount);
+        $view->set('pagesList', $pagesList);
+        
+        $content = $view->render();
         
         return $content;
     }
