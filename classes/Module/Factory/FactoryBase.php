@@ -1,0 +1,397 @@
+<?php
+
+declare(strict_types=1);
+
+namespace classroom;
+
+include_once('Factory.php');
+
+/**
+ * Creates modules and models.
+ */
+abstract class FactoryBase extends Factory {
+    
+    /**
+     * @var string $_moduleNamePostfix Postfix for some modules' names.
+     */
+    protected $_moduleNamePostfix = null;
+    
+    /**
+     * @var bool $_isTestMode If test mode is turned on.
+     */
+    protected $_isTestMode = false;
+    
+    /**
+     * @var Database $_database Database object.
+     */
+    protected $_database = null;
+    
+    /**
+     * Turns on test mode.
+     */
+    public function setTestMode(): void {
+        $this->_isTestMode = true;
+    }
+    
+    /**
+     * Checks if test mode is turned on.
+     */
+    protected function isTestMode(): bool {
+        return $this->_isTestMode;
+    }
+    
+    /**
+     * Sets database object.
+     */
+    public function setDatabase(Database $database): bool {
+        $result = false;
+        
+        if (is_object($database) && $database instanceof Database) {
+            $this->_database = $database;
+            $result = true;
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Gets database object.
+     */
+    protected function getDatabase(): ?Database {
+        return $this->_database;
+    }
+    
+    /**
+     * Loads controller. Includes it's file, bun doesn't create an object.
+     * 
+     * @param string $name Controller's name.
+     * @return bool Is controller was succsessfully loaded.
+     */
+    public function loadController(string $name, string $localPath = null): bool {
+        if (! empty($localPath)) {
+            $path = 'Controller/' . $localPath;
+        } else {
+            $path = 'Controller';
+        }
+        $result = Core::loadClass($name, $path);
+        
+        return $result;
+    }
+    
+    /**
+     * Loads model. Includes it's file, bun doesn't create an object.
+     * 
+     * @param string $name Model's name.
+     * @return bool Is model was succsessfully loaded.
+     */
+    public function loadModel(string $name): bool {
+        $result = Core::loadClass($name, 'Model');
+        
+        return $result;
+    }
+    
+    /**
+     * Loads module. Includes it's file, bun doesn't create an object.
+     * 
+     * @param string $name Module's name.
+     * @param string|null $localPath Module section name.
+     * @return bool Is module was succsessfully loaded.
+     */
+    public function loadModule(string $name, string $localPath = null): bool {
+        $result = false;
+        
+        if ($name) {
+            if (! $localPath) {
+                $localPath = $name;
+            }
+            
+            $path = 'Module/' . $localPath;
+            $result = Core::loadClass($name, $path);
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Loads smarty.
+     * 
+     * @return bool Is smarty was found.
+     */
+    public function loadSmarty(): bool {
+        $result = false;
+        
+        $ds = FileSystem::getDS();
+        $path = FileSystem::getRoot() . $ds . 'vendor' . $ds . 'smarty' . $ds . 'libs' . $ds . 'Smarty.class.php';
+        if (is_file($path)) {
+            include_once($path);
+            $result = true;
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Creates module object.
+     */
+    public function createModule(string $moduleName, string $moduleBaseName = null): object {
+        $result = null;
+        
+        $loaded = $this->loadModule($moduleName, $moduleBaseName);
+        if ($loaded) {
+            $className = Core::getNamespace() . $moduleName;
+            $result = new $className();
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Creates module object. Module name is calculated from $_moduleNamePostfix property.
+     */
+    public function createTypedModule(string $moduleBaseName): object {
+        $result = null;
+        
+        if ($moduleBaseName) {
+            $moduleName = $moduleBaseName . $this->_moduleNamePostfix;
+            $result = $this->createModule($moduleName, $moduleBaseName);
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Creates model object.
+     */
+    public function createModel(string $modelName): Model {
+        $result = null;
+        
+        $loaded = $this->loadModel($modelName);
+        if ($loaded) {
+            $className = Core::getNamespace() . $modelName;
+            $result = new $className();
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Creates controller object.
+     */
+    public function createController(string $nameAndPath, Request $request, Response $response): Controller {
+        $result = null;
+        
+        $separatorPosition = strrpos($nameAndPath, '/');
+        if ($separatorPosition !== false) {
+            $localPath = substr($nameAndPath, 0, $separatorPosition);
+            $name = substr($nameAndPath, $separatorPosition + 1);
+        } else {
+            $localPath = null;
+            $name = $nameAndPath;
+        }
+        $loaded = $this->loadController($name, $localPath);
+        if ($loaded) {
+            $className = Core::getNamespace() . $name;
+            $result = new $className();
+            if ($result instanceof Controller) {
+                $result->init($request, $response);
+            }
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Creates request model object.
+     */
+    public function createModelRequest(): ModelRequest {
+        $modelName = 'ModelRequest';
+        $model = $this->createModel($modelName);
+        if ($this->getDatabase()) {
+            $model->setDatabase($this->getDatabase());
+        }
+        return $model;
+    }
+    
+    /**
+     * Creates log model object.
+     */
+    public function createModelLog(Request $request): ModelLog {
+        $modelName = 'ModelLog';
+        $model = $this->createModel($modelName);
+        $model->setRequest($request);
+        if ($this->getDatabase()) {
+            $model->setDatabase($this->getDatabase());
+        }
+        return $model;
+    }
+    
+    /**
+     * Creates user model object.
+     */
+    public function createModelUser(): ModelUser {
+        $modelName = 'ModelUser';
+        $model = $this->createModel($modelName);
+        if ($this->getDatabase()) {
+            $model->setDatabase($this->getDatabase());
+        }
+        return $model;
+    }
+    
+    /**
+     * Creates lesson model object.
+     */
+    public function createModelLesson(): ModelLesson {
+        $modelName = 'ModelLesson';
+        $model = $this->createModel($modelName);
+        if ($this->getDatabase()) {
+            $model->setDatabase($this->getDatabase());
+        }
+        return $model;
+    }
+    
+    /**
+     * Creates word model object.
+     */
+    public function createModelWord(): ModelWord {
+        $modelName = 'ModelWord';
+        $model = $this->createModel($modelName);
+        if ($this->getDatabase()) {
+            $model->setDatabase($this->getDatabase());
+        }
+        return $model;
+    }
+    
+    /**
+     * Creates application module object.
+     */
+    public function createApplication(): Application {
+        $moduleBaseName = 'Application';
+        if (! $this->isTestMode()) {
+            $moduleName = $moduleBaseName . 'Common';
+            $object = $this->createModule($moduleName, $moduleBaseName);
+        } else {
+            $moduleName = $moduleBaseName . 'Test';
+            $object = $this->createModule($moduleName, $moduleBaseName);
+        }
+        return $object;
+    }
+    
+    /**
+     * Creates config module object.
+     */
+    public function createConfig(): Config {
+        
+        $this->loadModule('Config');
+        $type = 'Common';
+        Config::setType($type);
+        $object = Config::instance();
+        return $object;
+    }
+    
+    /**
+     * Creates database module object.
+     */
+    public function createDatabase(): Database {
+        $moduleBaseName = 'Database';
+        if (! $this->isTestMode()) {
+            $moduleName = $moduleBaseName . 'Mysql';
+        } else {
+            $moduleName = $moduleBaseName . 'Test';
+        }
+        $object = $this->createModule($moduleName, $moduleBaseName);
+        return $object;
+    }
+    
+    /**
+     * Creates database logger object.
+     */
+    public function createLogger(Request $request): Logger {
+        $moduleName = 'Logger';
+        $object = $this->createModule($moduleName );
+        $object->setRequest($request);
+        return $object;
+    }
+    
+    /**
+     * Creates registry logger object.
+     */
+    public function createRegistry(): Registry {
+        $moduleName = 'Registry';
+        $object = $this->createModule($moduleName);
+        return $object;
+    }
+    
+    /**
+     * Creates request object.
+     */
+    public function createRequest(): Request {
+        $moduleBaseName = 'Request';
+        if (! $this->isTestMode()) {
+            $moduleName = $moduleBaseName . 'Http';
+        } else {
+            $moduleName = $moduleBaseName . 'Test';
+        }
+        $object = $this->createModule($moduleName, $moduleBaseName);
+        return $object;
+    }
+    
+    /**
+     * Creates response object.
+     */
+    public function createResponse(): Response {
+        $moduleBaseName = 'Response';
+        $moduleName = $moduleBaseName . 'Http';
+        $object = $this->createModule($moduleName, $moduleBaseName);
+        return $object;
+    }
+    
+    /**
+     * Creates router logger object.
+     */
+    public function createRouter(Request $request, Response $response): Router {
+        $moduleBaseName = 'Router';
+        if (! $this->isTestMode()) {
+            $moduleName = $moduleBaseName . 'Common';
+            $object = $this->createModule($moduleName, $moduleBaseName);
+        } else {
+            $moduleName = $moduleBaseName . 'Test';
+            $object = $this->createModule($moduleName, $moduleBaseName);
+        }
+        $object->init($request, $response);
+        return $object;
+    }
+    
+    /**
+     * Creates smarty object.
+     */
+    public function createSmarty(): ?\Smarty {
+        $result = null;
+        
+        if ($this->loadSmarty()) {
+            $smarty  = new \Smarty();
+            
+            $ds = FileSystem::getDS();
+            $smartyDataDir = FileSystem::getDataDir() . $ds . 'smarty';
+            
+            $smarty->setTemplateDir($smartyDataDir . $ds . 'templates');
+            $smarty->setCompileDir($smartyDataDir . $ds . 'templates_c');
+            $smarty->setConfigDir($smartyDataDir . $ds . 'configs');
+            $smarty->setCacheDir($smartyDataDir . $ds . 'cache');
+            
+            $result = $smarty;
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Creates view object.
+     */
+    public function createView(): View {
+        $moduleBaseName = 'View';
+        $moduleName = $moduleBaseName . 'Common';
+        $object = $this->createModule($moduleName, $moduleBaseName);
+        return $object;
+    }
+    
+}
