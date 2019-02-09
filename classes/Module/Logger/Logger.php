@@ -93,7 +93,8 @@ class Logger {
         string $file = null, int $line = null
     ): bool {
         $result = false;
-        $modelLog = Factory::instance()->createModelLog($this->getRequest());
+        $modelLog = Factory::instance()->createModel('Log');
+        $modelLog->setRequest($this->getRequest());
         
         if (method_exists($modelLog, $methodName)) {
             if ($this->getRequest()) {

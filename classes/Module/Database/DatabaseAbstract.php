@@ -12,20 +12,15 @@ abstract class DatabaseAbstract {
     /**
      * Gets data by id.
      */
-    abstract public function getById(string $table, string $id): ?array;
+    abstract public function getById(string $table, string $pk, string $primaryKey = 'id'): ?array;
     
     /**
-     * Gets data by key.
-     */
-    abstract public function getByKey(string $table, string $key, string $value): ?array;
-    
-    /**
-     * Gets data by id.
+     * Gets data for several records.
      */
     abstract public function getList(
         string $table, array $conditionsList,
         ?int $limit, ?int $offset
-    ): ?array;
+    ): array;
     
     /**
      * Gets count of records.
@@ -43,8 +38,18 @@ abstract class DatabaseAbstract {
     abstract public function updateRecord(string $table, array $data, string $primaryKey = 'id'): ?string;
     
     /**
+     * Deletes the record in the database.
+     */
+    abstract public function deleteRecord(string $table, string $pk, string $primaryKey = 'id'): ?string;
+    
+    /**
      * Gets last error information.
      */
     abstract public function getLastError(): ?array;
+    
+    /**
+     * Escapes string for safe using in sql statements.
+     */
+    abstract protected function escape(string $value): string;
     
 }

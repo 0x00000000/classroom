@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 include_once(dirname(__FILE__) . '/../init.php');
 
-Factory::instance()->loadModel('ModelRequest');
+Factory::instance()->loadModel('Request');
 
 final class ModelRequestTest extends TestCase {
     protected $_modelRequest = null;
@@ -16,7 +16,7 @@ final class ModelRequestTest extends TestCase {
     public function __construct() {
         parent::__construct();
         
-        $this->_modelRequest = Factory::instance()->createModelRequest();
+        $this->_modelRequest = Factory::instance()->createModel('Request');
     }
     
     public function testCreate(): void {
@@ -118,7 +118,7 @@ final class ModelRequestTest extends TestCase {
     }
     
     public function testDatabase(): void {
-        $modelRequestSave = Factory::instance()->createModelRequest();
+        $modelRequestSave = Factory::instance()->createModel('Request');
         $modelRequestSave->create();
         
         $idSave = $modelRequestSave->save();
@@ -126,7 +126,7 @@ final class ModelRequestTest extends TestCase {
         
         $dataAfterSave = $modelRequestSave->getDataAssoc();
         
-        $modelRequestGet = Factory::instance()->createModelRequest();
+        $modelRequestGet = Factory::instance()->createModel('Request');
         $modelRequestGet->loadById($idSave);
         $dataAfterGet = $modelRequestGet->getDataAssoc();
         
@@ -136,7 +136,7 @@ final class ModelRequestTest extends TestCase {
         $idGet = $modelRequestGet->save();
         $dataAfterUpdated = $modelRequestGet->getDataAssoc();
         
-        $modelRequestUpdatedGet = Factory::instance()->createModelRequest();
+        $modelRequestUpdatedGet = Factory::instance()->createModel('Request');
         $modelRequestUpdatedGet->loadById($idGet);
         
         $dataAfterUpdatedGet = $modelRequestUpdatedGet->getDataAssoc();

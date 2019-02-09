@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 include_once(dirname(__FILE__) . '/../init.php');
 
-Factory::instance()->loadModel('ModelLog');
+Factory::instance()->loadModel('Log');
 
 final class ModelLogTest extends TestCase {
     protected $_modelLog = null;
@@ -20,7 +20,8 @@ final class ModelLogTest extends TestCase {
         
         $this->_request = Factory::instance()->createRequest();
         
-        $this->_modelLog = Factory::instance()->createModelLog($this->_request);
+        $this->_modelLog = Factory::instance()->createModel('Log');
+        $this->_modelLog->setRequest($this->_request);
         
         $this->_logData = $this->getTestData();
     }
@@ -149,7 +150,7 @@ final class ModelLogTest extends TestCase {
     }
     
     public function testRequest(): void {
-        $modelLog = Factory::instance()->createModel('ModelLog');
+        $modelLog = Factory::instance()->createModel('Log');
         
         $this->assertTrue($modelLog->setRequest($this->_request));
     }
@@ -157,7 +158,8 @@ final class ModelLogTest extends TestCase {
     public function testDatabase(): void {
         $request = Factory::instance()->createRequest();
         
-        $modelLogSave = Factory::instance()->createModelLog($request);
+        $modelLogSave = Factory::instance()->createModel('Log');
+        $modelLogSave->setRequest($request);
         
         $modelLogSave->create(
             $this->_logData['level'], $this->_logData['message'], $this->_logData['description'],
@@ -170,7 +172,8 @@ final class ModelLogTest extends TestCase {
         
         $dataAfterSave = $modelLogSave->getDataAssoc();
         
-        $modelLogGet = Factory::instance()->createModelLog($request);
+        $modelLogGet = Factory::instance()->createModel('Log');
+        $modelLogGet->setRequest($request);
         $modelLogGet->loadById($idSave);
         $dataAfterGet = $modelLogGet->getDataAssoc();
         
@@ -180,7 +183,8 @@ final class ModelLogTest extends TestCase {
         $idGet = $modelLogGet->save();
         $dataAfterUpdated = $modelLogGet->getDataAssoc();
         
-        $modelLogUpdatedGet = Factory::instance()->createModelLog($request);
+        $modelLogUpdatedGet = Factory::instance()->createModel('Log');
+        $modelLogUpdatedGet->setRequest($request);
         $modelLogUpdatedGet->loadById($idGet);
         
         $dataAfterUpdatedGet = $modelLogUpdatedGet->getDataAssoc();

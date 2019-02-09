@@ -6,7 +6,7 @@ namespace classroom;
 
 include_once('ControllerAdminBase.php');
 
-class ControllerVocabulary extends ControllerAdminBase {
+class ControllerAdminVocabulary extends ControllerAdminBase {
     
     protected function actionIndex() {
         $content = 'Admin render content index page.';
@@ -28,8 +28,8 @@ class ControllerVocabulary extends ControllerAdminBase {
         $currentPage = array_key_exists('page', $get) ? $get['page'] : '1';
         $itemsPerPage = 10;
         
-        $modelWord = Factory::instance()->createModelWord();
-        $wordsList = $modelWord->getList(
+        $modelWord = Factory::instance()->createModel('Word');
+        $wordsList = $modelWord->getModelsList(
             array('image' => '0'),
             $itemsPerPage,
             ((int) $currentPage - 1) * (int) $itemsPerPage

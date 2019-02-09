@@ -30,13 +30,19 @@ class ApplicationCommon extends ApplicationBase {
     }
     
     public function setRoutes($router): void {
-        $router->setRule('/admin', 'Admin/ControllerAdmin', 'index');
+        $router->setRule('/admin', 'Admin/ControllerAdminIndex', 'index');
         
-        $router->setRule('/admin/vocabulary/images/fill', 'Admin/ControllerVocabulary', 'imagesAdd');
+        $router->setRule('/admin/vocabulary/images/fill', 'Admin/ControllerAdminVocabulary', 'imagesAdd');
         
-        $router->setRule('/admin/vocabulary/images/fill/<page>', 'Admin/ControllerVocabulary', 'imagesAdd');
+        $router->setRule('/admin/vocabulary/images/fill/<page>', 'Admin/ControllerAdminVocabulary', 'imagesAdd');
         
-        $router->setDefaultRule('Client/ControllerClient', 'index');
+        $router->setRule('/login', 'Guest/ControllerGuestLogin', 'index');
+        
+        $router->setRule('/teacher/lesson[/<action>][/<id>]', 'Teacher/ControllerTeacherManageLesson', 'index');
+        
+        $router->setRule('/teacher/student[/<action>][/<id>]', 'Teacher/ControllerTeacherManageLesson', 'index');
+        
+        $router->setDefaultRule('Guest/ControllerGuestIndex', 'index');
         
     }
     

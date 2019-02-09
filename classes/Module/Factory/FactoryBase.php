@@ -81,11 +81,12 @@ abstract class FactoryBase extends Factory {
     /**
      * Loads model. Includes it's file, bun doesn't create an object.
      * 
-     * @param string $name Model's name.
+     * @param string $modelName Model's name.
      * @return bool Is model was succsessfully loaded.
      */
-    public function loadModel(string $name): bool {
-        $result = Core::loadClass($name, 'Model');
+    public function loadModel(string $modelName): bool {
+        $modelClassName = 'Model' . $modelName;
+        $result = Core::loadClass($modelClassName, 'Model');
         
         return $result;
     }
@@ -133,7 +134,7 @@ abstract class FactoryBase extends Factory {
     /**
      * Creates module object.
      */
-    public function createModule(string $moduleName, string $moduleBaseName = null): object {
+    public function createModule(string $moduleName, string $moduleBaseName = null): ?object {
         $result = null;
         
         $loaded = $this->loadModule($moduleName, $moduleBaseName);
@@ -148,7 +149,7 @@ abstract class FactoryBase extends Factory {
     /**
      * Creates module object. Module name is calculated from $_moduleNamePostfix property.
      */
-    public function createTypedModule(string $moduleBaseName): object {
+    public function createTypedModule(string $moduleBaseName): ?object {
         $result = null;
         
         if ($moduleBaseName) {
@@ -162,22 +163,29 @@ abstract class FactoryBase extends Factory {
     /**
      * Creates model object.
      */
-    public function createModel(string $modelName): Model {
-        $result = null;
+    public function createModel(string $modelName): ?Model {
+        $model = null;
         
         $loaded = $this->loadModel($modelName);
+        $modelClassName = 'Model' . $modelName;
         if ($loaded) {
-            $className = Core::getNamespace() . $modelName;
-            $result = new $className();
+            $className = Core::getNamespace() . $modelClassName;
+            $model = new $className();
+            
+            if ($model instanceof ModelDatabase) {
+                if ($this->getDatabase()) {
+                    $model->setDatabase($this->getDatabase());
+                }
+            }
         }
         
-        return $result;
+        return $model;
     }
     
     /**
      * Creates controller object.
      */
-    public function createController(string $nameAndPath, Request $request, Response $response): Controller {
+    public function createController(string $nameAndPath, Request $request, Response $response): ?Controller {
         $result = null;
         
         $separatorPosition = strrpos($nameAndPath, '/');
@@ -201,78 +209,31 @@ abstract class FactoryBase extends Factory {
     }
     
     /**
-     * Creates request model object.
-     */
-    public function createModelRequest(): ModelRequest {
-        $modelName = 'ModelRequest';
-        $model = $this->createModel($modelName);
-        if ($this->getDatabase()) {
-            $model->setDatabase($this->getDatabase());
-        }
-        return $model;
-    }
-    
-    /**
-     * Creates log model object.
-     */
-    public function createModelLog(Request $request): ModelLog {
-        $modelName = 'ModelLog';
-        $model = $this->createModel($modelName);
-        $model->setRequest($request);
-        if ($this->getDatabase()) {
-            $model->setDatabase($this->getDatabase());
-        }
-        return $model;
-    }
-    
-    /**
-     * Creates user model object.
-     */
-    public function createModelUser(): ModelUser {
-        $modelName = 'ModelUser';
-        $model = $this->createModel($modelName);
-        if ($this->getDatabase()) {
-            $model->setDatabase($this->getDatabase());
-        }
-        return $model;
-    }
-    
-    /**
-     * Creates lesson model object.
-     */
-    public function createModelLesson(): ModelLesson {
-        $modelName = 'ModelLesson';
-        $model = $this->createModel($modelName);
-        if ($this->getDatabase()) {
-            $model->setDatabase($this->getDatabase());
-        }
-        return $model;
-    }
-    
-    /**
-     * Creates word model object.
-     */
-    public function createModelWord(): ModelWord {
-        $modelName = 'ModelWord';
-        $model = $this->createModel($modelName);
-        if ($this->getDatabase()) {
-            $model->setDatabase($this->getDatabase());
-        }
-        return $model;
-    }
-    
-    /**
      * Creates application module object.
      */
     public function createApplication(): Application {
         $moduleBaseName = 'Application';
         if (! $this->isTestMode()) {
             $moduleName = $moduleBaseName . 'Common';
-            $object = $this->createModule($moduleName, $moduleBaseName);
         } else {
             $moduleName = $moduleBaseName . 'Test';
-            $object = $this->createModule($moduleName, $moduleBaseName);
         }
+        $object = $this->createModule($moduleName, $moduleBaseName);
+        return $object;
+    }
+    
+    /**
+     * Creates auth module object.
+     */
+    public function createAuth(Request $request): Auth {
+        $moduleBaseName = 'Auth';
+        if (! $this->isTestMode()) {
+            $moduleName = $moduleBaseName . 'Common';
+        } else {
+            $moduleName = $moduleBaseName . 'Test';
+        }
+        $object = $this->createModule($moduleName, $moduleBaseName);
+        $object->setRequest($request);
         return $object;
     }
     
@@ -352,11 +313,10 @@ abstract class FactoryBase extends Factory {
         $moduleBaseName = 'Router';
         if (! $this->isTestMode()) {
             $moduleName = $moduleBaseName . 'Common';
-            $object = $this->createModule($moduleName, $moduleBaseName);
         } else {
             $moduleName = $moduleBaseName . 'Test';
-            $object = $this->createModule($moduleName, $moduleBaseName);
         }
+        $object = $this->createModule($moduleName, $moduleBaseName);
         $object->init($request, $response);
         return $object;
     }

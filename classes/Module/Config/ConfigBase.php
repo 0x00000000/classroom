@@ -31,10 +31,14 @@ class ConfigBase extends Config {
             array_key_exists($section, $this->_data)
             && is_array($this->_data[$section])
         ) {
-            if ($name && array_key_exists($name, $this->_data[$section])) {
-                $result = $this->_data[$section][$name];
-            } else {
+            if (is_null($name)) {
                 $result = $this->_data[$section];
+            } else {
+                if (array_key_exists($name, $this->_data[$section])) {
+                    $result = $this->_data[$section][$name];
+                } else {
+                    $result = null;
+                }
             }
         }
         

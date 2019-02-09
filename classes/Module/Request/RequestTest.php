@@ -29,12 +29,13 @@ class RequestTest extends RequestBase {
     public const TEST_HEADERS = array('headersParam' => 'test headers');
     public const TEST_IP = '127.0.0.1';
     public const TEST_USER_AGENT = 'Test UA';
+    public const TEST_BASE_URL = 'http://example.com';
     
     /**
      * Creates test reqeust.
      */
     protected function create() {
-        $this->_currentRequest = Factory::instance()->createModelRequest();
+        $this->_currentRequest = Factory::instance()->createModel('Request');
         
         $this->_currentRequest->url = self::TEST_URL;
         $this->_currentRequest->get = self::TEST_GET;
@@ -45,6 +46,15 @@ class RequestTest extends RequestBase {
         $this->_currentRequest->userAgent = self::TEST_USER_AGENT;
         
         $this->_currentRequest->save();
+    }
+    
+    /**
+     * Gets site's base url.
+     */
+    public function getBaseUrl(): string {
+        $url = self::TEST_BASE_URL;
+        
+        return $url;
     }
     
 }

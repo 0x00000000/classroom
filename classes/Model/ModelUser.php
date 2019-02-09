@@ -15,6 +15,8 @@ include_once('ModelDatabase.php');
  * @property bool $isAdmin Is user admin.
  * @property bool $isTeacher Is user teacher.
  * @property bool $isStudent Is user student.
+ * @property bool $disabled Is user disabled.
+ * @property bool $deleted Is user deleted.
  * 
  * Property only to set:
  * @property string|null $password User's password (writeonly).
@@ -29,9 +31,11 @@ class ModelUser extends ModelDatabase {
     protected $_login = null;
     protected $_password = null;
     protected $_name = null;
-    protected $_isAdmin = false;
-    protected $_isTeacher = false;
-    protected $_isStudent = false;
+    protected $_isAdmin = '0';
+    protected $_isTeacher = '0';
+    protected $_isStudent = '0';
+    protected $_disabled = '0';
+    protected $_deleted = '0';
     
     /**
      * @var string $_table Name of database table.
@@ -43,25 +47,51 @@ class ModelUser extends ModelDatabase {
      */
     public function __construct() {
         parent::__construct();
+        
+        $this->addBoolProperty('_isAdmin');
+        $this->addBoolProperty('_isTeacher');
+        $this->addBoolProperty('_isStudent');
+        $this->addBoolProperty('_disabled');
+        $this->addBoolProperty('_deleted');
     }
     
     /**
-     * Check user's password.
+     * Loads user from database by login if it is possible.
      */
-    public function loadByLogin(string $login): bool {
-        return $this->loadByKey('login', $login);
-    }
-    
-    /**
-     * Load user from database by login if it is possible.
-     */
-    public function check(string $password): bool {
+    public function loadByLogin(string $login, string $password): bool {
         $result = false;
         
-        if ($this->login && $password) {
-            if ($this->_password === $password) {
-                $result = true;
-            }
+        $dbData = $this->getDataRecord(
+            array(
+                'login' => $login,
+                'password' => $this->encodePassword($password),
+                'disabled' => '0',
+                'deleted' => '0'
+            )
+        );
+        if ($dbData && count($dbData)) {
+            $result = $this->setDataFromDB($dbData);
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Checks existing user with login and password.
+     */
+    public function check(string $login, string $password): bool {
+        $result = false;
+        
+        $dbData = $this->getDataRecord(
+            array(
+                'login' => $login,
+                'password' => $this->encodePassword($password),
+                'disabled' => '0',
+                'deleted' => '0'
+            )
+        );
+        if ($dbData && count($dbData)) {
+            $result = true;
         }
         
         return $result;
@@ -72,6 +102,22 @@ class ModelUser extends ModelDatabase {
      */
     public function getPassword() {
         return null;
+    }
+    
+    /**
+     * Sets hash instead of password.
+     */
+    public function setPassword($password) {
+        $this->_password = $this->encodePassword($password);
+    }
+    
+    /**
+     * Encodes password.
+     */
+    protected function encodePassword($password) {
+        $salt1 = Config::instance()->get('user', 'salt1');;
+        $salt2 = Config::instance()->get('user', 'salt2');;
+        return hash('sha512', $salt1 . $password . $salt2);
     }
     
 }

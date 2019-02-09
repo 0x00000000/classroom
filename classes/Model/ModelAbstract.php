@@ -15,11 +15,6 @@ abstract class ModelAbstract {
     abstract public function loadById(string $id): bool;
     
     /**
-     * Loads object's data by key.
-     */
-    abstract public function loadByKey(string $key, string $value): bool;
-    
-    /**
      * Saves object's data.
      */
     abstract public function save(): ?string;

@@ -55,8 +55,15 @@ class ModelLesson extends ModelDatabase {
     /**
      * Load site from database by site url if it is possible.
      */
-    public function loadByUrl(string $name): bool {
-        return $this->loadByKey('url', $name);
+    public function loadByUrl(string $url): bool {
+        $result = false;
+        
+        $dbData = $this->getDataRecord(array('url' => $url));
+        if ($dbData && count($dbData)) {
+            $result = $this->setDataFromDB($dbData);
+        }
+        
+        return $result;
     }
     
     protected function setUrl(?string $value): void {

@@ -6,7 +6,7 @@ namespace classroom;
 
 include_once('ControllerAdminBase.php');
 
-class ControllerAdmin extends ControllerAdminBase {
+class ControllerAdminIndex extends ControllerAdminBase {
     
     protected function actionIndex() {
         $content = 'Admin index page.';

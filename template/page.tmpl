@@ -4,15 +4,27 @@
 </head>
 <body>
 
-<div class="minMenu">
-{foreach $minMenuItems as $item}
-<span><a href="{$item['link']}">{$item['title']}</a></span>
-{/foreach}
-</div>
+    <div class="user">
+        {if $user}
+        Здравствуйте, {$user->name}.
+        <form action="{$baseUrl}/login" method="POST">
+            <input name="logout" value="1" type="hidden" />
+            <p><input type="submit" value="Выйти" /></p>
+        </form>
+        {else}
+        <a href="{$baseUrl}/login">Войти</a>
+        {/if}
+    </div>
 
-<div class="content">
-{$content}
-</div>
+    <div class="minMenu">
+        {foreach $minMenuItems as $item}
+            <span><a href="{$item['link']}">{$item['title']}</a></span>
+        {/foreach}
+    </div>
+
+    <div class="content">
+        {$content}
+    </div>
 
 </body>
 </html>

@@ -22,7 +22,7 @@ abstract class ControllerAbstract {
     /**
      * Redirects UA to url and stops script execution.
      */
-    abstract protected function redirect(string $url): void;
+    abstract protected function redirect(string $url = null): void;
     
     /**
      * Sends 404 response to UA.
@@ -48,5 +48,35 @@ abstract class ControllerAbstract {
      * Gets response.
      */
     abstract protected function getResponse(): ?Response;
+    
+    /**
+     * Sets data for key. Can be gotten later.
+     */
+    abstract protected function setStashData(string $key, $data): bool;
+    
+    /**
+     * Gets data for key and removes it from stash.
+     */
+    abstract protected function popStashData(string $key);
+    
+    /**
+     * Gets $_POST variable by key.
+     */
+    abstract protected function getPost(string $key);
+    
+    /**
+     * Gets $_GET variable by key.
+     */
+    abstract protected function getGet(string $key);
+    
+    /**
+     * Gets page url.
+     */
+    abstract protected function getUrl(): string;
+    
+    /**
+     * Gets site base url.
+     */
+    abstract protected function getBaseUrl(): string;
     
 }

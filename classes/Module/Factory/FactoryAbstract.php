@@ -69,52 +69,32 @@ abstract class FactoryAbstract {
     /**
      * Creates module object.
      */
-    abstract public function createModule(string $moduleName, string $moduleBaseName = null): object;
+    abstract public function createModule(string $moduleName, string $moduleBaseName = null): ?object;
     
     /**
      * Creates module object. Module name is calculated from $_moduleNamePostfix property.
      */
-    abstract public function createTypedModule(string $moduleBaseName): object;
+    abstract public function createTypedModule(string $moduleBaseName): ?object;
     
     /**
      * Creates model object.
      */
-    abstract public function createModel(string $modelName): Model;
+    abstract public function createModel(string $modelName): ?Model;
     
     /**
      * Creates controller object.
      */
-    abstract public function createController(string $nameAndPath, Request $request, Response $response): Controller;
-    
-    /**
-     * Creates request model object.
-     */
-    abstract public function createModelRequest(): ModelRequest;
-    
-    /**
-     * Creates log model object.
-     */
-    abstract public function createModelLog(Request $request): ModelLog;
-    
-    /**
-     * Creates user model object.
-     */
-    abstract public function createModelUser(): ModelUser;
-    
-    /**
-     * Creates lesson model object.
-     */
-    abstract public function createModelLesson(): ModelLesson;
-    
-    /**
-     * Creates word model object.
-     */
-    abstract public function createModelWord(): ModelWord;
+    abstract public function createController(string $nameAndPath, Request $request, Response $response): ?Controller;
     
     /**
      * Creates application module object.
      */
     abstract public function createApplication(): Application;
+    
+    /**
+     * Creates auth module object.
+     */
+    abstract public function createAuth(Request $request): Auth;
     
     /**
      * Creates config module object.

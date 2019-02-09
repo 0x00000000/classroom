@@ -6,6 +6,6 @@ namespace classroom;
 
 Factory::instance()->loadController('ControllerBase');
 
-abstract class ControllerClientBase extends ControllerBase {
+abstract class ControllerGuestBase extends ControllerBase {
     
 }

@@ -6,10 +6,10 @@ namespace classroom;
 
 Factory::instance()->loadController('ControllerBase');
 
-class ControllerTest extends ControllerBase {
+class ControllerTestIndex extends ControllerBase {
     
     protected function actionFillImages() {
-        $body = '@@@';
+        $body = 'Test contorller.';
         
         return $body;
     }

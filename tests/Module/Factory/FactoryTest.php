@@ -41,16 +41,16 @@ final class FactoryTest extends TestCase {
     }
     
     public function testLoadController(): void {
-        $this->assertTrue(Factory::instance()->loadController('ControllerClient', 'Client'));
-        $this->assertTrue(Factory::instance()->loadController('ControllerTest', 'Test'));
+        $this->assertTrue(Factory::instance()->loadController('ControllerGuestIndex', 'Guest'));
+        $this->assertTrue(Factory::instance()->loadController('ControllerTestIndex', 'Test'));
     }
     
     public function testLoadModel(): void {
-        $this->assertTrue(Factory::instance()->loadModel('ModelLesson'));
-        $this->assertTrue(Factory::instance()->loadModel('ModelLog'));
-        $this->assertTrue(Factory::instance()->loadModel('ModelRequest'));
-        $this->assertTrue(Factory::instance()->loadModel('ModelUser'));
-        $this->assertTrue(Factory::instance()->loadModel('ModelWord'));
+        $this->assertTrue(Factory::instance()->loadModel('Lesson'));
+        $this->assertTrue(Factory::instance()->loadModel('Log'));
+        $this->assertTrue(Factory::instance()->loadModel('Request'));
+        $this->assertTrue(Factory::instance()->loadModel('User'));
+        $this->assertTrue(Factory::instance()->loadModel('Word'));
     }
     
     public function testLoadModule(): void {
@@ -76,27 +76,33 @@ final class FactoryTest extends TestCase {
     }
     
     public function testCreateModel(): void {
-        $request = Factory::instance()->createModel('ModelRequest');
+        $request = Factory::instance()->createModel('Request');
         $this->assertTrue($request instanceof Model);
         
-        $log = Factory::instance()->createModel('ModelLog');
+        $log = Factory::instance()->createModel('Log');
         $this->assertTrue($log instanceof Model);
         
-        $request = Factory::instance()->createModelRequest();
+        $request = Factory::instance()->createModel('Request');
         $this->assertTrue($request instanceof Model);
         
-        $log = Factory::instance()->createModelLog($this->_request);
+        $log = Factory::instance()->createModel('Log');
+        $log->setRequest($this->_request);
         $this->assertTrue($log instanceof Model);
         
     }
     
     public function testCreateController(): void {
-        $controllerClient = Factory::instance()->createController('Client/ControllerClient', $this->_request, $this->_response);
-        $this->assertTrue($controllerClient instanceof Controller);
-        $controllerClientClient = Factory::instance()->createController('Test/ControllerTest', $this->_request, $this->_response);
-        $this->assertTrue($controllerClientClient instanceof Controller);
+        $controllerGuest = Factory::instance()->createController('Guest/ControllerGuestIndex', $this->_request, $this->_response);
+        $this->assertTrue($controllerGuest instanceof Controller);
+        $controllerTest = Factory::instance()->createController('Test/ControllerTestIndex', $this->_request, $this->_response);
+        $this->assertTrue($controllerTest instanceof Controller);
     }
         
+    public function testCreateAuth(): void {
+        $auth = Factory::instance()->createAuth($this->_request);
+        $this->assertTrue($auth instanceof Auth);
+    }
+    
     public function testCreateConfig(): void {
         $config = Factory::instance()->createConfig();
         $this->assertTrue($config instanceof Config);

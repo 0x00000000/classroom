@@ -83,9 +83,10 @@ abstract class ResponseBase extends Response {
             $body = $this->_default404Body;
         }
         
-        $this->getResponse()->setHeader('HTTP/1.0 404 Not Found');
-        $this->getResponse()->setBody($body);
-        $this->getResponse()->send();
+        $this->setHeader('HTTP/1.0 404 Not Found');
+        $this->setBody($body);
+        $this->send();
+        exit;
     }
     
 }

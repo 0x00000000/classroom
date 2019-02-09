@@ -17,6 +17,8 @@ class ConfigCommon extends ConfigBase {
     protected $_data = array(
         'application' => array(
             'session_name' => 'sid',
+            // Must be set if application is not in site's root.
+            // 'baseUrl' => 'http://example.com',
         ),
         'database' => array(
             'server' => 'localhost',
@@ -24,6 +26,10 @@ class ConfigCommon extends ConfigBase {
             'password' => '',
             'name' => 'classroom',
             'prefix' => 'classroom_',
+        ),
+        'user' => array(
+            'salt1' => 'DKfoA.d,XO',
+            'salt2' => 'cqPdMs!oee',
         ),
     );
     

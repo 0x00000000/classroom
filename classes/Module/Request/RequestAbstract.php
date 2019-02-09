@@ -22,4 +22,19 @@ abstract class RequestAbstract {
      */
     abstract public function getCurrentRequest(): ModelRequest;
     
+    /**
+     * Sets variable to session by key.
+     */
+    abstract public function setSessionVariable(string $key, $value): bool;
+    
+    /**
+     * Unsets variable from session by key.
+     */
+    abstract public function unsetSessionVariable(string $key): bool;
+    
+    /**
+     * Gets site's base url.
+     */
+    abstract public function getBaseUrl(): string;
+    
 }

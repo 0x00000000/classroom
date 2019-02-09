@@ -31,34 +31,12 @@ class DatabaseTest extends Database {
     /**
      * Gets data by id.
      */
-    public function getById(string $table, string $id): ?array {
+    public function getById(string $table, string $pk, string $primaryKey = 'id'): ?array {
         $result = null;
         
         if (array_key_exists($table, $this->_data)) {
-            if (array_key_exists($id, $this->_data[$table])) {
-                $result = $this->_data[$table][$id];
-            }
-        }
-        
-        return $result;
-    }
-    
-    /**
-     * Gets data by key.
-     */
-    public function getByKey(string $table, string $key, string $value): ?array {
-        $result = null;
-        
-        if ($key === 'id') {
-            $result = $this->getById($table, $value);
-        } else {
-            if (array_key_exists($table, $this->_data)) {
-                foreach ($this->_data[$table] as $id => $record) {
-                    if (array_key_exists($key, $record) && $record[$key] === $value) {
-                        $result = $record;
-                        break;
-                    }
-                }
+            if (array_key_exists($pk, $this->_data[$table])) {
+                $result = $this->_data[$table][$pk];
             }
         }
         
@@ -71,12 +49,12 @@ class DatabaseTest extends Database {
     public function getList(
         string $table, array $conditionsList,
         ?int $limit, ?int $offset
-    ): ?array {
-        $result = null;
+    ): array {
+        $result = array();
         
         if (array_key_exists($table, $this->_data)) {
             $counter = 0;
-            foreach ($this->_data[$table] as $id => $record) {
+            foreach ($this->_data[$table] as $pk => $record) {
                 $fit = true;
                 foreach ($conditionsList as $key => $value) {
                     if (! array_key_exists($key, $record) || $record[$key] !== $value) {
@@ -102,7 +80,7 @@ class DatabaseTest extends Database {
         $count = 0;
         
         if (array_key_exists($table, $this->_data)) {
-            foreach ($this->_data[$table] as $id => $record) {
+            foreach ($this->_data[$table] as $pk => $record) {
                 $fit = true;
                 foreach ($conditionsList as $key => $value) {
                     if (! array_key_exists($key, $record) || $record[$key] !== $value) {
@@ -166,12 +144,37 @@ class DatabaseTest extends Database {
     }
     
     /**
+     * Deletes the record in the database.
+     */
+    public function deleteRecord(string $table, string $pk, string $primaryKey = 'id'): ?string {
+        $result = false;
+        
+        if (array_key_exists($table, $this->_data)) {
+            if (array_key_exists($pk, $this->_data['$table'])) {
+                unset($this->_data['$table'][$pk]);
+                $result = true;
+            }
+        }
+        
+        return $result;
+    }
+    
+    /**
      * Gets last error information.
      */
     public function getLastError(): ?array {
         $error = null;
         
         return $error;
+    }
+    
+    /**
+     * Escapes string for safe using in sql statements.
+     */
+    protected function escape(string $value): string {
+        $result = $value;
+        
+        return $result;
     }
     
 }

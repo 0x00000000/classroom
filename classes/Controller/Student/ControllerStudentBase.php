@@ -6,13 +6,13 @@ namespace classroom;
 
 Factory::instance()->loadController('ControllerBase');
 
-abstract class ControllerAdminBase extends ControllerBase {
+abstract class ControllerStudentBase extends ControllerBase {
     
     /**
      * Executes before controller action.
      */
     protected function before(): void {
-        if (! $this->getAuth()->isAdmin()) {
+        if (! $this->getAuth()->isStudent()) {
             $this->redirect($this->getAuthUrl());
         }
     }

@@ -136,11 +136,49 @@ abstract class RouterBase extends Router {
         
         $rule = $ruleData['rule'];
         
+        $result = $this->checkRuleOptional($rule, $getData);
+        
+        return $result;
+    }
+    
+    /**
+     * Checks if rule fits to request. Checks optional pieces.
+     */
+    public function checkRuleOptional(string $rule, array &$getData): bool {
+        $result = false;
+        
+        $ruleCut = $rule;
+        
+        $ruleReplaced = str_replace(array('[', ']'), '', $ruleCut);
+        $result = $this->checkRuleParameterized($ruleReplaced, $getData);
+        
+        $pattern = '|^(.*)(\[[^]]+\])(.*)$|';
+        while (
+            ! $result
+            && preg_match($pattern, $ruleCut)
+        ) {
+            $ruleCut = preg_replace($pattern, '$1$3', $ruleCut);
+            $ruleReplaced = str_replace(array('[', ']'), '', $ruleCut);
+            $result = $this->checkRuleParameterized($ruleReplaced, $getData);
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Checks if rule fits to request.
+     * 
+     * $rule should not contain "[" or "]".
+     */
+    public function checkRuleParameterized(string $rule, array &$getData): bool {
+        $result = false;
+        
         $url = $this->getRequest()->url;
-        if (preg_match('|[^<]*<([\w_]+)>[^<]*|', $rule)) {
+        $pattern = '|[^<]*<([\w_]+)>[^<]*|';
+        if (preg_match($pattern, $rule)) {
             $namesList = array();
             $pregRule = $rule;
-            while (preg_match('|[^<]*<([\w_]+)>[^<]*|', $pregRule, $matchesName)) {
+            while (preg_match($pattern, $pregRule, $matchesName)) {
                 $replaced = false;
                 if (isset($matchesName[1]) && $matchesName[1]) {
                     $name = $matchesName[1];
@@ -151,7 +189,7 @@ abstract class RouterBase extends Router {
                     break;
                 }
             }
-            // $pregRule = preg_replace('|<[\w_]+>|', '([\w_-]+)', $rule);
+            
             if (preg_match('|^'.$pregRule.'$|', $url, $matchesValues)) {
                 $result = true;
                 

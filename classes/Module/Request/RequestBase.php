@@ -86,7 +86,7 @@ abstract class RequestBase extends Request {
      * Creates current reqeust. 
      */
     protected function create() {
-        $this->_currentRequest = Factory::instance()->createModelRequest();
+        $this->_currentRequest = Factory::instance()->createModel('Request');
         
         if (array_key_exists('REQUEST_URI', $_SERVER)) {
             $this->_currentRequest->url = $_SERVER['REQUEST_URI'];
@@ -107,6 +107,59 @@ abstract class RequestBase extends Request {
         }
         
         $this->_currentRequest->save();
+    }
+    
+    /**
+     * Sets variable to session by key.
+     */
+    public function setSessionVariable(string $key, $value): bool {
+        $result = false;
+        
+        if ($key) {
+            $_SESSION[$key] = $value;
+            $this->_currentRequest->session = $_SESSION;
+            $result = true;
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Unsets variable from session by key.
+     */
+    public function unsetSessionVariable(string $key): bool {
+        $result = false;
+        
+        if ($key) {
+            unset($_SESSION[$key]);
+            $this->_currentRequest->session = $_SESSION;
+            $result = true;
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Gets page's full url.
+     * f. e. http://example.com
+     */
+    public function getUrl(): string {
+        $url = $this->getBaseUrl() . $this->getCurrentRequest()->url;
+        
+        return $url;
+    }
+    
+    /**
+     * Gets site's base url.
+     */
+    public function getBaseUrl(): string {
+        if (Config::instance()->get('application', 'baseUrl')) {
+            $url = Config::instance()->get('application', 'baseUrl');
+        } else {
+            $url = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'];
+        }
+        
+        return $url;
     }
     
 }

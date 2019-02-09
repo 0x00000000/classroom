@@ -1,0 +1,9 @@
+<h1>Войдите на сайт</h1>
+{if $messageType === 'loginFailed'}
+<p>Неверный логин или пароль.</p>
+{/if}
+<form action="{$url}" method="POST">
+<p>Логин: <input name="login" maxlength="255" /></p>
+<p>Пароль: <input name="password" maxlength="255" type="password" /></p>
+<p><input type="submit" value="Войти" /></p>
+</form>
