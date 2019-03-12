@@ -33,11 +33,12 @@ function waitForActiveLesson(requestUrl, redirectUrl) {
 function initWhiteBoard() {
     
     function setWhiteBoardHeight() {
-        if ($('.activeLessonContent').length) {
-            var box = $('.activeLessonContent').get(0).getBoundingClientRect();
+        var el = $('.whiteBoard');
+        if (el.length) {
+            var box = el.get(0).getBoundingClientRect();
             var fromTop = box.top + pageYOffset;
             var height = Math.floor(document.documentElement.clientHeight - fromTop);
-            $('.activeLessonContent').height(height + 'px');
+            el.height(height + 'px');
         }
     }
     $(document).ready(function() {

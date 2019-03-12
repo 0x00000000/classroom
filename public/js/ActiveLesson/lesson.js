@@ -1,70 +1,53 @@
 function ActiveLesson(isTeacher, params) {
 
+var whiteBoard;
+var application;
+
+$(document).ready(function() {
+    if (! params)
+        return;
+    
+    if (typeof params['requestUrl'] === 'undefined')
+        return;
+    
+    whiteBoard = $('.whiteBoard').get(0);
+    
+    if (! whiteBoard)
+        return;
+    
+    application = new Application(isTeacher, params['requestUrl']);
+    application.start();
+});
+
 function Command(data) {
-    this.data = data;
-    this.type = 'Command';
+    this._data = data;
+    this._type = 'Command';
+    this._isSingle = true;
 }
 
 Command.prototype.execute = function() {
-    console.log('Base command execute data', this.data);
+    console.log('Base command execute data', this.getData());
 }
 
 Command.prototype.getData = function() {
-    return this.data;
+    return this._data;
 }
 
 Command.prototype.getType = function() {
-    return this.type;
+    return this._type;
 }
 
 Command.prototype.serialize = function() {
     var data = {
-        type: this.type,
-        data: this.data
+        type: this._type,
+        data: this._data
     };
     
     return JSON.stringify(data);
 }
 
-function ScrollCommand(data) {
-    Command.apply(this, arguments);
-    this.type = 'ScrollCommand';
-}
-
-ScrollCommand.prototype = Object.create(Command.prototype);
-ScrollCommand.prototype.constructor = ScrollCommand;
-
-ScrollCommand.prototype.execute = function() {
-    console.log('Scroll command execute data', this.data);
-    if (this.data != null) {
-        window.scrollTo({
-            top: this.data,
-            left: 0,
-            behavior: 'smooth',
-        });
-    }
-}
-
-function ClickCommand(data) {
-    Command.apply(this, arguments);
-    this.type = 'ClickCommand';
-    this.pointerClassName = 'pointer';
-}
-
-ClickCommand.prototype = Object.create(Command.prototype);
-ClickCommand.prototype.constructor = ClickCommand;
-
-ClickCommand.prototype.execute = function() {
-    console.log('Click command execute data', this.data);
-    if (this.data && typeof this.data.x !== 'undefined'  && typeof this.data.y !== 'undefined') {
-        var pointer = document.createElement('div');
-        pointer.className = this.pointerClassName;
-        pointer.style.left = this.data.x + 'px';
-        pointer.style.top = this.data.y + 'px';
-        document.body.appendChild(pointer);
-        setTimeout(function(){pointer.parentNode.removeChild(pointer);}, 5000);
-        document.documentElement.scrollTop = this.data;
-    }
+Command.prototype.isSingle = function() {
+    return this._isSingle;
 }
 
 function CommandFactory() {
@@ -100,20 +83,66 @@ CommandFactory.create = function(serialized) {
     }
 }
 
+function ScrollCommand(data) {
+    Command.apply(this, arguments);
+    this._type = 'ScrollCommand';
+}
+
+ScrollCommand.prototype = Object.create(Command.prototype);
+ScrollCommand.prototype.constructor = ScrollCommand;
+
+ScrollCommand.prototype.execute = function() {
+    console.log('Scroll command execute data', this.getData());
+    if (this.getData() != null) {
+        whiteBoard.scrollTo({
+            top: this.getData(),
+            left: 0,
+            behavior: 'instant',
+        });
+    }
+}
+
+function ClickCommand(data) {
+    Command.apply(this, arguments);
+    this._type = 'ClickCommand';
+    this._pointerClassName = 'pointer';
+    this._isSingle = false;
+}
+
+ClickCommand.prototype = Object.create(Command.prototype);
+ClickCommand.prototype.constructor = ClickCommand;
+
+ClickCommand.prototype.execute = function() {
+    console.log('Click command execute data', this.getData());
+    if (this.getData() && typeof this.getData().x !== 'undefined'  && typeof this.getData().y !== 'undefined') {
+        var pointer = document.createElement('div');
+        pointer.className = this._pointerClassName;
+        pointer.style.left = this.getData().x + 'px';
+        pointer.style.top = this.getData().y + 'px';
+        whiteBoard.appendChild(pointer);
+        setTimeout(function() {
+            $(pointer).hide('slow', function() {
+                pointer.parentNode.removeChild(pointer);
+            });
+            
+        }, 5000);
+    }
+}
+
 function Controller(params) {
     if (typeof params === 'undefined') {
         params = {};
     }
     
-    this.innerCommands = [];
-    this.outerCommands = [];
+    this.innerCommands = {}; // For inner use.
+    this.outerCommands = {}; // This commands will be executed.
     this.params = params;
 }
 
-Controller.prototype.getCommand = function(type) {
+Controller.prototype.popCommands = function(type) {
     var result = null;
     
-    if (typeof this.innerCommands[type] !== 'undefined') {
+    if (this.innerCommands[type] instanceof Array) {
         result = this.innerCommands[type]; 
         delete this.innerCommands[type];
     }
@@ -121,19 +150,55 @@ Controller.prototype.getCommand = function(type) {
     return result;
 }
 
-Controller.prototype.setCommand = function(type, command) {
-    if (type) {
-        this.outerCommands[type] = command;
+Controller.prototype.addCommands = function(type, commands) {
+    if (type && commands instanceof Array && commands.length) {
+        for (var i = 0; i < commands.length; i++) {
+            if (commands[i].getType() !== type)
+                continue;
+            this.addOuterCommand(commands[i]);
+        }
+    }
+}
+
+Controller.prototype.addInnerCommand = function(command) {
+    if (! (command instanceof Command))
+        return;
+    
+    var type = command.getType();
+    if (command.isSingle()) {
+        this.innerCommands[type] = [command];
+    } else {
+        if (! (this.innerCommands[type] instanceof Array)) {
+            this.innerCommands[type] = [];
+        }
+        this.innerCommands[type].push(command);
+    }
+}
+
+Controller.prototype.addOuterCommand = function(command) {
+    if (! (command instanceof Command))
+        return;
+    
+    var type = command.getType();
+    if (command.isSingle()) {
+        this.outerCommands[type] = [command];
+    } else {
+        if (! (this.outerCommands[type] instanceof Array)) {
+            this.outerCommands[type] = [];
+        }
+        this.outerCommands[type].push(command);
     }
 }
 
 Controller.prototype.executeCommands = function() {
     for (var type in this.outerCommands) {
-        if (this.outerCommands[type] instanceof Command) {
-            this.outerCommands[type].execute();
-            delete this.outerCommands[type];
+        if (this.outerCommands[type] instanceof Array) {
+            for (var i = 0; i < this.outerCommands[type].length; i++) {
+                this.outerCommands[type][i].execute();
+            }
         }
     }
+    this.outerCommands = {};
 }
 
 Controller.prototype.setLock = function() {
@@ -142,6 +207,12 @@ Controller.prototype.setLock = function() {
 
 function UiController(params) {
     var self = this;
+    
+    if (typeof params === 'undefined') {
+        params = {};
+    }
+    
+    Controller.apply(self, arguments);
     
     function checkLock(event) {
         currentTime = (new Date()).getTime();
@@ -152,28 +223,22 @@ function UiController(params) {
         }
     }
     
-    if (typeof params === 'undefined') {
-        params = {};
-    }
+    self.unlockTime = 0;
+    self.lockWaitTime = 5000;
     
-    Controller.apply(this, arguments);
-    
-    this.unlockTime = 0;
-    this.lockTimePeriod = 5000;
-    
-    this.prevData = [];
-    this.prevData['ScrollCommand'] = this.getUiData('ScrollCommand');
+    self.prevData = {};
+    self.prevData['ScrollCommand'] = self.getUiData('ScrollCommand');
     
     $(window).on('scroll keypress keyup keydown click dbclick mousedown mouseup mousemove mousewheel wheel DOMMouseScroll MozMousePixelScroll', function(event) {
         checkLock(event);
     });
     
-    $(document).on('click', function(event) {
+    $(whiteBoard).on('click', function(event) {
         if (event && event.originalEvent) {
-            var data = {x: event.originalEvent.x, y: event.originalEvent.y};
+            var data = {x: event.originalEvent.layerX, y: event.originalEvent.layerY};
             var command = new ClickCommand(data);
             command.execute();
-            self.innerCommands['ClickCommand'] = command;
+            self.addInnerCommand(command);
         }
     });
 }
@@ -181,20 +246,20 @@ function UiController(params) {
 UiController.prototype = Object.create(Controller.prototype);
 UiController.prototype.constructor = UiController;
 
-UiController.prototype.getCommand = function(type) {
-    var command = null;
+UiController.prototype.popCommands = function(type) {
+    var commands = null;
     
     switch (type) {
         case 'ScrollCommand':
             var data = this.getUiData(type);
             if (data !== this.prevData[type]) {
-                command = new ScrollCommand(data);
+                commands = [new ScrollCommand(data)];
                 this.prevData[type] = data;
             }
             break;
         case 'ClickCommand':
-            if (typeof this.innerCommands[type] !== 'undefined') {
-                command = this.innerCommands[type];
+            if (this.innerCommands[type]) {
+                commands = this.innerCommands[type];
                 delete this.innerCommands[type];
             }
             break;
@@ -202,23 +267,11 @@ UiController.prototype.getCommand = function(type) {
             break;
     }
     
-    return command;
-}
-
-UiController.prototype.executeCommands = function() {
-    for (var type in this.outerCommands) {
-        if (this.outerCommands[type] instanceof Command) {
-            this.outerCommands[type].execute();
-            if (type === 'ScrollCommand') {
-                this.prevData[type] = this.outerCommands[type].getData();
-            }
-            delete this.outerCommands[type];
-        }
-    }
+    return commands;
 }
 
 UiController.prototype.setLock = function() {
-    this.unlockTime = new Date().getTime() + this.lockTimePeriod;
+    this.unlockTime = new Date().getTime() + this.lockWaitTime;
 }
 
 UiController.prototype.getUiData = function(type) {
@@ -226,7 +279,7 @@ UiController.prototype.getUiData = function(type) {
     
     switch (type) {
         case 'ScrollCommand':
-            result = window.pageYOffset || document.documentElement.scrollTop;
+            result = whiteBoard.scrollTop;
             break;
         default:
             break;
@@ -255,19 +308,21 @@ WebController.prototype.constructor = WebController;
 WebController.prototype.executeCommands = function() {
     var self = this;
     
-    if (! this.url) {
+    if (! self.url) {
         console.log('Url is empty.');
         return;
     }
     
-    requestData = {command: []};
-    for (var type in this.outerCommands) {
-        if (this.outerCommands[type] instanceof Command) {
-            requestData['command'].push(this.outerCommands[type].serialize());
+    requestData = {commands: {}};
+    for (var type in self.outerCommands) {
+        if (self.outerCommands[type] instanceof Array) {
+            requestData['commands'][type] = [];
+            for (var i = 0; i < self.outerCommands[type].length; i++) {
+                requestData['commands'][type].push(self.outerCommands[type][i].serialize());
+            }
         }
     }
-    
-    this.outerCommands = {};
+    self.outerCommands = {};
     
     $.ajax(
         self.url,
@@ -276,10 +331,14 @@ WebController.prototype.executeCommands = function() {
             method: 'POST',
             data: requestData,
             success: function(data) {
-                if (typeof data['command'] === 'object' && data['command'].length) {
-                    for (var i = 0; i < data['command'].length; i++) {
-                        var command = CommandFactory.create(data['command'][i]);
-                        self.innerCommands[command.getType()] = command;
+                if (data['commands'] instanceof Object) {
+                    for (var type in data['commands']) {
+                        if (data['commands'][type] instanceof Array) {
+                            for (var i = 0; i < data['commands'][type].length; i++) {
+                                var command = CommandFactory.create(data['commands'][type][i]);
+                                self.addInnerCommand(command);
+                            }
+                        }
                     }
                 }
             },
@@ -306,23 +365,23 @@ TeacherStrategy.prototype.constructor = TeacherStrategy;
 TeacherStrategy.prototype.act = function(uiController, webController) {
     var types = ['ScrollCommand'];
     for (var i = 0; i < types.length; i++) {
-        var uiCommand = uiController.getCommand(types[i]);
-        if (uiCommand) {
-            webController.setCommand(types[i], uiCommand);
+        var uiCommands = uiController.popCommands(types[i]);
+        if (uiCommands) {
+            webController.addCommands(types[i], uiCommands);
         } else {
-            var webCommand = webController.getCommand(types[i]);
-            if (webCommand) {
-                uiController.setCommand(types[i], webCommand);
+            var webCommands = webController.popCommands(types[i]);
+            if (webCommands) {
+                uiController.addCommands(types[i], webCommands);
             }
         }
     }
     
     var types = ['ClickCommand'];
     for (var i = 0; i < types.length; i++) {
-        var uiCommand = uiController.getCommand(types[i]);
-        var webCommand = webController.getCommand(types[i]);
-        uiController.setCommand(types[i], webCommand);
-        webController.setCommand(types[i], uiCommand);
+        var uiCommands = uiController.popCommands(types[i]);
+        var webCommands = webController.popCommands(types[i]);
+        uiController.addCommands(types[i], webCommands);
+        webController.addCommands(types[i], uiCommands);
     }
     
     uiController.executeCommands();
@@ -339,24 +398,24 @@ StudentStrategy.prototype.constructor = StudentStrategy;
 StudentStrategy.prototype.act = function(uiController, webController) {
     var types = ['ScrollCommand'];
     for (var i = 0; i < types.length; i++) {
-        var webCommand = webController.getCommand(types[i]);
-        if (webCommand) {
-            uiController.setCommand(types[i], webCommand);
+        var webCommands = webController.popCommands(types[i]);
+        if (webCommands) {
+            uiController.addCommands(types[i], webCommands);
             uiController.setLock();
         } else {
-            var uiCommand = uiController.getCommand(types[i]);
-            if (uiCommand) {
-                webController.setCommand(types[i], uiCommand);
+            var uiCommands = uiController.popCommands(types[i]);
+            if (uiCommands) {
+                webController.addCommands(types[i], uiCommands);
             }
         }
     }
     
     var types = ['ClickCommand'];
     for (var i = 0; i < types.length; i++) {
-        var uiCommand = uiController.getCommand(types[i]);
-        var webCommand = webController.getCommand(types[i]);
-        uiController.setCommand(types[i], webCommand);
-        webController.setCommand(types[i], uiCommand);
+        var uiCommands = uiController.popCommands(types[i]);
+        var webCommands = webController.popCommands(types[i]);
+        uiController.addCommands(types[i], webCommands);
+        webController.addCommands(types[i], uiCommands);
     }
     
     uiController.executeCommands();
@@ -396,15 +455,10 @@ Application.prototype.stop = function() {
 
 Application.prototype.act = function() {
     if (this.active) {
-        self = this;
+        var self = this;
         this.strategy.act(this.uiController, this.webController);
         setTimeout(function() {self.act()}, 1000);
     }
-}
-
-if (params && typeof params['requestUrl'] !== 'undefined') {
-    var application = new Application(isTeacher, params['requestUrl']);
-    application.start();
 }
 
 }

@@ -108,9 +108,9 @@ class ControllerTeacherActiveLesson extends ControllerTeacherBase {
         
         if ($activeLesson) {
             $changed = false;
-            if (array_key_exists('command', $this->getRequest()->post)) {
-                $command = $this->getRequest()->post['command'];
-                 // Set the new command.
+            if (array_key_exists('commands', $this->getRequest()->post)) {
+                $command = $this->getRequest()->post['commands'];
+                 // Set the new commands.
                 $time = (string) time();
                 $activeLesson->teacherCommand = $command ? json_encode($command) : '';
                 $activeLesson->teacherUpdated = $time;
@@ -122,7 +122,7 @@ class ControllerTeacherActiveLesson extends ControllerTeacherBase {
             
             if ($activeLesson->studentCommand) {
                 $studentCommand = json_decode($activeLesson->studentCommand);
-                $activeLesson->studentCommand = ''; // The command will be shown, clear it.
+                $activeLesson->studentCommand = ''; // The commands will be shown, clear it.
                 $changed = true;
             } else {
                 $studentCommand = '';
@@ -130,7 +130,7 @@ class ControllerTeacherActiveLesson extends ControllerTeacherBase {
             
             if (! $changed || $activeLesson->save()) {
                 $result = array(
-                    'command' => $studentCommand,
+                    'commands' => $studentCommand,
                     'updated' => $activeLesson->studentUpdated,
                     'error' => false,
                 );
