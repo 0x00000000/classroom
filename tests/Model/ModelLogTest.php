@@ -174,7 +174,7 @@ final class ModelLogTest extends TestCase {
         
         $modelLogGet = Factory::instance()->createModel('Log');
         $modelLogGet->setRequest($request);
-        $modelLogGet->loadById($idSave);
+        $modelLogGet->loadByPk($idSave);
         $dataAfterGet = $modelLogGet->getDataAssoc();
         
         $this->assertEquals($dataAfterSave, $dataAfterGet);
@@ -185,7 +185,7 @@ final class ModelLogTest extends TestCase {
         
         $modelLogUpdatedGet = Factory::instance()->createModel('Log');
         $modelLogUpdatedGet->setRequest($request);
-        $modelLogUpdatedGet->loadById($idGet);
+        $modelLogUpdatedGet->loadByPk($idGet);
         
         $dataAfterUpdatedGet = $modelLogUpdatedGet->getDataAssoc();
         

@@ -10,9 +10,17 @@ namespace classroom;
 abstract class ModelAbstract {
     
     /**
-     * Loads object's data by id.
+     * Field types.
      */
-    abstract public function loadById(string $id): bool;
+    public const TYPE_TEXT = 'text';
+    public const TYPE_BOOL = 'bool';
+    public const TYPE_INT = 'int';
+    public const TYPE_FK = 'fk'; // foreign key
+    
+    /**
+     * Loads object's data by primary key.
+     */
+    abstract public function loadByPk(string $id): bool;
     
     /**
      * Saves object's data.
@@ -33,5 +41,11 @@ abstract class ModelAbstract {
      * Gets last error information.
      */
     abstract public function getLastError(): ?array;
+    
+    /**
+     * Gets model name for this object.
+     * This name may be used for creating models using factory.
+     */
+    abstract public function getModelName(): string;
     
 }

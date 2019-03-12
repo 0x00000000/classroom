@@ -1,0 +1,37 @@
+<link rel="stylesheet" type="text/css" href="{$rootUrl}/css/ActiveLesson/ActiveLesson.css" />
+
+<div class="listContent">
+
+<h3>Lessons for student {$student->name}</h3>
+
+{if $pagesList}
+<div class="pages">
+{foreach $pagesList as $page}
+{if $page === $currentPage}
+    <strong>{$page}</strong>
+{else}
+    <a href="{$baseUrl}/student/{$student->id}/{$page}">{$page}</a>
+{/if}
+{/foreach}
+</div>
+{/if}
+
+<table class"listTable"><tbody>
+    <tr>
+        <th>Caption</th>
+        <th>Subject</th>
+    </tr>
+    
+    {foreach $lessonsList as $lesson}
+    <tr>
+        <td>
+            {include file="$baseTemplatePath/viewText.tmpl" value="{$lesson->caption}" href="{$baseUrl}/lesson/{$student->id}/{$lesson->id}"}
+        </td>
+        <td>
+            {include file="$baseTemplatePath/viewText.tmpl" value="{$lesson->subject}"}
+        </td>
+    </tr>
+    {/foreach}
+</tbody></table>
+
+</div>

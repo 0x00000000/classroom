@@ -25,6 +25,12 @@ class DatabaseMysql extends Database {
      * Last executed query.
      */
     private $_lastQuery = null;
+    
+    /**
+     * Allowed condition operators.
+     */
+    private $_allowedConditionOperators = array('=', '<', '>', '!=', '<=', '>=');
+    
     /**
      * Class constructor.
      */
@@ -44,9 +50,9 @@ class DatabaseMysql extends Database {
     }
     
     /**
-     * Gets data by id.
+     * Gets data by primary key.
      */
-    public function getById(string $table, string $pk, string $primaryKey = 'id'): ?array {
+    public function getByPk(string $table, string $pk, string $primaryKey = 'id'): ?array {
         $result = null;
         
         $query = 'select * from `' . $this->escape($this->_prefix . $table) . '`' 
@@ -66,23 +72,28 @@ class DatabaseMysql extends Database {
     }
     
     /**
-     * Gets data by id.
+     * Gets data for one or more records.
      */
     public function getList(
         string $table, array $conditionsList,
-        ?int $limit, ?int $offset
+        ?int $limit, ?int $offset, ?array $sortingList
     ): array {
         $result = array();
         
-        $conditionQuery = '';
-        if (count($conditionsList)) {
-            $conditionQueryList = array();
-            foreach ($conditionsList as $key => $value) {
-                $conditionQueryList[] = '`' . $this->escape($key) . '` = "'
-                    . $this->escape($value) . '"';
+        $conditionQuery = $this->getConditionQuery($conditionsList);
+        
+        $sortingQuery = '';
+        if (! is_null($sortingList) && count($sortingList)) {
+            $sortingQueryList = array();
+            foreach ($sortingList as $key => $value) {
+                if (strcasecmp($value, 'desc') !== 0) {
+                    $value = 'asc';
+                }
+                $sortingQueryList[] = '`' . $this->escape($key) . '` '
+                    . $this->escape($value);
             }
             
-            $conditionQuery = ' where (' . implode(' and ', $conditionQueryList) . ')';
+            $sortingQuery = ' order by ' . implode(', ', $sortingQueryList);
         }
         
         $limitQuery = '';
@@ -96,6 +107,7 @@ class DatabaseMysql extends Database {
         
         $query = 'select * from `' . $this->escape($this->_prefix . $table) . '`'
             . $conditionQuery
+            . $sortingQuery
             . $limitQuery;
         $this->_lastQuery = $query;
         
@@ -115,16 +127,7 @@ class DatabaseMysql extends Database {
     public function getCount(string $table, array $conditionsList): int {
         $count = 0;
         
-        $conditionQuery = '';
-        if (count($conditionsList)) {
-            $conditionQueryList = array();
-            foreach ($conditionsList as $key => $value) {
-                $conditionQueryList[] = '`' . $this->escape($key) . '` = "'
-                    . $this->escape($value) . '"';
-            }
-            
-            $conditionQuery = ' where (' . implode(' and ', $conditionQueryList) . ')';
-        }
+        $conditionQuery = $this->getConditionQuery($conditionsList);
         
         $query = 'select count(*) as count from `' . $this->escape($this->_prefix . $table) . '`'
             . $conditionQuery;
@@ -147,6 +150,9 @@ class DatabaseMysql extends Database {
     public function addRecord(string $table, array $data): ?string {
         $result = null;
         
+        if ($table == 'template_id') {
+            echo '###';
+        }
         if (is_array($data) && count($data)) {
             $query = 'insert into ' . $this->escape($this->_prefix . $table);
             $keysArray = array();
@@ -179,9 +185,13 @@ class DatabaseMysql extends Database {
             $valsArray = array();
             foreach ($data as $key => $val) {
                 if ($key !== $primaryKey) {
-                    $valsArray[] = '`' . $this->escape($key) . '`'
-                        . ' = '
-                        . '"' . $this->escape($val) . '"';
+                    if (! is_null($val)) {
+                        $valsArray[] = '`' . $this->escape($key) . '`'
+                            . ' = '
+                            . '"' . $this->escape($val) . '"';
+                    } else {
+                        $valsArray[] = '`' . $this->escape($key) . '`' . ' = NULL';
+                    }
                 }
             }
             
@@ -201,10 +211,38 @@ class DatabaseMysql extends Database {
     }
     
     /**
-     * Deletes the record in the database.
+     * Deletes one or more records from the database.
      */
-    public function deleteRecord(string $table, string $pk, string $primaryKey = 'id'): ?string {
-        $result = null;
+    public function delete(string $table, array $conditionsList): bool {
+        $result = false;
+        
+        $conditionQuery = '';
+        if (count($conditionsList)) {
+            $conditionQueryList = array();
+            foreach ($conditionsList as $key => $value) {
+                $conditionQueryList[] = '`' . $this->escape($key) . '` = "'
+                    . $this->escape($value) . '"';
+            }
+            
+            $conditionQuery = ' where (' . implode(' and ', $conditionQueryList) . ')';
+            
+            $query = 'delete from `'
+                . $this->escape($this->_prefix . $table)
+                . '` where ' . $conditionQuery;
+            $this->_lastQuery = $query;
+            if ($this->_mysqli->query($query)) {
+                $result = true;
+            }
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Deletes one record by primary key from the database.
+     */
+    public function deleteRecord(string $table, string $pk, string $primaryKey = 'id'): bool {
+        $result = false;
         
         $query = 'delete from `'
             . $this->escape($this->_prefix . $table)
@@ -215,7 +253,7 @@ class DatabaseMysql extends Database {
             $result = true;
         }
         
-        return $pk;
+        return $result;
     }
     
     /**
@@ -245,4 +283,31 @@ class DatabaseMysql extends Database {
         return $result;
     }
     
+    /**
+     * Get query string by conditions.
+     */
+    private function getConditionQuery(array $conditionsList): string {
+        $conditionQuery = '';
+        
+        if (count($conditionsList)) {
+            $conditionQueryList = array();
+            foreach ($conditionsList as $key => $value) {
+                if (
+                    is_array($value)
+                    && isset($value['value'])
+                    && isset($value['condition'])
+                    && in_array($value['condition'], $this->_allowedConditionOperators)
+                ) {
+                    $conditionQueryList[] = '`' . $this->escape($key) . '`'
+                        . ' ' . $value['condition'] . ' '
+                        . '"' . $this->escape($value['value']) . '"';
+                }
+            }
+            
+            $conditionQuery = ' where (' . implode(' and ', $conditionQueryList) . ')';
+        }
+        
+        return $conditionQuery;
+    }
+
 }

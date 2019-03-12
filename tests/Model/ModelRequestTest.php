@@ -127,7 +127,7 @@ final class ModelRequestTest extends TestCase {
         $dataAfterSave = $modelRequestSave->getDataAssoc();
         
         $modelRequestGet = Factory::instance()->createModel('Request');
-        $modelRequestGet->loadById($idSave);
+        $modelRequestGet->loadByPk($idSave);
         $dataAfterGet = $modelRequestGet->getDataAssoc();
         
         $this->assertEquals($dataAfterSave, $dataAfterGet);
@@ -137,7 +137,7 @@ final class ModelRequestTest extends TestCase {
         $dataAfterUpdated = $modelRequestGet->getDataAssoc();
         
         $modelRequestUpdatedGet = Factory::instance()->createModel('Request');
-        $modelRequestUpdatedGet->loadById($idGet);
+        $modelRequestUpdatedGet->loadByPk($idGet);
         
         $dataAfterUpdatedGet = $modelRequestUpdatedGet->getDataAssoc();
         

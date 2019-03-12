@@ -25,6 +25,8 @@ include_once('ModelDatabase.php');
  * @property bool $isPlural
  * @property bool $isCountable
  * @property bool $isPhrase
+ * @property bool $disabled Is user disabled.
+ * @property bool $deleted Is user deleted.
  */
 class ModelWord extends ModelDatabase {
     /**
@@ -32,98 +34,40 @@ class ModelWord extends ModelDatabase {
      */
     public const UNKNOWN_SERVER_NAME = 'UNKNOWN_SERVER_NAME';
     
-    protected $_id = null;
-    protected $_english = null;
-    protected $_russian = null;
-    protected $_transcription = null;
-    protected $_audio = null;
-    protected $_audioFileName = null;
-    protected $_audioFileType = null;
-    protected $_audioSource = null;
-    protected $_image = null;
-    protected $_imageFileName = null;
-    protected $_imageFileType = null;
-    protected $_imageSource = null;
-    protected $_partOfSpeech = null;
-    protected $_isPlural = null;
-    protected $_isCountable = null;
-    protected $_isPhrase = null;
-    
     /**
      * @var string $_table Name of database table.
      */
     protected $_table = 'word';
     
     /**
+     * @var array $_propertiesList List of properties.
+     */
+    protected $_propertiesList = array(
+        array('name' => 'id'),
+        array('name' => 'english'),
+        array('name' => 'russian'),
+        array('name' => 'transcription'),
+        array('name' => 'audio', 'type' => self::TYPE_BOOL),
+        array('name' => 'audioFileName'),
+        array('name' => 'audioFileType'),
+        array('name' => 'audioSource'),
+        array('name' => 'image', 'type' => self::TYPE_BOOL),
+        array('name' => 'imageFileName'),
+        array('name' => 'imageFileType'),
+        array('name' => 'imageSource'),
+        array('name' => 'partOfSpeech'),
+        array('name' => 'isPlural', 'type' => self::TYPE_BOOL),
+        array('name' => 'isCountable', 'type' => self::TYPE_BOOL),
+        array('name' => 'isPhrase', 'type' => self::TYPE_BOOL),
+        array('name' => 'disabled', 'type' => self::TYPE_BOOL),
+        array('name' => 'deleted', 'type' => self::TYPE_BOOL, 'skipControl' => true),
+    );
+    
+    /**
      * Class constructor.
      */
     public function __construct() {
         parent::__construct();
-    }
-    
-    protected function getAudio(): bool {
-        return ($this->_audio === '1');
-    }
-    
-    protected function setAudio(?bool $value): void {
-        if ($value) {
-            $valueAsString = '1';
-        } else {
-            $valueAsString = '0';
-        }
-        $this->_audio = $valueAsString;
-    }
-    
-    protected function getImage(): bool {
-        return ($this->_image === '1');
-    }
-    
-    protected function setImage(?bool $value): void {
-        if ($value) {
-            $valueAsString = '1';
-        } else {
-            $valueAsString = '0';
-        }
-        $this->_image = $valueAsString;
-    }
-    
-    protected function getIsPlural(): bool {
-        return ($this->_isPlural === '1');
-    }
-    
-    protected function setIsPlural(?bool $value): void {
-        if ($value) {
-            $valueAsString = '1';
-        } else {
-            $valueAsString = '0';
-        }
-        $this->_isPlural = $valueAsString;
-    }
-    
-    protected function getIsCountable(): bool {
-        return ($this->_isCountable === '1');
-    }
-    
-    protected function setIsCountable(?bool $value): void {
-        if ($value) {
-            $valueAsString = '1';
-        } else {
-            $valueAsString = '0';
-        }
-        $this->_isCountable = $valueAsString;
-    }
-    
-    protected function getIsPhrase(): bool {
-        return ($this->_isPhrase === '1');
-    }
-    
-    protected function setIsPhrase(?bool $value): void {
-        if ($value) {
-            $valueAsString = '1';
-        } else {
-            $valueAsString = '0';
-        }
-        $this->_isPhrase = $valueAsString;
     }
     
 }

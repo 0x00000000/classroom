@@ -26,15 +26,20 @@ class ModelRequest extends ModelDatabase {
      */
     public const UNKNOWN_REQUEST_URI = 'UNKNOWN_REQUEST_URI';
     
-    protected $_id = null;
-    protected $_url = null;
-    protected $_get = null;
-    protected $_post = null;
-    protected $_session = null;
-    protected $_headers = null;
-    protected $_ip = null;
-    protected $_userAgent = null;
-    protected $_info = null;
+    /**
+     * @var array $_propertiesList List of properties.
+     */
+    protected $_propertiesList = array(
+        array('name' => 'id'),
+        array('name' => 'url'),
+        array('name' => 'get'),
+        array('name' => 'post'),
+        array('name' => 'session'),
+        array('name' => 'headers'),
+        array('name' => 'ip'),
+        array('name' => 'userAgent'),
+        array('name' => 'info'),
+    );
     
     /**
      * @var string $_table Name of database table.
@@ -53,24 +58,24 @@ class ModelRequest extends ModelDatabase {
      */
     public function create() {
         if (array_key_exists('REQUEST_URI', $_SERVER)) {
-            $this->_url = $_SERVER['REQUEST_URI'];
+            $this->url = $_SERVER['REQUEST_URI'];
         } else {
-            $this->_url = self::UNKNOWN_REQUEST_URI;
+            $this->url = self::UNKNOWN_REQUEST_URI;
         }
         
-        $this->_get = json_encode($_GET);
-        $this->_post = json_encode($_POST);
+        $this->get = $_GET;
+        $this->post = $_POST;
         if (! empty($_SESSION)) {
-            $this->_session = json_encode($_SESSION);
+            $this->session = $_SESSION;
         }
         if (function_exists('getallheaders')) {
-            $this->_headers = json_encode(getallheaders());
+            $this->headers = getallheaders();
         }
         if (array_key_exists('REMOTE_ADDR', $_SERVER)) {
-            $this->_ip = $_SERVER['REMOTE_ADDR'];
+            $this->ip = $_SERVER['REMOTE_ADDR'];
         }
         if (array_key_exists('HTTP_USER_AGENT', $_SERVER)) {
-            $this->_userAgent = $_SERVER['HTTP_USER_AGENT'];
+            $this->userAgent = $_SERVER['HTTP_USER_AGENT'];
         }
     }
     
@@ -78,56 +83,80 @@ class ModelRequest extends ModelDatabase {
      * Gets request's get data.
      */
     public function getGet(): ?array {
-        return $this->_get ? json_decode($this->_get, true) : null;
+        $get = $this->getRawProperty('get');
+        if ($get) {
+            $get = json_decode($get, true);
+        }
+
+        return $get;
     }
     
     /**
      * Sets request's set data.
      */
     public function setGet(?array $value): void {
-        $this->_get = json_encode($value);
+        $get = json_encode($value);
+        $this->setRawProperty('get', $get);
     }
     
     /**
      * Gets request's post data.
      */
     public function getPost(): ?array {
-        return $this->_post ? json_decode($this->_post, true) : null;
+        $post = $this->getRawProperty('post');
+        if ($post) {
+            $post = json_decode($post, true);
+        }
+
+        return $post;
     }
     
     /**
      * Sets request's post data.
      */
     public function setPost(?array $value): void {
-        $this->_post = json_encode($value);
+        $post = json_encode($value);
+        $this->setRawProperty('post', $post);
     }
     
     /**
      * Gets request's session data.
      */
     public function getSession(): ?array {
-        return $this->_session ? json_decode($this->_session, true) : null;
+        $session = $this->getRawProperty('session');
+        if ($session) {
+            $session = json_decode($session, true);
+        }
+
+        return $session;
     }
     
     /**
      * Sets request's session data.
      */
     public function setSession(?array $value): void {
-        $this->_session = json_encode($value);
+        $session = json_encode($value);
+        $this->setRawProperty('session', $session);
     }
     
     /**
      * Gets request's headers.
      */
     public function getHeaders(): ?array {
-        return $this->_headers ? json_decode($this->_headers, true) : null;
+        $headers = $this->getRawProperty('headers');
+        if ($headers) {
+            $headers = json_decode($headers, true);
+        }
+
+        return $headers;
     }
     
     /**
      * Sets request's headers.
      */
     public function setHeaders(?array $value): void {
-        $this->_headers = json_encode($value);
+        $headers = json_encode($value);
+        $this->setRawProperty('headers', $headers);
     }
     
 }

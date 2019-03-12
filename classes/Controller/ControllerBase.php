@@ -14,29 +14,54 @@ abstract class ControllerBase extends Controller {
     /**
      * Request object.
      */
-    protected $_request = null;
+    private $_request = null;
     
     /**
      * Response object.
      */
-    protected $_response = null;
+    private $_response = null;
     
     /**
      * Auth object.
      */
-    protected $_auth = null;
+    private $_auth = null;
     
     /**
-     * View object.
+     * @var $_isAjaxMode Determines if html or ajax mode is active.
      */
-    protected $_view = null;
+    private $_isAjaxMode = false;
     
-     /**
+    /**
+     * View object for whole page.
+     */
+    private $_pageView = null;
+    
+    /**
+     * View object for content area.
+     */
+    private $_view = null;
+    
+    /**
+     * @var $_pageTemplate string Page template.
+     */
+    protected $_pageTemplate = 'page';
+    
+    /**
+     * @var $_ajaxTemplate string Page template for ajax.
+     */
+    protected $_ajaxTemplate = 'ajax';
+    
+    /**
+     * @var array $_innerUrl Inner url to controller's root page. Should be started from '/'.
+     */
+    protected $_innerUrl = null;
+    
+    /**
      * Class constructor.
      */
     public function __construct() {
         $this->_view = Factory::instance()->createView();
-        $this->_view->setTemplate('page');
+        $this->_pageView = Factory::instance()->createView();
     }
     
     /**
@@ -54,14 +79,14 @@ abstract class ControllerBase extends Controller {
     public function execute(string $action): void {
         $methodName = 'action' . ucfirst($action);
         if (strlen($action) && method_exists($this, $methodName)) {
-            $this->setVariables();
-            
             $this->before();
+            $this->setContentViewVariables();
             $content = $this->$methodName();
             
-            $this->setVariable('content', $content);
+            $this->setPageViewVariables();
+            $this->getPageView()->set('content', $content);
             $this->after();
-            $this->setVariable('minMenuItems', $this->getMenuItems());
+            $this->getPageView()->set('minMenuItems', $this->getMenuItems());
             $this->printPage();
         } else {
             $this->send404();
@@ -111,7 +136,12 @@ abstract class ControllerBase extends Controller {
      * Renders and prints page.
      */
     protected function printPage(): void {
-        $html = $this->_view->render();
+        if ($this->getAjaxMode()) {
+            $this->getPageView()->setTemplate($this->_ajaxTemplate);
+        } else {
+            $this->getPageView()->setTemplate($this->_pageTemplate);
+        }
+        $html = $this->getPageView()->render();
         
         $this->getResponse()->setBody($html);
         $this->getResponse()->send();
@@ -160,7 +190,14 @@ abstract class ControllerBase extends Controller {
     }
     
     /**
-     * Gets view.
+     * Gets whole page's view.
+     */
+    protected function getPageView(): ?View {
+        return $this->_pageView;
+    }
+    
+    /**
+     * Gets content's view.
      */
     protected function getView(): ?View {
         return $this->_view;
@@ -182,12 +219,14 @@ abstract class ControllerBase extends Controller {
         if ($this->getAuth()->isTeacher()) {
             // $menuItems[] = array('link' => '/teacher', 'title' => 'Учительская');
             $menuItems[] = array('link' => '/teacher/student', 'title' => 'Ученики');
-            $menuItems[] = array('link' => '/teacher/lesson', 'title' => 'Материалы');
-            $menuItems[] = array('link' => '/teacher/lesson/create', 'title' => 'Начать урок');
+            $menuItems[] = array('link' => '/teacher/lesson', 'title' => 'Уроки');
+            $menuItems[] = array('link' => '/teacher/lessonTemplate', 'title' => 'Шаблоны');
+            $menuItems[] = array('link' => '/teacher/activeLesson', 'title' => 'Начать урок');
         }
         
         if ($this->getAuth()->isStudent()) {
-            $menuItems[] = array('link' => '/student/lesson/active', 'title' => 'Начать урок');
+            $menuItems[] = array('link' => '/student/lesson', 'title' => 'Уроки');
+            $menuItems[] = array('link' => '/student/activeLesson', 'title' => 'Начать урок');
         }
         
         if ($this->getAuth()->isGuest()) {
@@ -200,21 +239,26 @@ abstract class ControllerBase extends Controller {
     }
     
     /**
-     * Adds varible to main view.
+     * Adds common varibles to page's view.
      */
-    protected function setVariable(string $key, $value): bool {
-        return $this->_view->set($key, $value);
+    protected function setPageViewVariables() {
+        $this->getPageView()->set('user', $this->getAuth()->getUser());
+        $this->getPageView()->set('url', $this->getUrl());
+        $this->getPageView()->set('rootUrl', $this->getRootUrl());
+        $this->getPageView()->set('baseTemplatePath', $this->getBaseTemplatePath());
     }
     
-    /**
-     * Adds common varibles to main view.
-     */
-    protected function setVariables() {
-        $this->setVariable('user', $this->getAuth()->getUser());
-        $this->setVariable('url', $this->getUrl());
-        $this->setVariable('baseUrl', $this->getBaseUrl());
+    protected function setContentViewVariables() {
+        $this->getView()->set('currentUrl', $this->getUrl());
+        $this->getView()->set('rootUrl', $this->getRootUrl());
+        $this->getView()->set('baseUrl', $this->getBaseUrl());
+        
+        $this->getView()->set('baseTemplatePath', $this->getBaseTemplatePath());
+        
+        $messageType = $this->popStashData('messageType');
+        $this->getView()->set('messageType', $messageType);
     }
-    
+        
     /**
      * Sets data for key. Can be gotten later.
      */
@@ -309,24 +353,64 @@ abstract class ControllerBase extends Controller {
     /**
      * Gets site's base url.
      */
-    protected function getBaseUrl(): string {
+    protected function getRootUrl(): string {
         $url = '';
         
         if ($this->getRequest()) {
-            $url = $this->getRequest()->getBaseUrl();
+            $url = $this->getRequest()->getRootUrl();
         }
         
         return $url;
+    }
+    
+    /**
+     * Gets url to controller's root page.
+     */
+    public function getBaseUrl(): string {
+        if ($this->_innerUrl) {
+            $baseUrl = $this->getRootUrl() . $this->_innerUrl;
+        } else {
+            $baseUrl = '';
+        }
+        
+        return $baseUrl;
+    }
+    
+    /**
+     * Gets template's path for including from templates.
+     */
+    protected function getBaseTemplatePath(): string {
+        $ds = FileSystem::getDS();
+        $baseTemplatePath = FileSystem::getRoot() . $ds . 'template' . $ds . 'Standart';
+        return $baseTemplatePath;
     }
     
     protected function getAuthUrl(): string {
         $url = '';
         
         if ($this->getRequest()) {
-            $url = $this->getRequest()->getBaseUrl() . '/login';
+            $url = $this->getRequest()->getRootUrl() . '/login';
         }
         
         return $url;
+    }
+    
+    protected function getFromPost(string $name, string $defaultValue = null): ?string {
+        if (array_key_exists($name, $this->getRequest()->post)) {
+            $value = (string) $this->getRequest()->post[$name];
+        } else {
+            $value = $defaultValue;
+        }
+        
+        return $value;
+    }
+    
+    protected function setAjaxMode(bool $value): void {
+        $this->_isAjaxMode = $value;
+    }
+    
+    protected function getAjaxMode(): bool {
+        return $this->_isAjaxMode;
     }
     
 }

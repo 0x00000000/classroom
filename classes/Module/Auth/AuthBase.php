@@ -172,7 +172,7 @@ abstract class AuthBase extends Auth {
                 $userId = $session['userId'];
                 if ($userId) {
                     $user = Factory::instance()->createModel('User');
-                    $success = $user->loadById($userId);
+                    $success = $user->loadByPk($userId);
                     if (! $success) {
                         $user = null;
                     }

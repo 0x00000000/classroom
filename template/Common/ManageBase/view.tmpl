@@ -1,0 +1,20 @@
+<h3>View</h3>
+
+<table class="viewTable">
+{foreach $propertiesList as $propertyName => $property}
+{if $controlsList[$propertyName] !== 'none'}
+    <tr>
+    <td>{$property['caption']}</td>
+    <td>
+        {if $controlsList[$propertyName] === 'select'}
+            {include file="$baseTemplatePath/viewSelect.tmpl" values=${$property['name']}Values value="{$item->{$propertyName}}"}
+        {else if $controlsList[$propertyName] === 'selectBool'}
+            {include file="$baseTemplatePath/viewBool.tmpl" value="{$item->{$propertyName}}"}
+        {else}
+            {include file="$baseTemplatePath/viewText.tmpl" value="{$item->{$propertyName}}"}
+        {/if}
+    </td>
+    </tr>
+{/if}
+{/foreach}
+</table>

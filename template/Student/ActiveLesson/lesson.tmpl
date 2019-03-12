@@ -1,0 +1,67 @@
+<link rel="stylesheet" type="text/css" href="{$rootUrl}/css/ActiveLesson/ActiveLesson.css" />
+
+<script type="text/javascript" src="{$rootUrl}/js/ActiveLesson/common.js"></script>
+<script type="text/javascript" src="{$rootUrl}/js/ActiveLesson/lesson.js"></script>
+<script type="text/javascript">
+    initWhiteBoard();
+    
+    var requestUrl = "{$baseUrl}/command/{$teacher->id}/{$lesson->id}";
+    {literal}
+    ActiveLesson(false, {requestUrl: requestUrl});
+    {/literal}
+</script>
+
+<h3>Lesson with teacher {$teacher->name}</h3>
+
+<h4>{$lesson->caption}</h4>
+
+<h4>{$lesson->subject}</h4>
+
+<div class="activeLessonContent">
+    {$lesson->content}
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+    .<br>
+</div>

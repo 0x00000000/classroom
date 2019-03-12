@@ -10,6 +10,7 @@ include_once('ModelDatabase.php');
  * Model user.
  * 
  * @property string|null $id User's id.
+ * @property string|null $teacherId Teacher's id. Hidden.
  * @property string $login User's login.
  * @property string $name User's name.
  * @property bool $isAdmin Is user admin.
@@ -27,32 +28,32 @@ class ModelUser extends ModelDatabase {
      */
     public const UNKNOWN_SERVER_NAME = 'UNKNOWN_SERVER_NAME';
     
-    protected $_id = null;
-    protected $_login = null;
-    protected $_password = null;
-    protected $_name = null;
-    protected $_isAdmin = '0';
-    protected $_isTeacher = '0';
-    protected $_isStudent = '0';
-    protected $_disabled = '0';
-    protected $_deleted = '0';
-    
     /**
      * @var string $_table Name of database table.
      */
     protected $_table = 'user';
     
     /**
+     * @var array $_propertiesList List of properties.
+     */
+    protected $_propertiesList = array(
+        array('name' => 'id'),
+        array('name' => 'teacherId', 'skipControl' => true),
+        array('name' => 'login'),
+        array('name' => 'password'),
+        array('name' => 'name'),
+        array('name' => 'isAdmin', 'type' => self::TYPE_BOOL),
+        array('name' => 'isTeacher', 'type' => self::TYPE_BOOL),
+        array('name' => 'isStudent', 'type' => self::TYPE_BOOL),
+        array('name' => 'disabled', 'type' => self::TYPE_BOOL),
+        array('name' => 'deleted', 'type' => self::TYPE_BOOL, 'skipControl' => true),
+    );
+    
+    /**
      * Class constructor.
      */
     public function __construct() {
         parent::__construct();
-        
-        $this->addBoolProperty('_isAdmin');
-        $this->addBoolProperty('_isTeacher');
-        $this->addBoolProperty('_isStudent');
-        $this->addBoolProperty('_disabled');
-        $this->addBoolProperty('_deleted');
     }
     
     /**
@@ -107,8 +108,22 @@ class ModelUser extends ModelDatabase {
     /**
      * Sets hash instead of password.
      */
-    public function setPassword($password) {
-        $this->_password = $this->encodePassword($password);
+    public function setPassword($value) {
+        $password = $this->encodePassword($value);
+        $this->setRawProperty('password', $password);
+    }
+    
+    /**
+     * Teacher's id can't be gotten.
+     */
+    public function getTeacherId() {
+        return null;
+    }
+    
+    /**
+     * Teacher's id can't be set.
+     */
+    public function setTeacherId($value) {
     }
     
     /**
@@ -118,6 +133,96 @@ class ModelUser extends ModelDatabase {
         $salt1 = Config::instance()->get('user', 'salt1');;
         $salt2 = Config::instance()->get('user', 'salt2');;
         return hash('sha512', $salt1 . $password . $salt2);
+    }
+    
+    /**
+     * Gets students list.
+     */
+    public function getStudentsList(
+        ?int $limit = 0, ?int $offset = 0,
+        ?array $sortingList = array('id' => 'desc'),
+        ?array $extraConditionsList = array()
+    ): array {
+        $list = array();
+        if ($this->getPk() && $this->isTeacher) {
+            $conditionsList = array('teacherId' => $this->getPk(), 'isStudent' => true, 'deleted' => false);
+            if ($extraConditionsList) {
+                $conditionsList = array_merge($conditionsList, $extraConditionsList);
+            }
+            $list = $this->getModelsList(
+                $conditionsList,
+                $limit,
+                $offset,
+                $sortingList
+            );
+        }
+        
+        return $list;
+    }
+    
+    /**
+     * Gets students count for teacher.
+     */
+    public function getStudentsCount(?array $extraConditionsList = array()): int {
+        $count = 0;
+        if ($this->getPk() && $this->isTeacher) {
+            $conditionsList = array('teacherId' => $this->getPk(), 'isStudent' => true, 'deleted' => false);
+            if ($extraConditionsList) {
+                $conditionsList = array_merge($conditionsList, $extraConditionsList);
+            }
+            $count = $this->getCount($conditionsList);
+        }
+        
+        return $count;
+    }
+    
+    /**
+     * Gets teachers list.
+     */
+    public function getTeachersList(
+        ?int $limit = 0, ?int $offset = 0,
+        ?array $sortingList = array('id' => 'desc')
+    ): array {
+        $list = array();
+        if ($this->getPk() && $this->isStudent) {
+            if ($this->getRawProperty('teacherId')) {
+                $modelName = $this->getModelName();
+                $teacher = Factory::instance()->createModel($modelName);
+                if ($teacher->loadByPk($this->getRawProperty('teacherId'))) {
+                    if (! $teacher->deleted) {
+                        $list = array($teacher);
+                    }
+                }
+            }
+        }
+        
+        return $list;
+    }
+    
+    /**
+     * Gets teachers count for student.
+     */
+    public function getTeachersCount(): int {
+        $count = 1;
+        
+        return $count;
+    }
+    
+    /**
+     * Sets teacher for student.
+     */
+    public function setTeacher(ModelUser $teacher): bool {
+        $result = false;
+        
+        if ($this->isStudent) {
+            if ($teacher->getPk() && $teacher->isTeacher) {
+                if ($this->setRawProperty('teacherId', $teacher->getPk())) {
+                    $result = true;
+                }
+            }
+        }
+        
+        return $result;
     }
     
 }

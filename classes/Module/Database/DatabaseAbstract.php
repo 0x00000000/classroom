@@ -10,16 +10,16 @@ namespace classroom;
 abstract class DatabaseAbstract {
     
     /**
-     * Gets data by id.
+     * Gets data by primary key.
      */
-    abstract public function getById(string $table, string $pk, string $primaryKey = 'id'): ?array;
+    abstract public function getByPk(string $table, string $pk, string $primaryKey = 'id'): ?array;
     
     /**
-     * Gets data for several records.
+     * Gets data for one or more records.
      */
     abstract public function getList(
         string $table, array $conditionsList,
-        ?int $limit, ?int $offset
+        ?int $limit, ?int $offset, ?array $sortingList
     ): array;
     
     /**
@@ -38,9 +38,14 @@ abstract class DatabaseAbstract {
     abstract public function updateRecord(string $table, array $data, string $primaryKey = 'id'): ?string;
     
     /**
-     * Deletes the record in the database.
+     * Deletes one or more records from the database.
      */
-    abstract public function deleteRecord(string $table, string $pk, string $primaryKey = 'id'): ?string;
+    abstract public function delete(string $table, array $conditionsList): bool;
+    
+    /**
+     * Deletes one record by primary key from the database.
+     */
+    abstract public function deleteRecord(string $table, string $pk, string $primaryKey = 'id'): bool;
     
     /**
      * Gets last error information.

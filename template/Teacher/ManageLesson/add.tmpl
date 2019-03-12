@@ -1,0 +1,29 @@
+<h3>Add</h3>
+
+<form action="{$currentUrl}" method="POST">
+<table>
+{foreach $propertiesList as $propertyName => $property}
+{if $propertyName !== 'deleted'}
+{if ! $model->isPk($propertyName)}
+{if $controlsList[$propertyName] !== 'none'}
+{if ! in_array($propertyName, array('caption', 'subject', 'keywords', 'content'))}
+    <tr>
+    <td>{$property['caption']}</td>
+    <td>
+        {if $controlsList[$propertyName] === 'select'}
+            {include file="$baseTemplatePath/select.tmpl" name="{$property['name']}" values=${$property['name']}Values}
+        {else if $controlsList[$propertyName] === 'selectBool'}
+            {include file="$baseTemplatePath/selectBool.tmpl" name="{$property['name']}"}
+        {else}
+            {include file="$baseTemplatePath/text.tmpl" name="{$property['name']}"}
+        {/if}
+    </td>
+    </tr>
+{/if}
+{/if}
+{/if}
+{/if}
+{/foreach}
+</table>
+<p><input type="submit" name="submit" value="Save" /></p>
+</form>

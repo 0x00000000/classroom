@@ -1,0 +1,48 @@
+<div class="listContent">
+
+<h3>List</h3>
+
+{if $pagesList}
+<div class="pages">
+{foreach $pagesList as $page}
+{if $page === $currentPage}
+    <strong>{$page}</strong>
+{else}
+    <a href="{$baseUrl}/{$page}">{$page}</a>
+{/if}
+{/foreach}
+</div>
+{/if}
+
+<table class"listTable"><tbody>
+    <tr>
+    {foreach $propertiesList as $propertyName => $property}
+    {if $controlsList[$propertyName] !== 'none'}
+        <th>{$property['caption']}</th>
+    {/if}
+    {/foreach}
+
+    </tr>
+    
+    {foreach $itemsList as $item}
+    <tr>
+    {foreach $propertiesList as $propertyName => $property}
+    {if $controlsList[$propertyName] !== 'none'}
+        <td>
+        {if $propertyName === 'caption'}
+            {include file="$baseTemplatePath/viewText.tmpl" value="{$item->{$propertyName}}" href="{$baseUrl}/view/{$item->id}"}
+        {else if $controlsList[$propertyName] === 'select'}
+            {include file="$baseTemplatePath/viewSelect.tmpl" values=${$property['name']}Values value="{$item->{$propertyName}}"}
+        {else if $controlsList[$propertyName] === 'selectBool'}
+            {include file="$baseTemplatePath/viewBool.tmpl" value="{$item->{$propertyName}}"}
+        {else}
+            {include file="$baseTemplatePath/viewText.tmpl" value="{$item->{$propertyName}}"}
+        {/if}
+        </td>
+    {/if}
+    {/foreach}
+    </tr>
+    {/foreach}
+</tbody></table>
+
+</div>

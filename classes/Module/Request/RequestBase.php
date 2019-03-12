@@ -144,15 +144,15 @@ abstract class RequestBase extends Request {
      * f. e. http://example.com
      */
     public function getUrl(): string {
-        $url = $this->getBaseUrl() . $this->getCurrentRequest()->url;
+        $url = $this->getRootUrl() . $this->getCurrentRequest()->url;
         
         return $url;
     }
     
     /**
-     * Gets site's base url.
+     * Gets site's root url.
      */
-    public function getBaseUrl(): string {
+    public function getRootUrl(): string {
         if (Config::instance()->get('application', 'baseUrl')) {
             $url = Config::instance()->get('application', 'baseUrl');
         } else {

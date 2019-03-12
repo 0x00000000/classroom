@@ -33,8 +33,8 @@ abstract class RequestAbstract {
     abstract public function unsetSessionVariable(string $key): bool;
     
     /**
-     * Gets site's base url.
+     * Gets site's root url.
      */
-    abstract public function getBaseUrl(): string;
+    abstract public function getRootUrl(): string;
     
 }

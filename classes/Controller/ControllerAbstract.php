@@ -10,6 +10,16 @@ namespace classroom;
 abstract class ControllerAbstract {
     
     /**
+     * Field types.
+     */
+    public const CONTROL_INPUT = 'input';
+    public const CONTROL_TEXTAREA = 'textarea';
+    public const CONTROL_HTML = 'html';
+    public const CONTROL_SELECT_BOOL = 'selectBool';
+    public const CONTROL_SELECT = 'select';
+    public const CONTROL_NONE = 'none';
+    
+    /**
      * Initializes controller.
      */
     abstract public function init(Request $request, Response $response): void;
@@ -75,8 +85,8 @@ abstract class ControllerAbstract {
     abstract protected function getUrl(): string;
     
     /**
-     * Gets site base url.
+     * Gets site root url.
      */
-    abstract protected function getBaseUrl(): string;
+    abstract protected function getRootUrl(): string;
     
 }

@@ -36,11 +36,19 @@ class ApplicationCommon extends ApplicationBase {
         
         $router->setRule('/admin/vocabulary/images/fill/<page>', 'Admin/ControllerAdminVocabulary', 'imagesAdd');
         
-        $router->setRule('/login', 'Guest/ControllerGuestLogin', 'index');
-        
         $router->setRule('/teacher/lesson[/<action>][/<id>]', 'Teacher/ControllerTeacherManageLesson', 'index');
         
-        $router->setRule('/teacher/student[/<action>][/<id>]', 'Teacher/ControllerTeacherManageLesson', 'index');
+        $router->setRule('/teacher/lessonTemplate[/<action>][/<id>]', 'Teacher/ControllerTeacherManageLessonTemplate', 'index');
+        
+        $router->setRule('/teacher/student[/<action>][/<id>]', 'Teacher/ControllerTeacherManageStudent', 'index');
+        
+        $router->setRule('/teacher/activeLesson[/<action>][/<studentId>][/<lessonId>]', 'Teacher/ControllerTeacherActiveLesson', 'index');
+        
+        $router->setRule('/student/lesson[/<action>][/<id>]', 'Student/ControllerStudentManageLesson', 'index');
+        
+        $router->setRule('/student/activeLesson[/<action>][/<teacherId>][/<lessonId>]', 'Student/ControllerStudentActiveLesson', 'index');
+        
+        $router->setRule('/login', 'Guest/ControllerGuestLogin', 'index');
         
         $router->setDefaultRule('Guest/ControllerGuestIndex', 'index');
         

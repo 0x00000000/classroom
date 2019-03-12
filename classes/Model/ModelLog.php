@@ -30,21 +30,26 @@ class ModelLog extends ModelDatabase {
     public const LEVEL_WARNING = 4;
     public const LEVEL_NOTICE = 8;
     
-    protected $_id = null;
-    protected $_requestId = null;
-    protected $_level = null;
-    protected $_message = null;
-    protected $_description = null;
-    protected $_data = null;
-    protected $_code = null;
-    protected $_file = null;
-    protected $_line = null;
-    protected $_url = null;
-    
     /**
      * @var string $_table Name of database table.
      */
     protected $_table = 'log';
+    
+    /**
+     * @var array $_propertiesList List of properties.
+     */
+    protected $_propertiesList = array(
+        array('name' => 'id'),
+        array('name' => 'requestId', 'type' => self::TYPE_FK, 'fkModelName' => 'Request'),
+        array('name' => 'level'),
+        array('name' => 'message'),
+        array('name' => 'description'),
+        array('name' => 'data'),
+        array('name' => 'code'),
+        array('name' => 'file'),
+        array('name' => 'line'),
+        array('name' => 'url'),
+    );
     
     /**
      * @var Request $_request Request object.
@@ -56,8 +61,6 @@ class ModelLog extends ModelDatabase {
      */
     public function __construct() {
         parent::__construct();
-        
-        $this->addHiddenProperty('_request');
     }
     
     /**
@@ -180,13 +183,14 @@ class ModelLog extends ModelDatabase {
     protected function setMessage(string $value): void {
         $maxMessageLength = 255;
         
-        if ($value) {
-            if (strlen($value) > $maxMessageLength) {
-                $value = substr($value, 0, $maxMessageLength);
+        $message = $value;
+        if ($message) {
+            if (strlen($message) > $maxMessageLength) {
+                $message = substr($message, 0, $maxMessageLength);
             }
         }
         
-        $this->_message = $value;
+        $this->setRawProperty('message', $message);
     }
     
     /**
@@ -195,27 +199,36 @@ class ModelLog extends ModelDatabase {
     protected function setUrl(string $value): void {
         $maxUrlLength = 255;
         
-        if ($value) {
-            if (strlen($value) > $maxUrlLength) {
-                $value = substr($value, 0, $maxUrlLength);
+        $url = $value;
+        if ($url) {
+            if (strlen($url) > $maxUrlLength) {
+                $url = substr($url, 0, $maxUrlLength);
             }
         }
         
-        $this->_url = $value;
+        $this->setRawProperty('url', $url);
     }
     
     /**
      * Gets log's data property.
      */
     public function getData() {
-        return $this->_data ? json_decode($this->_data, true) : null;
+        $data = $this->getRawProperty('data');
+        if (! is_null($data)) {
+            $data = json_decode($data, true);
+        }
+        return $data;
     }
     
     /**
      * Sets log's data property.
      */
     public function setData($value): void {
-        $this->_data = json_encode($value);
+        $data = $value;
+        if (! is_null($data)) {
+            $data = json_encode($data);
+        }
+        $this->setRawProperty('data', $data);
     }
     
     /**

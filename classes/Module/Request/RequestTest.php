@@ -29,7 +29,7 @@ class RequestTest extends RequestBase {
     public const TEST_HEADERS = array('headersParam' => 'test headers');
     public const TEST_IP = '127.0.0.1';
     public const TEST_USER_AGENT = 'Test UA';
-    public const TEST_BASE_URL = 'http://example.com';
+    public const TEST_ROOT_URL = 'http://example.com';
     
     /**
      * Creates test reqeust.
@@ -49,10 +49,10 @@ class RequestTest extends RequestBase {
     }
     
     /**
-     * Gets site's base url.
+     * Gets site's root url.
      */
-    public function getBaseUrl(): string {
-        $url = self::TEST_BASE_URL;
+    public function getRootUrl(): string {
+        $url = self::TEST_ROOT_URL;
         
         return $url;
     }

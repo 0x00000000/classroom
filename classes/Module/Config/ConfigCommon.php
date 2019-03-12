@@ -31,6 +31,15 @@ class ConfigCommon extends ConfigBase {
             'salt1' => 'DKfoA.d,XO',
             'salt2' => 'cqPdMs!oee',
         ),
+        'admin' => array(
+            'itemsPerPage' => 20,
+        ),
+        'teacher' => array(
+            'itemsPerPage' => 20,
+        ),
+        'student' => array(
+            'itemsPerPage' => 20,
+        ),
     );
     
 }

@@ -29,9 +29,9 @@ class DatabaseTest extends Database {
     }
     
     /**
-     * Gets data by id.
+     * Gets data by primary key.
      */
-    public function getById(string $table, string $pk, string $primaryKey = 'id'): ?array {
+    public function getByPk(string $table, string $pk, string $primaryKey = 'id'): ?array {
         $result = null;
         
         if (array_key_exists($table, $this->_data)) {
@@ -44,11 +44,13 @@ class DatabaseTest extends Database {
     }
     
     /**
-     * Gets data by id.
+     * Gets data for one or more records.
+     * 
+     * Ignores $sortingList paramether.
      */
     public function getList(
         string $table, array $conditionsList,
-        ?int $limit, ?int $offset
+        ?int $limit, ?int $offset, ?array $sortingList
     ): array {
         $result = array();
         
@@ -57,7 +59,7 @@ class DatabaseTest extends Database {
             foreach ($this->_data[$table] as $pk => $record) {
                 $fit = true;
                 foreach ($conditionsList as $key => $value) {
-                    if (! array_key_exists($key, $record) || $record[$key] !== $value) {
+                    if (! array_key_exists($key, $record) || $record[$key] !== $value['value']) {
                         $fit = false;
                         break;
                     }
@@ -83,7 +85,7 @@ class DatabaseTest extends Database {
             foreach ($this->_data[$table] as $pk => $record) {
                 $fit = true;
                 foreach ($conditionsList as $key => $value) {
-                    if (! array_key_exists($key, $record) || $record[$key] !== $value) {
+                    if (! array_key_exists($key, $record) || $record[$key] !== $value['value']) {
                         $fit = false;
                         break;
                     }
@@ -127,7 +129,7 @@ class DatabaseTest extends Database {
         
         if (is_array($data) && count($data) && array_key_exists($primaryKey, $data) && $data[$primaryKey]) {
             // For this implementation DB we may ignore $primaryKey name and use it's value.
-            $record = $this->getById($table, $data[$primaryKey]);
+            $record = $this->getByPk($table, $data[$primaryKey]);
             if ($record) {
                 foreach ($data as $key => $val) {
                     if ($key !== $primaryKey) {
@@ -144,9 +146,42 @@ class DatabaseTest extends Database {
     }
     
     /**
-     * Deletes the record in the database.
+     * Deletes one or more records from the database.
      */
-    public function deleteRecord(string $table, string $pk, string $primaryKey = 'id'): ?string {
+    public function delete(string $table, array $conditionsList): bool {
+        $result = false;
+        
+        if (array_key_exists($table, $this->_data)) {
+            $counter = 0;
+            $tableData = array();
+            foreach ($this->_data[$table] as $pk => $record) {
+                $fit = true;
+                foreach ($conditionsList as $key => $value) {
+                    if (! array_key_exists($key, $record) || $record[$key] !== $value) {
+                        $fit = false;
+                        break;
+                    }
+                }
+                
+                if ($fit) {
+                    $tableData[$pk] = $this->_data[$table][$pk];
+                    $counter++;
+                } else {
+                    // These records will be deleted.
+                    $result = true;
+                }
+            }
+            
+            $this->_data[$table] = $tableData;
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Deletes one record by primary key from the database.
+     */
+    public function deleteRecord(string $table, string $pk, string $primaryKey = 'id'): bool {
         $result = false;
         
         if (array_key_exists($table, $this->_data)) {

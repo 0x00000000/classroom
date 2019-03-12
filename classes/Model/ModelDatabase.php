@@ -12,46 +12,46 @@ include_once('Model.php');
 abstract class ModelDatabase extends Model {
     
     /**
-     * Field types.
-     */
-    public const TYPE_TEXT = 'text';
-    public const TYPE_BOOL = 'bool';
-    
-    /**
      * @var string $_table Name of database table.
      */
     protected $_table = null;
     
     /**
-     * @var array $_hiddenPropsList List of protected properties that are not accessible from outside.
+     * @var array $_propertiesList List of properties.
      */
-    protected $_hiddenPropsList = array('_table', '_hiddenPropsList', '_boolPropsList', '_database');
+    protected $_propertiesList = array();
     
     /**
-     * @var array $_boolPropsList List of boolean properties.
+     * @var ?Database $_database Database object.
      */
-    protected $_boolPropsList = array();
+    private $_database = null;
     
     /**
-     * Database object.
+     * @var array $_dbFieldsMap Database fields to model properties map.
      */
-    protected $_database = null;
+    private $_dbFieldsMap = array();
+    
+    /**
+     * @var array $_propertiesData Properties data.
+     */
+    public $_propertiesData = array();
     
     /**
      * Class constructor.
      */
     public function __construct() {
+        $this->initPropertiesList();
     }
     
     /**
-     * Load object's data from database by id.
+     * Load object's data from database by primary key.
      */
-    public function loadById(string $id): bool {
+    public function loadByPk(string $pk): bool {
         $result = false;
         
         if ($this->getDatabase()) {
-            if ($this->_table && $id) {
-                $dbData = $this->getDatabase()->getById($this->_table, $id);
+            if ($this->_table && $pk) {
+                $dbData = $this->getDatabase()->getByPk($this->_table, $pk);
                 if ($dbData) {
                     $result = $this->setDataFromDB($dbData);
                 }
@@ -64,16 +64,28 @@ abstract class ModelDatabase extends Model {
     /**
      * Gets data from DB.
      */
-    protected function getDataList(array $conditionsList, ?int $limit, ?int $offset): array {
+    protected function getDataList(
+        array $conditionsList,
+        ?int $limit = 0, ?int $offset = 0,
+        ?array $sortingList = array('id' => 'desc')
+    ): array {
         $result = array();
         
         if ($this->getDatabase()) {
             if ($this->_table) {
+                $dbConditionsList = $this->prepareConditionsListForDB($conditionsList);
+                
+                $dbSortingList = $sortingList;
+                if (! is_null($dbSortingList)) {
+                    $dbSortingList = $this->prepareSortingListForDB($sortingList);
+                }
+                
                 $dbDataList = $this->getDatabase()->getList(
                     $this->_table,
-                    $conditionsList,
+                    $dbConditionsList,
                     $limit,
-                    $offset
+                    $offset,
+                    $dbSortingList
                 );
                 if ($dbDataList) {
                     // $dbDataList can be null
@@ -106,18 +118,23 @@ abstract class ModelDatabase extends Model {
     /**
      * Gets array of models.
      */
-    public function getModelsList(array $conditionsList, ?int $limit, ?int $offset): array {
+    public function getModelsList(
+        array $conditionsList,
+        ?int $limit = 0, ?int $offset = 0,
+        ?array $sortingList = array('id' => 'desc')
+    ): array {
         $result = array();
         
         $dbDataList = $this->getDataList(
             $conditionsList,
             $limit,
-            $offset
+            $offset,
+            $sortingList
         );
-        $className = get_class($this);
         if ($dbDataList && count($dbDataList)) {
             foreach ($dbDataList as $dbData) {
-                $model = new $className();
+                $modelName = $this->getModelName();
+                $model = Factory::instance()->createModel($modelName);
                 $model->setDataFromDB($dbData);
                 $result[] = $model;
             }
@@ -134,8 +151,8 @@ abstract class ModelDatabase extends Model {
         
         $dbData = $this->getDataRecord($conditionsList);
         if ($dbData && count($dbData)) {
-            $className = get_class($this);
-            $model = new $className();
+            $modelName = $this->getModelName();
+            $model = Factory::instance()->createModel($modelName);
             if ($model->setDataFromDB($dbData)) {
                 $result = $model;
             }
@@ -150,11 +167,12 @@ abstract class ModelDatabase extends Model {
     public function getCount(array $conditionsList): int {
         $result = false;
         
+        $dbConditionsList = $this->prepareConditionsListForDB($conditionsList);
         if ($this->getDatabase()) {
             if ($this->_table) {
                 $result = $this->getDatabase()->getCount(
                     $this->_table,
-                    $conditionsList
+                    $dbConditionsList
                 );
             }
         }
@@ -167,22 +185,20 @@ abstract class ModelDatabase extends Model {
      */
     public function save(): ?string {
         $result = null;
-        
         if ($this->getDatabase()) {
             if ($this->_table) {
                 $data = $this->getDataForDB();
                 
                 if (count($data)) {
-                    if (! $this->id) {
-                        $id = $this->getDatabase()->addRecord($this->_table, $data);
-                        if ($id) {
-                            $this->id = $id;
-                            $result = $this->id;
-                        } else {
+                    if (! $this->getPk()) {
+                        $pk = $this->getDatabase()->addRecord($this->_table, $data);
+                        if ($pk) {
+                            $this->setPk($pk);
+                            $result = $pk;
                         }
                     } else {
                         $this->getDatabase()->updateRecord($this->_table, $data);
-                        $result = $this->id;
+                        $result = $this->getPk();
                     }
                 }
             }
@@ -192,31 +208,32 @@ abstract class ModelDatabase extends Model {
     }
     
     /**
-     * Gets object's data as associative array.
+     * Deletes models by condition.
      */
-    public function getDataAssoc(): array {
-        $data = array();
+    public function delete(array $conditionsList): bool {
+        $result = false;
         
-        foreach ($this as $propName => $value) {
-            if ($this->isDataProperty($propName)) {
-                if (! is_null($value)) {
-                    $key = substr($propName, 1);
-                    $data[$key] = $value;
+        if ($this->getDatabase()) {
+            if ($this->_table && $pk) {
+                if ($conditionsList) {
+                    $result = $this->getDatabase()->delete($this->_table, $conditionsList);
                 }
             }
         }
         
-        return $data;
+        return $result;
     }
     
     /**
-     * Sets database object.
+     * Deletes models by condition.
      */
-    public function setDatabase(Database $database): bool {
+    public function deleteByPk(string $pk): bool {
         $result = false;
-        if (is_object($database) && $database instanceof Database) {
-            $this->_database = $database;
-            $result = true;
+        
+        if ($this->getDatabase()) {
+            if ($this->_table && $pk) {
+                $result = $this->getDatabase()->deleteRecord($this->_table, $pk);
+            }
         }
         
         return $result;
@@ -238,28 +255,44 @@ abstract class ModelDatabase extends Model {
     /**
      * Sets database object.
      */
+    public function setDatabase(Database $database): bool {
+        $result = false;
+        if (is_object($database) && $database instanceof Database) {
+            $this->_database = $database;
+            $result = true;
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Sets database object.
+     */
     protected function getDatabase() {
         return $this->_database;
+    }
+    
+    /**
+     * Gets object's data as associative array.
+     */
+    public function getDataAssoc(): array {
+        $data = array();
+        
+        foreach ($this->_propertiesList as $name => $property) {
+            $data[$name] = $this->$name;
+        }
+        
+        return $data;
     }
     
     /**
      * Gets data for current object. This data may be used for writing to database.
      */
     public function getDataForDB(): array {
-        $data = $this->getDataAssoc();
         $dbData = array();
         
-        if (is_array($data)) {
-            foreach ($data as $key => $val) {
-                $newKey = preg_replace_callback(
-                    '/[A-Z]/',
-                    function($matches) {
-                        return '_' . strtolower($matches[0]);
-                    },
-                    $key
-                );
-                $dbData[$newKey] = $val;
-            }
+        foreach ($this->_propertiesData as $dbField => $value) {
+            $dbData[$dbField] = $value;
         }
         
         return $dbData;
@@ -272,30 +305,14 @@ abstract class ModelDatabase extends Model {
         $result = false;
         $data = array();
         if (is_array($dbData)) {
-            foreach ($dbData as $key => $value) {
-                $propName = preg_replace_callback(
-                    '/_\w/',
-                    function($matches) {
-                        return substr(strtoupper($matches[0]), 1);
-                    },
-                    $key
-                );
-                $propName = '_' . $propName;
-                
-                if ($this->isDataProperty($propName)) {
-                    $data[$propName] = $value;
-                }
-            }
-            
-            if (count($data)) {
+            if (count($dbData)) {
                 $result = true;
-                foreach ($this as $propName => $value) {
-                    if ($this->isDataProperty($propName)) {
-                        if (array_key_exists($propName, $data)) {
-                            $this->$propName = $data[$propName];
-                        } else {
-                            $this->$propName = null;
-                        }
+                $this->clearPropertiesData();
+                
+                foreach ($dbData as $dbField => $valueRaw) {
+                    $propertyName = $this->getModelPropertyName($dbField);
+                    if ($propertyName) {
+                        $this->setRawProperty($propertyName, $valueRaw);
                     }
                 }
             }
@@ -305,40 +322,33 @@ abstract class ModelDatabase extends Model {
     }
     
     /**
-     * Some properties may be set by this magic meghod.
-     * Properties, start from "_", has only one "_" in it's name and
-     * not in _hiddenPropsList list.
+     * Model properties can be set by this magic meghod.
      */
-    public function __set(string $name, $value): void {
-        $propertyName = '_' . $name;
-        if ($this->isDataProperty($propertyName)) {
-            $methodName = 'set' . ucfirst($name);
+    public function __set(string $propertyName, $value): void {
+        if ($this->isProperty($propertyName)) {
+            $methodName = 'set' . ucfirst($propertyName);
             if (method_exists($this, $methodName)) {
                 $this->$methodName($value);
             } else {
-                $valuePrepared = $this->preparePropertyBeforeSet($propertyName, $value);
-                $this->$propertyName = $valuePrepared;
+                $valuePrepared = $this->preparePropertyForDB($propertyName, $value);
+                $this->setRawProperty($propertyName, $valuePrepared);
             }
         }
     }
     
     /**
-     * Some properties may be get by this magic meghod.
-     * Properties, start from "_", has only one "_" in their names and
-     * are not in _hiddenPropsList list.
+     * Model properties can be get by this magic meghod.
      */
-    public function __get(string $name) {
+    public function __get(string $propertyName) {
         $result = null;
-        $propertyName = '_' . $name;
         
-        if ($this->isDataProperty($propertyName)) {
-            $methodName = 'get' . ucfirst($name);
+        if ($this->isProperty($propertyName)) {
+            $methodName = 'get' . ucfirst($propertyName);
             if (method_exists($this, $methodName)) {
                 $result = $this->$methodName();
             } else {
-                $value = $this->$propertyName;
-                $valuePrepared = $this->preparePropertyBeforeGet($propertyName, $value);
-                $result = $valuePrepared;
+                $valueRaw = $this->getRawProperty($propertyName);
+                $result = $this->preparePropertyFromDB($propertyName, $valueRaw);
             }
         }
         
@@ -348,15 +358,22 @@ abstract class ModelDatabase extends Model {
     /**
      * Prepare property before setting to object porperty.
      */
-    protected function preparePropertyBeforeSet($propertyName, $value) {
-        if ($this->isBoolProperty($propertyName)) {
-            if ($value) {
-                $preparedValue = '1';
-            } else {
-                $preparedValue = '0';
+    protected function preparePropertyForDB($propertyName, $value) {
+        $preparedValue = null;
+        
+        if ($this->isProperty($propertyName)) {
+            $type = $this->_propertiesList[$propertyName]['type'];
+            switch ($type) {
+                case self::TYPE_BOOL:
+                    $preparedValue = (string) (int) $value;
+                    break;
+                case self::TYPE_INT:
+                    $preparedValue = (string) $value;
+                    break;
+                default:
+                    $preparedValue = (string) $value;
+                    break;
             }
-        } else {
-            $preparedValue = $value;
         }
         
         return $preparedValue;
@@ -365,92 +382,247 @@ abstract class ModelDatabase extends Model {
     /**
      * Prepare property before getting from object porperty.
      */
-    protected function preparePropertyBeforeGet($propertyName, $value) {
-        if ($this->isBoolProperty($propertyName)) {
-            $preparedValue = ($value === '1');
-        } else {
-            $preparedValue = $value;
+    protected function preparePropertyFromDB($propertyName, $value) {
+        $preparedValue = null;
+        
+        if (! is_null($value)) {
+            if ($this->isProperty($propertyName)) {
+                $type = $this->_propertiesList[$propertyName]['type'];
+                switch ($type) {
+                    case self::TYPE_BOOL:
+                        $preparedValue = (int) $value;
+                        break;
+                    case self::TYPE_INT:
+                        $preparedValue = (int) $value;
+                        break;
+                    default:
+                        $preparedValue = (string) $value;
+                        break;
+                }
+            }
         }
         
         return $preparedValue;
     }
     
     /**
-     * Checks if property is can be used from outside.
-     * Properties, start from "_", has only one "_" in their names and
-     * are not in _hiddenPropsList list.
-     * 
-     * Use inner porperties names, f e _categoryName.
+     * Checks if $propertyName is model property
+     * and it can be used from outside.
      */
-    protected function isDataProperty($propertyName) {
+    protected function isProperty($propertyName) {
         $result = false;
         
-        if (! in_array($propertyName, $this->_hiddenPropsList)) {
-            if (substr($propertyName, 0, 1) === '_') {
-                if (strpos($propertyName, '_', 1) === false) {
-                    $result = true;
+        if (array_key_exists($propertyName, $this->_propertiesList)) {
+            $result = true;
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Gets promary key value.
+     */
+    public function getPk() {
+        return $this->id;
+    }
+    
+    /**
+     * Sets promary key value.
+     */
+    protected function setPk($pk) {
+        $this->id = $pk;
+    }
+    
+    /**
+     * Checks if property is primary key.
+     */
+    public function isPk($propertyName) {
+        return $propertyName === 'id';
+    }
+    
+    /**
+     * Inits properties list.
+     */
+    private function initPropertiesList() {
+        $extendedList = array();
+        
+        if (is_array($this->_propertiesList)) {
+            foreach ($this->_propertiesList as $property) {
+                if (is_array($property)) {
+                    $extended = $this->getExtendedProperty($property);
+                    if ($extended) {
+                        $extendedList[$extended['name']] = $extended;
+                        $this->_dbFieldsMap[$extended['dbField']] = $extended['name'];
+                    }
                 }
             }
         }
         
-        return $result;
+        if (! array_key_exists('id', $extendedList)) {
+            $property = array('name' => 'id',);
+            $extended = $this->getExtendedProperty($property);
+            if ($extended) {
+                $extendedList[$extended['name']] = $extended;
+                $this->_dbFieldsMap[$extended['dbField']] = $extended['name'];
+            }
+        }
+        
+        $this->_propertiesList = $extendedList;
     }
     
     /**
-     * Checks if property is boolean.
-     * 
-     * Use inner porperties names, f e _categoryName.
+     * Inits property.
      */
-    protected function isBoolProperty($propertyName) {
-        return in_array($propertyName, $this->_boolPropsList);
+    private function getExtendedProperty(array $property): ?array {
+        $extended = null;
+        
+        if (array_key_exists('name', $property)) {
+            $extended = $property;
+            
+            if (! array_key_exists('caption', $extended)) {
+                $extended['caption'] = ucfirst($extended['name']);
+            }
+            
+            if (! array_key_exists('dbField', $extended)) {
+                $extended['dbField'] = $this->getDefaultDbFieldName($extended['name']);
+            }
+            
+            if (! array_key_exists('type', $extended)) {
+                $extended['type'] = self::TYPE_TEXT;
+            }
+            
+        }
+        
+        return $extended;
     }
     
     /**
-     * Adds property to _hiddenPropsList list.
+     * Transforms model property name to database field name.
      */
-    protected function addHiddenProperty($propertyName) {
+    private function getDefaultDbFieldName(string $propertyName): string {
+        $fieldName = preg_replace_callback(
+            '/[A-Z]/',
+            function($matches) {
+                return '_' . strtolower($matches[0]);
+            },
+            $propertyName
+        );
+        
+        return $fieldName;
+    }
+    
+    /**
+     * Gets database property name by model property name.
+     */
+    private function getDbFieldName(string $propertyName): ?string {
+        $fieldName = null;
+        
+        if ($this->isProperty($propertyName)) {
+            $fieldName = $this->_propertiesList[$propertyName]['dbField'];
+        }
+        
+        return $fieldName;
+    }
+    
+    /**
+     * Gets model property name by database property name.
+     */
+    protected function getModelPropertyName(string $fieldName): ?string {
+        $propertyName = null;
+        
+        if (array_key_exists($fieldName, $this->_dbFieldsMap)) {
+            $propertyName = $this->_dbFieldsMap[$fieldName];
+        }
+        
+        return $propertyName;
+    }
+    
+    protected function clearPropertiesData(): void {
+        $this->_propertiesData = array();
+    }
+    
+    protected function setRawProperty(string $propertyName, $value): bool {
         $result = false;
-        if (is_string($propertyName) && strlen($propertyName) && is_array($this->_hiddenPropsList)) {
-            if (! in_array($propertyName, $this->_hiddenPropsList)) {
-                $this->_hiddenPropsList[] = $propertyName;
-            }
+        
+        if ($this->isProperty($propertyName)) {
             $result = true;
+            $dbField = $this->getDbFieldName($propertyName);
+            $this->_propertiesData[$dbField] = $value;
         }
         
         return $result;
     }
     
-    /**
-     * Adds property to _boolPropsList list.
-     */
-    protected function addBoolProperty($propertyName) {
-        $result = false;
-        if (is_string($propertyName) && strlen($propertyName) && is_array($this->_boolPropsList)) {
-            if (! in_array($propertyName, $this->_boolPropsList)) {
-                $this->_boolPropsList[] = $propertyName;
+    protected function getRawProperty(string $propertyName) {
+        $result = null;
+        
+        if ($this->isProperty($propertyName)) {
+            $dbField = $this->getDbFieldName($propertyName);
+            if (array_key_exists($dbField, $this->_propertiesData)) {
+                $result = $this->_propertiesData[$dbField];
             }
-            $result = true;
         }
         
         return $result;
     }
     
-    /**
-     * Gets property type.
-     */
-    public function getPropertyType(string $propertyName): ?string {
-        $type = null;
+    protected function prepareConditionsListForDB(array $conditionsList): array {
+        $dbConditionsList = array();
         
-        if ($propertyName) {
-            $innerPropertyName = '_' . $propertyName;
-            if ($this->isBoolProperty($propertyName)) {
-                $type = self::TYPE_BOOL;
-            } else {
-                $type = self::TYPE_TEXT;
+        foreach ($conditionsList as $propertyName => $complexValue) {
+            $dbField = $this->getDbFieldName($propertyName);
+            if ($dbField) {
+                $value = null;
+                $conditionOperator = '=';
+                if (is_array($complexValue) && array_key_exists('value', $complexValue)) {
+                    $value = $complexValue['value'];
+                    if (array_key_exists('condition', $complexValue)) {
+                        // By default use '='.
+                        $conditionOperator = $complexValue['condition'];
+                    }
+                } else if (! is_array($complexValue)) {
+                    // Use '=' as condition by default.
+                    $value = $complexValue;
+                } else {
+                    // Skip this.
+                    $conditionOperator = null;
+                }
+                
+                if ($conditionOperator) {
+                    $dbValue = $this->preparePropertyForDB($propertyName, $value);
+                    $dbConditionsList[$dbField] = array('value' => $dbValue, 'condition' => $conditionOperator);
+                }
             }
         }
         
-        return $type;
+        return $dbConditionsList;
+    }
+    
+    protected function prepareSortingListForDB(array $sortingList): array {
+        $dbSortingList = array();
+        
+        foreach ($sortingList as $propertyName => $sortingValue) {
+            $dbField = $this->getDbFieldName($propertyName);
+            if ($dbField) {
+                $dbSortingList[$dbField] = $sortingValue;
+            }
+        }
+        
+        return $dbSortingList;
+    }
+    
+    public function getPropertiesList() {
+        return $this->_propertiesList;
+    }
+    
+    /**
+     * Gets model name for this object.
+     * This name may be used for creating models using factory.
+     */
+    public function getModelName(): string {
+        $className = get_class($this);
+        $modelName = preg_replace('/^' . Core::getNamespace() . '\\Model/', '', $className, 1);
+        return $modelName;
     }
     
 }
