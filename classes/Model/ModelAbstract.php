@@ -16,6 +16,7 @@ abstract class ModelAbstract {
     public const TYPE_BOOL = 'bool';
     public const TYPE_INT = 'int';
     public const TYPE_FK = 'fk'; // foreign key
+    public const TYPE_ENUM = 'enum';
     
     /**
      * Loads object's data by primary key.

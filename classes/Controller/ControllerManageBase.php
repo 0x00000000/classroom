@@ -105,6 +105,19 @@ abstract class ControllerManageBase extends ControllerBase {
         $this->getView()->set('propertiesList', $propertiesList);
         $controlsList = $this->getModelControlsList();
         $this->getView()->set('controlsList', $controlsList);
+        
+        $propertiesList = $model->getPropertiesList();
+        foreach ($propertiesList as $propertyName => $propertyData) {
+            if (
+                $propertyData['type'] === Model::TYPE_ENUM
+                && array_key_exists('getValuesMethodName', $propertyData)
+                && method_exists($model, $propertyData['getValuesMethodName'])
+            ) {
+                $methodName = $propertyData['getValuesMethodName'];
+                $values = $model->$methodName();
+                $this->getView()->set($propertyData['name'] . 'Values', $values);
+            }
+        }
     }
     
     protected function setPropertiesFromPost(ModelDatabase $model): bool {
@@ -136,8 +149,12 @@ abstract class ControllerManageBase extends ControllerBase {
      * @param  string $fkModelCaptionField Name of linked model field.
      * @return array
      */
-    protected function getFkValues(string $fkPropertyName, array $condition, string $fkModelCaptionField = 'name'): array {
-        $itemsList = array();
+    protected function getFkValues(string $fkPropertyName, array $condition, string $fkModelCaptionField = 'name', $addEmptyValue = false): array {
+        if ($addEmptyValue) {
+            $itemsList = array('' => ' ');
+        } else {
+            $itemsList = array();
+        }
         
         $model = Factory::instance()->createModel($this->_modelName);
         $propertiesList = $model->getPropertiesList();
@@ -181,6 +198,8 @@ abstract class ControllerManageBase extends ControllerBase {
             if ($model->save()) {
                 $this->setStashData('messageType', 'addedSuccessfully');
             } else {
+                var_export($model->getLastError());
+                exit;
                 $this->setStashData('messageType', 'addingFailed');
             }
         } else {
@@ -419,6 +438,9 @@ abstract class ControllerManageBase extends ControllerBase {
                             $controlType = self::CONTROL_SELECT_BOOL;
                             break;
                         case Model::TYPE_FK:
+                            $controlType = self::CONTROL_SELECT;
+                            break;
+                        case Model::TYPE_ENUM:
                             $controlType = self::CONTROL_SELECT;
                             break;
                         default:

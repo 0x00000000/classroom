@@ -8,4 +8,13 @@ Factory::instance()->loadController('ControllerBase');
 
 abstract class ControllerGuestBase extends ControllerBase {
     
+    /**
+     * Adds common varibles to page's view.
+     */
+    protected function setPageViewVariables(): void {
+        parent::setPageViewVariables();
+        
+        $this->getPageView()->set('bodyClass', 'guest');
+    }
+    
 }

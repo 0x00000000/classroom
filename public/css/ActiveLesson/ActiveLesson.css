@@ -13,3 +13,7 @@
     width: 980px;
     overflow-y: scroll;
 }
+
+body.student .ct-app .ct-toolbox {
+    display: none;
+}

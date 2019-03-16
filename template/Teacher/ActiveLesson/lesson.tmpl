@@ -1,7 +1,3 @@
-<link rel="stylesheet" type="text/css" href="{$rootUrl}/css/ActiveLesson/ActiveLesson.css" />
-
-<script type="text/javascript" src="{$rootUrl}/js/ActiveLesson/common.js"></script>
-<script type="text/javascript" src="{$rootUrl}/js/ActiveLesson/lesson.js"></script>
 <script type="text/javascript">
     initWhiteBoard();
     
@@ -17,8 +13,9 @@
 
 <h4>{$lesson->subject}</h4>
 
-<div class="whiteBoard">
-    {$lesson->content}
+<div class="whiteBoard" data-editable data-name="whiteBoardContent">
+    <p>{$lesson->content}</p>
+    </p>
 .<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>
 .<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>
 .<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>
@@ -27,4 +24,5 @@
 .<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>
 .<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>
 .<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>
+</p>
 </div>

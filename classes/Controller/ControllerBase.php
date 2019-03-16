@@ -57,6 +57,16 @@ abstract class ControllerBase extends Controller {
     protected $_innerUrl = null;
     
     /**
+     * List of css files.
+     */
+    private $_cssFiles = array();
+    
+    /**
+     * List of javascript files.
+     */
+    private $_jsFiles = array();
+    
+    /**
      * Class constructor.
      */
     public function __construct() {
@@ -83,10 +93,12 @@ abstract class ControllerBase extends Controller {
             $this->setContentViewVariables();
             $content = $this->$methodName();
             
+            $this->addJsAndCssFiles();
             $this->setPageViewVariables();
+            $this->setPageViewMenuVariables();
             $this->getPageView()->set('content', $content);
             $this->after();
-            $this->getPageView()->set('minMenuItems', $this->getMenuItems());
+            $this->getResponse()->setHeader('Content-type: text/html; charset=utf-8');
             $this->printPage();
         } else {
             $this->send404();
@@ -204,48 +216,47 @@ abstract class ControllerBase extends Controller {
     }
     
     /**
-     * Sets menu items.
+     * Adds menu varibles to page's view.
      */
-    protected function getMenuItems(): array {
-        $menuItems = array(
-            array('link' => '/', 'title' => 'Главная страница'),
-        );
-        
-        if ($this->getAuth()->isAdmin()) {
-            $menuItems[] = array('link' => '/admin', 'title' => 'Админка');
-            $menuItems[] = array('link' => '/admin/vocabulary/images/fill', 'title' => 'Заполнить видео');
+    protected function setPageViewMenuVariables(): void {
+        $conditionsList = array('disabled' => false, 'delete' => false);
+        $sortingList = array('variable' => 'asc');
+        $menusList = Factory::instance()->createModel('Menu')
+            ->getModelsList($conditionsList, 0, 0, $sortingList);
+        foreach ($menusList as $menu) {
+            $menuItems = array();
+            
+            if ($menu->userHasAccess($this->getAuth())) {
+                foreach ($menu->getItems() as $item) {
+                    if ($item->userHasAccess($this->getAuth())) {
+                        $menuItems[] = $item;
+                    }
+                }
+            }
+            
+            // If there is no access set empty array.
+            $this->getPageView()->set($menu->variable, $menuItems);
         }
-        
-        if ($this->getAuth()->isTeacher()) {
-            // $menuItems[] = array('link' => '/teacher', 'title' => 'Учительская');
-            $menuItems[] = array('link' => '/teacher/student', 'title' => 'Ученики');
-            $menuItems[] = array('link' => '/teacher/lesson', 'title' => 'Уроки');
-            $menuItems[] = array('link' => '/teacher/lessonTemplate', 'title' => 'Шаблоны');
-            $menuItems[] = array('link' => '/teacher/activeLesson', 'title' => 'Начать урок');
-        }
-        
-        if ($this->getAuth()->isStudent()) {
-            $menuItems[] = array('link' => '/student/lesson', 'title' => 'Уроки');
-            $menuItems[] = array('link' => '/student/activeLesson', 'title' => 'Начать урок');
-        }
-        
-        if ($this->getAuth()->isGuest()) {
-            $menuItems[] = array('link' => '/login', 'title' => 'Войти');
-        } else {
-            $menuItems[] = array('link' => '/login', 'title' => 'Выйти');
-        }
-        
-        return $menuItems;
     }
     
     /**
      * Adds common varibles to page's view.
      */
-    protected function setPageViewVariables() {
+    protected function setPageViewVariables(): void {
         $this->getPageView()->set('user', $this->getAuth()->getUser());
         $this->getPageView()->set('url', $this->getUrl());
         $this->getPageView()->set('rootUrl', $this->getRootUrl());
         $this->getPageView()->set('baseTemplatePath', $this->getBaseTemplatePath());
+        $this->getPageView()->set('bodyClass', '');
+        
+        $config = Config::instance();
+        $this->getPageView()->set('pageCaption', $config->get('site', 'caption'));
+        $this->getPageView()->set('pageTitle', $config->get('site', 'title'));
+        $this->getPageView()->set('pageKeywords', $config->get('site', 'keywords'));
+        $this->getPageView()->set('pageDescription', $config->get('site', 'description'));
+        
+        $this->getPageView()->set('cssFiles', $this->_cssFiles);
+        $this->getPageView()->set('jsFiles', $this->_jsFiles);
     }
     
     protected function setContentViewVariables() {
@@ -370,7 +381,7 @@ abstract class ControllerBase extends Controller {
         if ($this->_innerUrl) {
             $baseUrl = $this->getRootUrl() . $this->_innerUrl;
         } else {
-            $baseUrl = '';
+            $baseUrl = $this->getRootUrl();
         }
         
         return $baseUrl;
@@ -411,6 +422,24 @@ abstract class ControllerBase extends Controller {
     
     protected function getAjaxMode(): bool {
         return $this->_isAjaxMode;
+    }
+    
+    protected function addCssFile($filePath) {
+        if ($filePath && ! in_array($filePath, $this->_cssFiles)) {
+            $this->_cssFiles[] = $filePath;
+        }
+    }
+    
+    protected function addJsFile($filePath) {
+        if ($filePath && ! in_array($filePath, $this->_jsFiles)) {
+            $this->_jsFiles[] = $filePath;
+        }
+    }
+    
+    protected function addJsAndCssFiles() {
+        $this->addCssFile('/css/common.css');
+        $this->addJsFile('/js/vendor/jquery/jquery-3.3.1.js');
+        $this->addJsFile('/js/common.js');
     }
     
 }

@@ -14,6 +14,8 @@
             {include file="$baseTemplatePath/selectBool.tmpl" name="{$property['name']}"}
         {else if $controlsList[$propertyName] === 'textarea'}
             {include file="$baseTemplatePath/textarea.tmpl" name="{$property['name']}"}
+        {else if $controlsList[$propertyName] === 'html'}
+            {include file="$baseTemplatePath/html.tmpl" name="{$property['name']}" value="{$model->{$propertyName}}"}
         {else}
             {include file="$baseTemplatePath/text.tmpl" name="{$property['name']}"}
         {/if}
@@ -23,5 +25,8 @@
 {/if}
 {/foreach}
 </table>
-<p><input type="submit" name="submit" value="Save" /></p>
+<p>
+    <input type="submit" name="submit" value="Save" />
+    <input type="button" value="Cansel" class="back" />
+</p>
 </form>

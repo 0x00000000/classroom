@@ -9,7 +9,7 @@ include_once('ModelDatabase.php');
 /**
  * Model lesson's template.
  * 
- * @property string|null $id Log's id.
+ * @property string|null $id Id.
  * @property string|null $teacherId Teacher's id.
  * @property string|null $caption Caption.
  * @property string|null $subject Subject.

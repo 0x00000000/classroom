@@ -19,4 +19,13 @@ class ControllerStudentManageBase extends ControllerManageBase {
         parent::execute($action);
     }
     
+    /**
+     * Adds common varibles to page's view.
+     */
+    protected function setPageViewVariables(): void {
+        parent::setPageViewVariables();
+        
+        $this->getPageView()->set('bodyClass', 'student');
+    }
+    
 }

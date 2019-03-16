@@ -27,6 +27,12 @@ class ConfigCommon extends ConfigBase {
             'name' => 'classroom',
             'prefix' => 'classroom_',
         ),
+        'site' => array(
+            'caption' => 'Learn English',
+            'title' => 'Learn English',
+            'keywords' => '',
+            'description' => '',
+        ),
         'user' => array(
             'salt1' => 'DKfoA.d,XO',
             'salt2' => 'cqPdMs!oee',

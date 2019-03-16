@@ -6,13 +6,13 @@ namespace classroom;
 
 Factory::instance()->loadController('ControllerManageBase');
 
-class ControllerTeacherManageBase extends ControllerManageBase {
+class ControllerAdminManageBase extends ControllerManageBase {
     
     /**
      * Execute controller action.
      */
     public function execute(string $action): void {
-        if (! $this->getAuth() || ! $this->getAuth()->isTeacher()) {
+        if (! $this->getAuth() || ! $this->getAuth()->isAdmin()) {
             $this->redirect($this->getAuthUrl());
         }
         
@@ -25,7 +25,7 @@ class ControllerTeacherManageBase extends ControllerManageBase {
     protected function setPageViewVariables(): void {
         parent::setPageViewVariables();
         
-        $this->getPageView()->set('bodyClass', 'teacher');
+        $this->getPageView()->set('bodyClass', 'admin');
     }
     
     protected function addJsAndCssFiles() {

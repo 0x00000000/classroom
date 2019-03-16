@@ -41,6 +41,13 @@ class ControllerStudentActiveLesson extends ControllerStudentBase {
      */
     protected $_waitingTime = 60;
     
+    protected function addJsAndCssFiles() {
+        parent::addJsAndCssFiles();
+        
+        $this->addCssFile('/css/ActiveLesson/ActiveLesson.css');
+        $this->addJsFile('/js/ActiveLesson/common.js');
+    }
+    
     protected function actionIndex() {
         
         $get = $this->getRequest()->get;
@@ -120,6 +127,10 @@ class ControllerStudentActiveLesson extends ControllerStudentBase {
         if (array_key_exists('lesson', $this->_templateNames)) {
             $this->getView()->setTemplate($this->_templateNames['lesson']);
         }
+        
+        $this->addCssFile('/css/vendor/content-tools/content-tools.min.css');
+        $this->addJsFile('/js/vendor/content-tools/content-tools.js');
+        $this->addJsFile('/js/ActiveLesson/lesson.js');
         
         $user = $this->getAuth()->getUser();
         $activeLesson = Factory::instance()->createModel('ActiveLesson')

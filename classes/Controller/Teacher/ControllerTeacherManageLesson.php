@@ -20,7 +20,7 @@ class ControllerTeacherManageLesson extends ControllerTeacherManageBase {
      */
     protected $_modelControlsList = array(
         'teacherId' => self::CONTROL_NONE,
-        'content' => self::CONTROL_TEXTAREA,
+        'content' => self::CONTROL_HTML,
     );
     
     /**

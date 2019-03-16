@@ -47,6 +47,7 @@ class DatabaseMysql extends Database {
             die('Can\'t connect');
         }
         
+        $this->_mysqli->query('set names UTF8');
     }
     
     /**

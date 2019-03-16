@@ -1,0 +1,5 @@
+<div class="htmlContentToolsControlBox">
+    <div class="htmlContentToolsControl" data-editable 
+    data-name="{$name}-html">{$value}</div>
+</div>
+<input type="hidden" name="{$name}" {if isset($value) && $value !== null} value="{htmlspecialchars($value)}"{/if}/>

@@ -42,11 +42,6 @@ class ModelActiveLesson extends ModelDatabase {
     );
     
     /**
-     * @var int $_maxCommandLength Max length for commands.
-     */
-    protected $_maxCommandLength = 1024;
-    
-    /**
      * Class constructor.
      */
     public function __construct() {
@@ -109,10 +104,6 @@ class ModelActiveLesson extends ModelDatabase {
     public function setTeacherCommand($command): bool {
         $result = false;
         
-        if (strlen($command) > $this->_maxCommandLength) {
-            return $result;
-        }
-        
         $time = (string) time();
         $this->setRawProperty('teacherCommand', $command);
         $this->setRawProperty('teacherUpdated', $time);
@@ -126,10 +117,6 @@ class ModelActiveLesson extends ModelDatabase {
     
     public function setStudentCommand($command): bool {
         $result = false;
-        
-        if (strlen($command) > $this->_maxCommandLength) {
-            return $result;
-        }
         
         $time = (string) time();
         $this->setRawProperty('studentCommand', $command);

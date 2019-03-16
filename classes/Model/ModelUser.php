@@ -29,6 +29,14 @@ class ModelUser extends ModelDatabase {
     public const UNKNOWN_SERVER_NAME = 'UNKNOWN_SERVER_NAME';
     
     /**
+     * User's access levels.
+     */
+    public const ACCESS_ADMIN = 1;
+    public const ACCESS_TEACHER = 2;
+    public const ACCESS_STUDENT = 4;
+    public const ACCESS_GUEST = 8;
+    
+    /**
      * @var string $_table Name of database table.
      */
     protected $_table = 'user';
@@ -223,6 +231,18 @@ class ModelUser extends ModelDatabase {
         }
         
         return $result;
+    }
+    
+    /**
+     * Gets access levels values. May be used in controls.
+     */
+    public static function getAccessValues(): array {
+        return array(
+            self::ACCESS_ADMIN => 'admin',
+            self::ACCESS_TEACHER => 'teacher',
+            self::ACCESS_STUDENT => 'student',
+            self::ACCESS_GUEST => 'guest',
+        );
     }
     
 }

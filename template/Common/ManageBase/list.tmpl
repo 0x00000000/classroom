@@ -46,10 +46,13 @@
 
 <p><a href="{$baseUrl}/add">Create new</a></a>
         
-<table class"listTable"><tbody>
+<table class="listTable"><tbody>
     <tr>
     {foreach $propertiesList as $propertyName => $property}
-    {if $controlsList[$propertyName] !== 'none'}
+    {if $controlsList[$propertyName] === 'none'}
+    {else if $controlsList[$propertyName] === 'textarea'}
+    {else if $controlsList[$propertyName] === 'html'}
+    {else}
         <th>{$property['caption']}</th>
     {/if}
     {/foreach}
@@ -60,7 +63,7 @@
     {foreach $itemsList as $item}
     <tr>
     {foreach $propertiesList as $propertyName => $property}
-    {if $controlsList[$propertyName] !== 'none'}
+    {if $controlsList[$propertyName] !== 'none' && $controlsList[$propertyName] !== 'textarea' && $controlsList[$propertyName] !== 'html' }
         <td>
         {if $controlsList[$propertyName] === 'select'}
             {include file="$baseTemplatePath/viewSelect.tmpl" values=${$property['name']}Values value="{$item->{$propertyName}}"}

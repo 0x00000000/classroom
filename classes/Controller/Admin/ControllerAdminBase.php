@@ -17,4 +17,13 @@ abstract class ControllerAdminBase extends ControllerBase {
         }
     }
     
+    /** 
+     * Adds common varibles to page's view.
+     */
+    protected function setPageViewVariables(): void {
+        parent::setPageViewVariables();
+        
+        $this->getPageView()->set('bodyClass', 'admin');
+    }
+    
 }

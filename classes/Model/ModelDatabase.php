@@ -370,6 +370,13 @@ abstract class ModelDatabase extends Model {
                 case self::TYPE_INT:
                     $preparedValue = (string) $value;
                     break;
+                case self::TYPE_FK:
+                    $preparedValue = (string) $value;
+                    if (strlen($preparedValue) === 0) {
+                        // We can't set empty strings as empty fk values.
+                        $preparedValue = null;
+                    }
+                    break;
                 default:
                     $preparedValue = (string) $value;
                     break;

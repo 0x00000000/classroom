@@ -2,33 +2,58 @@
 <head>
     <meta charset="utf-8" />
     
-    <link rel="stylesheet" type="text/css" href="{$rootUrl}/css/common.css" />
+    {foreach from=$cssFiles item=cssFile}
+    <link rel="stylesheet" type="text/css" href="{$rootUrl}{$cssFile}" />
+    {/foreach}
     
-    <script type="text/javascript" src="{$rootUrl}/js/vendor/jquery/jquery-3.3.1.js"></script>
+    {foreach from=$jsFiles item=jsFile}
+    <script type="text/javascript" src="{$rootUrl}{$jsFile}"></script>
+    {/foreach}
 </head>
-<body>
 
-    <div class="user">
-        {if $user}
-        Здравствуйте, {$user->name}.
-        <form action="{$rootUrl}/login" method="POST">
-            <input name="logout" value="1" type="hidden" />
-            <p><input type="submit" value="Выйти" /></p>
-        </form>
-        {else}
-        <a href="{$rootUrl}/login">Войти</a>
-        {/if}
+<body class="{$bodyClass}">
+
+<div class="all">
+    <div class="header">
+        <div class="headerTop">
+            <div class="headerLogo">
+            </div>
+            <div class="user">
+                {if $user}
+                <form action="{$rootUrl}/login" method="POST" class="headerForm">
+                    <input name="logout" value="1" type="hidden" />
+                    Здравствуйте, {$user->name}.
+                    <input type="submit" value="Выйти" />
+                </form>
+                {else}
+                <a href="{$rootUrl}/login">Войти</a>
+                {/if}
+            </div>
+        </div>
+        
+        <div class="mainMenu">
+            {foreach $mainMenu as $item}
+                <span><a href="{$item->link}">{$item->caption}</a></span>
+            {/foreach}
+        </div>
+    </header>
+    
+    <div class="body">
+        <div class="bodyLeft">
+        </div>
+        <div class="bodyCenter">
+            <div class="content">
+                {$content}
+            </div>
+        </div>
+        <div class="bodyRight">
+        </div>
     </div>
-
-    <div class="minMenu">
-        {foreach $minMenuItems as $item}
-            <span><a href="{$item['link']}">{$item['title']}</a></span>
-        {/foreach}
+    
+    <div class="footer">
+        <div class="copyright">
+        </div>
     </div>
-
-    <div class="content">
-        {$content}
-    </div>
-
+</div>
 </body>
 </html>
