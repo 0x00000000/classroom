@@ -51,6 +51,15 @@ class ControllerStudentManageLesson extends ControllerStudentManageBase {
     }
     
     protected function setContentViewVariables() {
+        $get = $this->getRequest()->get;
+        $_action = null;
+        if (array_key_exists('action', $get)) {
+            $_action = $get['action'];
+        }
+        if ($this->_action === 'list' || empty($this->_action)) {
+            $this->_modelControlsList['content'] = self::CONTROL_NONE;
+        }
+        
         parent::setContentViewVariables();
         
         $user = $this->getAuth()->getUser();

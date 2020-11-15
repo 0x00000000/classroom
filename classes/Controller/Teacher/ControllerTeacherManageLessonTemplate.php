@@ -38,4 +38,22 @@ class ControllerTeacherManageLessonTemplate extends ControllerTeacherManageBase 
         return $result;
     }
     
+    protected function innerActionView() {
+        $this->_conditionsList['teacherId'] = $this->getAuth()->getUser()->id;
+        
+        return parent::innerActionView();
+    }
+    
+    protected function innerActionEdit() {
+        $this->_conditionsList['teacherId'] = $this->getAuth()->getUser()->id;
+        
+        return parent::innerActionEdit();
+    }
+    
+    protected function innerActionList() {
+        $this->_conditionsList['teacherId'] = $this->getAuth()->getUser()->id;
+        
+        return parent::innerActionList();
+    }
+    
 }

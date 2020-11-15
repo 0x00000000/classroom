@@ -1,3 +1,9 @@
+.whiteBoard {
+    position: relative;
+    width: 980px;
+    overflow-y: scroll;
+}
+
 .pointer {
     position: absolute;
     width: 20px;
@@ -8,12 +14,3 @@
     margin-top: -10px;
 }
 
-.whiteBoard {
-    position: relative;
-    width: 980px;
-    overflow-y: scroll;
-}
-
-body.student .ct-app .ct-toolbox {
-    display: none;
-}

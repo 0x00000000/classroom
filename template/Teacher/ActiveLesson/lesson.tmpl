@@ -1,6 +1,4 @@
 <script type="text/javascript">
-    initWhiteBoard();
-    
     var requestUrl = "{$baseUrl}/command/{$student->id}/{$lesson->id}";
     {literal}
     ActiveLesson(true, {requestUrl: requestUrl});
@@ -13,16 +11,8 @@
 
 <h4>{$lesson->subject}</h4>
 
-<div class="whiteBoard" data-editable data-name="whiteBoardContent">
-    <p>{$lesson->content}</p>
-    </p>
-.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>
-.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>
-.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>
-.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>
-.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>
-.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>
-.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>
-.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>
-</p>
+<div class="htmlNicEditContainer whiteBoardContainer">
+    <div id="lessonNicEditPanelContainer">
+        <textarea id="lessonNicEditPanel">{$lesson->content}</textarea>
+    </div>
 </div>

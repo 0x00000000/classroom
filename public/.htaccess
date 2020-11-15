@@ -18,6 +18,8 @@ RewriteRule ^css/.*\.css$ - [L]
 RewriteRule ^js/.*\.js$ - [L]
 
 RewriteRule ^images/.*\.((jpg)|(jpeg)|(gif)|(ico)|(png)|(svg)|(woff))$ - [L]
+RewriteRule ^vendor/.*\.((js)|(css)|(jpg)|(jpeg)|(gif)|(ico)|(png)|(svg)|(woff))$ - [L]
+
 RewriteRule ^css/vendor/content-tools/images/.*\.((svg)|(woff))$ - [L]
 
 # Allow any files or directories that exist to be displayed directly

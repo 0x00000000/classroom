@@ -6,29 +6,29 @@
 {if $messageType}
     {if $messageType === 'addedSuccessfully'}
         <p>Item was added.</p>
-    {elseif $messageType === 'addingFailed'}
+    {else if $messageType === 'addingFailed'}
         <p>Item wasn't added. Error occured.</p>
-    {elseif $messageType === 'itemNotFound'}
+    {else if $messageType === 'itemNotFound'}
         <p>Item not found.</p>
-    {elseif $messageType === 'editedSuccessfully'}
+    {else if $messageType === 'editedSuccessfully'}
         <p>Item was sucessfully updaeted.</p>
-    {elseif $messageType === 'editingFailed'}
+    {else if $messageType === 'editingFailed'}
         <p>Item wasn't updated. Error occured.</p>
-    {elseif $messageType === 'deletedSuccessfully'}
+    {else if $messageType === 'deletedSuccessfully'}
         <p>Item was successfully deleted.</p>
-    {elseif $messageType === 'deletingFailed'}
+    {else if $messageType === 'deletingFailed'}
         <p>Item wasn't deleted. Error occured.</p>
-    {elseif $messageType === 'disabledSuccessfully'}
+    {else if $messageType === 'disabledSuccessfully'}
         <p>Item was successfully updated.</p>
-    {elseif $messageType === 'enabledSuccessfully'}
+    {else if $messageType === 'enabledSuccessfully'}
         <p>Item was successfully updated.</p>
-    {elseif $messageType === 'disablingFailed'}
+    {else if $messageType === 'disablingFailed'}
         <p>Item wasn't updated. Error occured.</p>
-    {elseif $messageType === 'enabledFailed'}
+    {else if $messageType === 'enabledFailed'}
         <p>Item wasn't updated. Error occured.</p>
-    {elseif $messageType === 'wrongParamethers'}
+    {else if $messageType === 'wrongParamethers'}
         <p>Wrong paramethers.</p>
-    {/if}    
+    {/if}
 {/if}
 </div>
 
@@ -52,6 +52,7 @@
     {if $controlsList[$propertyName] === 'none'}
     {else if $controlsList[$propertyName] === 'textarea'}
     {else if $controlsList[$propertyName] === 'html'}
+    {else if $controlsList[$propertyName] === 'password'}
     {else}
         <th>{$property['caption']}</th>
     {/if}
@@ -63,7 +64,11 @@
     {foreach $itemsList as $item}
     <tr>
     {foreach $propertiesList as $propertyName => $property}
-    {if $controlsList[$propertyName] !== 'none' && $controlsList[$propertyName] !== 'textarea' && $controlsList[$propertyName] !== 'html' }
+    {if $controlsList[$propertyName] === 'none'}
+    {else if $controlsList[$propertyName] === 'textarea'}
+    {else if $controlsList[$propertyName] === 'html'}
+    {else if $controlsList[$propertyName] === 'password'}
+    {else}
         <td>
         {if $controlsList[$propertyName] === 'select'}
             {include file="$baseTemplatePath/viewSelect.tmpl" values=${$property['name']}Values value="{$item->{$propertyName}}"}

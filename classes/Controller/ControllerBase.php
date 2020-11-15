@@ -297,6 +297,7 @@ abstract class ControllerBase extends Controller {
         $result = null;
         
         if ($this->getRequest()) {
+            
             if (
                 array_key_exists('stash', $this->getRequest()->session)
                 && is_array($this->getRequest()->session['stash'])
@@ -438,7 +439,8 @@ abstract class ControllerBase extends Controller {
     
     protected function addJsAndCssFiles() {
         $this->addCssFile('/css/common.css');
-        $this->addJsFile('/js/vendor/jquery/jquery-3.3.1.js');
+        $this->addJsFile('/vendor/jquery/jquery-3.3.1.js');
+        $this->addJsFile('/vendor/nicEdit/nicEdit.js');
         $this->addJsFile('/js/common.js');
     }
     

@@ -9,9 +9,7 @@ include_once('ControllerTeacherBase.php');
 class ControllerTeacherIndex extends ControllerTeacherBase {
     
     protected function actionIndex() {
-        $content = 'Index page.';
-        
-        return $content;
+        $this->redirect($this->getRootUrl() . '/teacher/activeLesson');
     }
     
 }

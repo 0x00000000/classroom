@@ -9,9 +9,7 @@ include_once('ControllerStudentBase.php');
 class ControllerStudentIndex extends ControllerStudentBase {
     
     protected function actionIndex() {
-        $content = 'Index page.';
-        
-        return $content;
+        $this->redirect($this->getRootUrl() . '/student/lesson');
     }
     
 }

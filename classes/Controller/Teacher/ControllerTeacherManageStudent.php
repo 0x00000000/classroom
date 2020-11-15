@@ -24,6 +24,7 @@ class ControllerTeacherManageStudent extends ControllerTeacherManageBase {
      * propertyName => controlType
      */
     protected $_modelControlsList = array(
+        'password' => self::CONTROL_PASSWORD,
         'isAdmin' => self::CONTROL_NONE,
         'isTeacher' => self::CONTROL_NONE,
         'isStudent' => self::CONTROL_NONE,
@@ -105,6 +106,18 @@ class ControllerTeacherManageStudent extends ControllerTeacherManageBase {
         $content = $this->getView()->render();
         
         return $content;
+    }
+    
+    protected function innerActionView() {
+        $this->_conditionsList['teacherId'] = $this->getAuth()->getUser()->id;
+        
+        return parent::innerActionView();
+    }
+    
+    protected function innerActionEdit() {
+        $this->_conditionsList['teacherId'] = $this->getAuth()->getUser()->id;
+        
+        return parent::innerActionEdit();
     }
     
 }

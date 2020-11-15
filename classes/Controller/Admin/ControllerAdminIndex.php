@@ -9,9 +9,7 @@ include_once('ControllerAdminBase.php');
 class ControllerAdminIndex extends ControllerAdminBase {
     
     protected function actionIndex() {
-        $content = 'Admin index page.';
-        
-        return $content;
+        $this->redirect($this->getRootUrl() . '/admin/page');
     }
     
 }

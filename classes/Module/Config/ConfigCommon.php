@@ -22,8 +22,8 @@ class ConfigCommon extends ConfigBase {
         ),
         'database' => array(
             'server' => 'localhost',
-            'login' => 'root',
-            'password' => '',
+            'login' => 'mysql',
+            'password' => '555',
             'name' => 'classroom',
             'prefix' => 'classroom_',
         ),

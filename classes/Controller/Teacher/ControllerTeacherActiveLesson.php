@@ -70,7 +70,6 @@ class ControllerTeacherActiveLesson extends ControllerTeacherBase {
         parent::addJsAndCssFiles();
         
         $this->addCssFile('/css/ActiveLesson/ActiveLesson.css');
-        $this->addJsFile('/js/ActiveLesson/common.js');
     }
     
     protected function actionIndex() {
@@ -155,8 +154,6 @@ class ControllerTeacherActiveLesson extends ControllerTeacherBase {
             $this->getView()->setTemplate($this->_templateNames['lesson']);
         }
         
-        $this->addCssFile('/css/vendor/content-tools/content-tools.min.css');
-        $this->addJsFile('/js/vendor/content-tools/content-tools.js');
         $this->addJsFile('/js/ActiveLesson/lesson.js');
         
         $user = $this->getAuth()->getUser();

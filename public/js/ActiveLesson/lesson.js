@@ -1,42 +1,126 @@
-function ActiveLesson(isTeacher, params) {
+function ActiveLesson(isTeacher, lessonParams) {
 
 var whiteBoard;
 var application;
-var editor;
+var nicEdit;
 
-$(document).ready(function() {
-    if (! params)
-        return;
-    
-    if (typeof params['requestUrl'] === 'undefined')
-        return;
-    
-    whiteBoard = $('.whiteBoard').get(0);
-    
-    if (! whiteBoard)
-        return;
-    
-    editor = ContentTools.EditorApp.get();
-    editor.init('*[data-editable]', 'data-name');
-    // editor.ToolShelf.fetch('undo');
-    // ContentTools.DEFAULT_TOOLS[0]
+var bkLibReady = false;
+var documentReady = false;
 
-    // ContentTools.StylePalette.add([
-    //     new ContentTools.Style('Author', 'author', ['p'])
-    // ]);
+if (! lessonParams)
+    return;
 
-    application = new Application(isTeacher, params['requestUrl']);
-    application.start();
+if (typeof lessonParams['requestUrl'] === 'undefined')
+    return;
+
+bkLib.onDomLoaded(function() {
+    var iconsPath = (typeof rootUrl !== 'undefined' ? rootUrl : '')
+        + '/vendor/nicEdit/nicEditorIcons.gif';
+    var nicEditParams = {
+            maxHeight : 400,
+            iconsPath: iconsPath,
+            buttonList: ['bold','italic','underline','forecolor']};
+    nicEdit = new nicEditor(nicEditParams).panelInstance('lessonNicEditPanel');
+    var editorContainer = document.getElementById('lessonNicEditPanelContainer');
+    if (editorContainer) {
+        whiteBoard = editorContainer.querySelector('.nicEdit-main');
+        whiteBoard.classList.add('whiteBoard');
+    }
+    if (whiteBoard) {
+        bkLibReady = true;
+        initApplication();
+    }
 });
 
-function Command(data) {
-    this._data = data;
+$(document).ready(function() {
+    documentReady = true;
+    initApplication();
+});
+
+function initApplication() {
+    if (documentReady && bkLibReady) {
+        Params.init(lessonParams);
+        initWhiteBoard();
+        application = new Application(isTeacher, Params.requestUrl);
+        application.start();
+    }
+}
+
+var Params = function() {
+}
+Params.requestUrl = '';
+Params.lockTime = 3000;
+Params.reloadTimeout = 1000;
+Params.pointerLifeTime = 7000;
+Params.init = function(params) {
+    Params.requestUrl = params['requestUrl'];
+    if (params['lockTime']) {
+        Params.lockTime = params['lockTime'];
+    }
+    if (params['reloadTimeout']) {
+        Params.reloadTimeout = params['reloadTimeout'];
+    }
+    if (params['pointerLifeTime']) {
+        Params.pointerLifeTime = params['pointerLifeTime'];
+    }
+};
+
+function initWhiteBoard() {
+    
+    function setWhiteBoardHeight() {
+        var el = $('.whiteBoard').parent();
+        if (el.length) {
+            var box = el.get(0).getBoundingClientRect();
+            var fromTop = box.top + pageYOffset;
+            var bordersHeight = 2;
+            var height = Math.floor(document.documentElement.clientHeight - fromTop - bordersHeight);
+            el.get(0).style.height = height + 'px';
+            el.get(0).style.maxHeight = height + 'px';
+        }
+    }
+    
+    $(window).on('resize', function() {
+        setWhiteBoardHeight();
+    });
+    
+    setWhiteBoardHeight();
+}
+
+function Command(params) {
+    this._data = params;
     this._type = 'Command';
     this._isSingle = true;
 }
 
+Command.prototype.debug = function(caption) {
+    var today = new Date;
+    console.log((caption ? caption : '') + 'command (' + this.getType() + ') ' + today.getHours() + '-' + today.getMinutes() + '-' + today.getSeconds() + ':', JSON.stringify(this.getData()));
+}
+
 Command.prototype.execute = function() {
     console.log('Base command execute data', this.getData());
+}
+
+Command.prototype.isEqualTo = function(command) {
+    var result = false;
+    
+    if (command instanceof Command) {
+        var data1 = command.getData();
+        var data2 = this.getData();
+        if (data1 && data2) {
+            result = this.isDataEqual(data1, data2);
+        } else {
+            if (data1 === data2) {
+                result = true;
+            }
+        }
+    }
+    
+    return result;
+}
+
+Command.prototype.isDataEqual = function(data1, data2) {
+    return JSON.stringify(data1) === JSON.stringify(data2);
 }
 
 Command.prototype.getData = function() {
@@ -50,7 +134,7 @@ Command.prototype.getType = function() {
 Command.prototype.serialize = function() {
     var data = {
         type: this._type,
-        data: this._data
+        params: this._data
     };
     
     return JSON.stringify(data);
@@ -72,20 +156,17 @@ CommandFactory.create = function(serialized) {
             if (
                 data
                 && typeof data['type'] !== 'undefined'
-                && typeof data['data'] !== 'undefined'
+                && typeof data['params'] !== 'undefined'
             ) {
                 switch (data['type']) {
                     case 'ScrollCommand':
-                        command = new ScrollCommand(data['data']);
+                        command = new ScrollCommand(data['params']);
                         break;
                     case 'ClickCommand':
-                        command = new ClickCommand(data['data']);
-                        break;
-                    case 'LockCommand':
-                        command = new LockCommand(data['data']);
+                        command = new ClickCommand(data['params']);
                         break;
                     case 'EditCommand':
-                        command = new EditCommand(data['data']);
+                        command = new EditCommand(data['params']);
                         break;
                     default:
                         break;
@@ -99,11 +180,11 @@ CommandFactory.create = function(serialized) {
     }
 }
 
-function ScrollCommand(data) {
-    if (typeof data === 'undefined') {
-        data = UiDataProvider.get('ScrollCommand');
+function ScrollCommand(params) {
+    if (typeof params === 'undefined') {
+        params = {scroll: whiteBoard.parentNode.scrollTop};
     }
-    Command.apply(this, arguments);
+    Command.apply(this, [params]);
     this._type = 'ScrollCommand';
 }
 
@@ -111,14 +192,24 @@ ScrollCommand.prototype = Object.create(Command.prototype);
 ScrollCommand.prototype.constructor = ScrollCommand;
 
 ScrollCommand.prototype.execute = function() {
-    console.log('Scroll command execute data', this.getData());
-    if (this.getData() != null) {
-        UiDataProvider.set('ScrollCommand', this.getData());
+    this.debug('execute');
+    var data = this.getData();
+    if (data && typeof data.scroll != 'undefined') {
+        whiteBoard.parentNode.scrollTo({
+            top: data.scroll,
+            left: 0,
+            behavior: 'instant',
+        });
     }
 }
 
-function ClickCommand(data) {
-    Command.apply(this, arguments);
+ScrollCommand.prototype.isDataEqual = function(data1, data2) {
+    // Not strict comparing. We count that '100' is equal to 100.
+    return data1.scroll == data2.scroll;
+}
+
+function ClickCommand(params) {
+    Command.apply(this, [params]);
     this._type = 'ClickCommand';
     this._pointerClassName = 'pointer';
     this._isSingle = false;
@@ -128,46 +219,42 @@ ClickCommand.prototype = Object.create(Command.prototype);
 ClickCommand.prototype.constructor = ClickCommand;
 
 ClickCommand.prototype.execute = function() {
-    console.log('Click command execute data', this.getData());
-    if (this.getData() && typeof this.getData().x !== 'undefined'  && typeof this.getData().y !== 'undefined') {
+    this.debug('execute');
+    var self = this;
+    var data = self.getData();
+    if (data && typeof data.x !== 'undefined'  && typeof data.y !== 'undefined') {
         var pointer = document.createElement('div');
-        pointer.className = this._pointerClassName;
-        pointer.style.left = this.getData().x + 'px';
-        pointer.style.top = this.getData().y + 'px';
+        pointer.className = self._pointerClassName;
+        pointer.style.left = data.x + 'px';
+        pointer.style.top = data.y + 'px';
         whiteBoard.appendChild(pointer);
-        setTimeout(function() {
-            $(pointer).hide('slow', function() {
-                this.parentNode.removeChild(pointer);
-            });
-            
-        }, 5000);
+        setTimeout(
+            function() {
+                $(pointer).hide('slow', function() {
+                    if (pointer && pointer.remove) {
+                        pointer.remove();
+                    }
+                });
+            }, Params.pointerLifeTime
+        );
     }
 }
 
-function LockCommand(data) {
-    Command.apply(this, arguments);
-    this._type = 'LockCommand';
-    this._isSingle = false;
+ClickCommand.prototype.isDataEqual = function(data1, data2) {
+    // Not strict comparing. We count that '100' is equal to 100.
+    return data1.x == data2.x && data1.y == data2.y;
 }
 
-LockCommand.prototype = Object.create(Command.prototype);
-LockCommand.prototype.constructor = LockCommand;
-
-LockCommand.prototype.execute = function() {
-    console.log('Lock command execute data', this.getData());
-    if (this.getData() && this.getData().name) {
-        if (typeof this.getData().seconds === 'undefined') {
-            var seconds = 0;
-        } else {
-            var seconds = parseInt(this.getData().seconds);
-        }
-        
-        LockerPool.set(this.getData().name, seconds);
+function EditCommand(params) {
+    if (typeof params === 'undefined') {
+        params = {content: whiteBoard.innerHTML};
     }
-}
-
-function EditCommand(data) {
-    Command.apply(this, arguments);
+    Command.apply(this, [params]);
+    
+    if (this._data && typeof this._data.content === 'string') {
+        var regExp = /\s*(\s*<div[^>]+class\s*=[\s'"]+pointer[\s'"]+[^>]*>\w*<\/div>\s*)*$/i;
+        this._data.content = this._data.content.replace(regExp, '');
+    }
     this._type = 'EditCommand';
 }
 
@@ -175,75 +262,68 @@ EditCommand.prototype = Object.create(Command.prototype);
 EditCommand.prototype.constructor = EditCommand;
 
 EditCommand.prototype.execute = function() {
-    console.log('Edit command execute data length', this.getData().content ? this.getData().content.length : this.getData());
+    this.debug('execute');
     if (this.getData() && this.getData().content) {
         $scrollCommand = new ScrollCommand();
-        UiDataProvider.set('EditCommand', this.getData().content);
+        whiteBoard.innerHTML = this.getData().content;
         $scrollCommand.execute();
     }
+}
+
+EditCommand.prototype.isDataEqual = function(data1, data2) {
+    return data1.content === data2.content;
 }
 
 function LockerPool() {
 }
 
-LockerPool.lockers = [];
+LockerPool._lockers = {};
+LockerPool._lockTime = Params.lockTime;
 
-LockerPool.isSet = function(name) {
+LockerPool.UI = 'ui';
+LockerPool.WEB = 'web';
+
+LockerPool.isSet = function(type, subtype) {
     var result = false;
-    if (LockerPool.lockers[name]) {
+    
+    if (type && subtype && LockerPool._lockers[type] && LockerPool._lockers[type][subtype]) {
         var time = (new Date()).getTime();
-        result = time < LockerPool.lockers[name];
+        result = time < LockerPool._lockers[type][subtype];
+        if (! result) {
+            LockerPool._lockers[type][subtype] = null;
+        }
     }
+    
     return result;
 }
 
-LockerPool.set = function(name, value) {
-    var time = (new Date()).getTime();
-    LockerPool.lockers[name] = time + value * 1000;
-}
-
-LockerPool.clear = function(name, value) {
-    var time = (new Date()).getTime();
-    LockerPool.lockers[name] = time;
-}
-
-function UiDataProvider() {
-}
-
-UiDataProvider.get = function(type) {
-    var value = null;
+LockerPool.set = function(type, subtype) {
+    var result = false;
     
-    switch (type) {
-        case 'ScrollCommand':
-            value = whiteBoard.scrollTop;
-            break;
-        case 'EditCommand':
-            value = whiteBoard.innerHTML;
-            break;
-        default:
-            break;
+    if (type && subtype) {
+        if (! LockerPool._lockers[type]) {
+            LockerPool._lockers[type] = {};
+        }
+        var time = (new Date()).getTime();
+        LockerPool._lockers[type][subtype] = time + LockerPool._lockTime;
+        result = true;
     }
     
-    return value;
+    return result;
 }
 
-UiDataProvider.set = function(type, value) {
-    var result = null;
+LockerPool.clear = function(type, subtype) {
+    var result = false;
     
-    switch (type) {
-        case 'ScrollCommand':
-            whiteBoard.scrollTo({
-                top: value,
-                left: 0,
-                behavior: 'instant',
-            });
-            break;
-        case 'EditCommand':
-            whiteBoard.innerHTML = value;
-            break;
-        default:
-            break;
+    if (type && subtype) {
+        if (! LockerPool._lockers[type]) {
+            LockerPool._lockers[type] = {};
+        }
+        LockerPool._lockers[type][subtype] = null;
+        result = true;
     }
+    
+    return result;
 }
 
 function Controller(params) {
@@ -307,7 +387,7 @@ Controller.prototype.addOuterCommand = function(command) {
     }
 }
 
-Controller.prototype.executeCommands = function() {
+Controller.prototype.executeCommands = function(callback) {
     for (var type in this.outerCommands) {
         if (this.outerCommands[type] instanceof Array) {
             for (var i = 0; i < this.outerCommands[type].length; i++) {
@@ -316,6 +396,10 @@ Controller.prototype.executeCommands = function() {
         }
     }
     this.outerCommands = {};
+    
+    if (typeof callback === 'function') {
+        callback(null); // For backward compatibility.
+    }
 }
 
 function UiController(params) {
@@ -329,37 +413,40 @@ function UiController(params) {
     
     self.scrollWaitTime = 5;
     
-    self.lastCommandData = {};
-    self.setLastCommandData(ScrollCommand, UiDataProvider.get('ScrollCommand'));
+    self.editWaitTime = 5;
+    
+    self.lastCommandsList = {};
+    self.setLastCommand('ScrollCommand', new ScrollCommand());
+    self.setLastCommand('EditCommand', new EditCommand());
     
     // $(window).on('scroll keypress keyup keydown click dbclick mousedown mouseup mousemove mousewheel wheel DOMMouseScroll MozMousePixelScroll', function(event) {
     // event.stopPropagation();
     // event.preventDefault();
     // event.stopImmediatePropagation();
     $(whiteBoard).on('scroll mousewheel wheel DOMMouseScroll MozMousePixelScroll', function(event) {
-        if (LockerPool.isSet('ScrollCommand')) {
+        if (LockerPool.isSet('ScrollCommand', LockerPool.UI)) {
             event.preventDefault();
         }
     });
     
     $(whiteBoard).on('keydown', function(event) {
-        if (event.originalEvent.keyCode >=33 && event.originalEvent.keyCode <= 40) {
-            if (LockerPool.isSet('ScrollCommand')) {
+        if (LockerPool.isSet('EditCommand', LockerPool.UI)) {
+            event.preventDefault();
+        } else if (event.originalEvent.keyCode >=33 && event.originalEvent.keyCode <= 40) {
+            if (LockerPool.isSet('ScrollCommand', LockerPool.UI)) {
                 event.preventDefault();
             }
         }
     });
     
-    $(whiteBoard).on('dblclick', function(event) {
-        if (! LockerPool.isSet('EditCommand')) {
-        }
-    });
-    
     $(whiteBoard).on('mousedown', function(event) {
+        if (LockerPool.isSet('EditCommand', LockerPool.UI)) {
+            event.preventDefault(); // Previnting text selection when editor is locked.
+        }
         if (event.originalEvent.ctrlKey) {
-            var data = {x: event.originalEvent.layerX, y: event.originalEvent.layerY};
-            if (data.x > 10 || data.y > 10) { // For preventing false pointers for boubleclick.
-                var command = new ClickCommand(data);
+            var params = {x: event.originalEvent.layerX, y: event.originalEvent.layerY};
+            if (params.x > 10 || params.y > 10) { // For preventing false pointers for boubleclick.
+                var command = new ClickCommand(params);
                 self.addInnerCommand(command);
                 command.execute();
             }
@@ -367,21 +454,9 @@ function UiController(params) {
         }
     });
     
-    editor.addEventListener('saved', function (ev) {
-        var name, payload, regions, xhr;
-
-        // Check that something changed
-        regions = ev.detail().regions;
-        if (! ev.detail().regions.whiteBoardContent) {
-            return;
-        }
-        
-        // Set the editor as busy while we save our changes
-        this.busy(true);
-        
-        var command = new EditCommand({content: ev.detail().regions.whiteBoardContent});
-        self.addInnerCommand(command);
-        editor.busy(false);
+    nicEdit.addEvent('blur', function() {
+        // var command = new EditCommand();
+        // self.addInnerCommand(command);
     });
     
 }
@@ -394,10 +469,10 @@ UiController.prototype.popCommands = function(type) {
     
     switch (type) {
         case 'ScrollCommand':
-            var data = UiDataProvider.get(type);
-            if (this.isLastCommandDataChanged(type, data)) {
-                commands = [new ScrollCommand(data)];
-                this.setLastCommandData(type, data)
+            var command = new ScrollCommand();
+            if (this.isLastCommandChanged(type, command)) {
+                commands = [command];
+                this.setLastCommand(type, command);
             }
             break;
         case 'ClickCommand':
@@ -406,16 +481,11 @@ UiController.prototype.popCommands = function(type) {
                 delete this.innerCommands[type];
             }
             break;
-        case 'LockCommand':
-            if (this.innerCommands[type]) {
-                commands = this.innerCommands[type];
-                delete this.innerCommands[type];
-            }
-            break;
         case 'EditCommand':
-            if (this.innerCommands[type]) {
-                commands = this.innerCommands[type];
-                delete this.innerCommands[type];
+            var command = new EditCommand();
+            if (this.isLastCommandChanged(type, command)) {
+                commands = [command];
+                this.setLastCommand(type, command);
             }
             break;
         default:
@@ -425,29 +495,33 @@ UiController.prototype.popCommands = function(type) {
     return commands;
 }
 
-UiController.prototype.executeCommands = function() {
+UiController.prototype.executeCommands = function(callback) {
     for (var type in this.outerCommands) {
         if (this.outerCommands[type] instanceof Array) {
             for (var i = 0; i < this.outerCommands[type].length; i++) {
                 this.outerCommands[type][i].execute();
-                this.setLastCommandData(type, this.outerCommands[type][i].getData());
+                this.setLastCommand(type, this.outerCommands[type][i]);
             }
         }
     }
     this.outerCommands = {};
-}
-
-UiController.prototype.setLastCommandData = function(type, data) {
-    if (type === 'ScrollCommand') {
-        this.lastCommandData[type] = data;
+    
+    if (typeof callback === 'function') {
+        callback(null); // For backward compatibility.
     }
 }
 
-UiController.prototype.isLastCommandDataChanged = function(type, data) {
+UiController.prototype.setLastCommand = function(type, command) {
+    if (type === 'ScrollCommand' || type === 'EditCommand') {
+        this.lastCommandsList[type] = command;
+    }
+}
+
+UiController.prototype.isLastCommandChanged = function(type, command) {
     var result = true;
     
-    if (type === 'ScrollCommand') {
-        result = this.lastCommandData[type] !== data;
+    if (type === 'ScrollCommand' || type === 'EditCommand') {
+        result = ! command.isEqualTo(this.lastCommandsList[type]);
     }
     
     return result;
@@ -470,7 +544,7 @@ function WebController(params) {
 WebController.prototype = Object.create(Controller.prototype);
 WebController.prototype.constructor = WebController;
 
-WebController.prototype.executeCommands = function() {
+WebController.prototype.executeCommands = function(callback) {
     var self = this;
     
     if (! self.url) {
@@ -506,6 +580,11 @@ WebController.prototype.executeCommands = function() {
                         }
                     }
                 }
+                
+                if (typeof callback === 'function') {
+                    callback(self.innerCommands);
+                    self.innerCommands = {};
+                }
             },
             error: function() {
             },
@@ -528,29 +607,34 @@ TeacherStrategy.prototype = Object.create(Strategy.prototype);
 TeacherStrategy.prototype.constructor = TeacherStrategy;
 
 TeacherStrategy.prototype.act = function(uiController, webController) {
-    var types = ['ScrollCommand', 'LockCommand', 'EditCommand'];
+    var types = ['ScrollCommand', 'ClickCommand', 'EditCommand'];
+    var uiCommands = {};
     for (var i = 0; i < types.length; i++) {
-        var uiCommands = uiController.popCommands(types[i]);
-        if (uiCommands) {
-            webController.addCommands(types[i], uiCommands);
-        } else {
-            var webCommands = webController.popCommands(types[i]);
-            if (webCommands) {
-                uiController.addCommands(types[i], webCommands);
+        uiCommands[types[i]] = uiController.popCommands(types[i]);
+        if (uiCommands[types[i]]) {
+            webController.addCommands(types[i], uiCommands[types[i]]);
+            
+            if (types[i] === 'ScrollCommand' || types[i] === 'EditCommand') {
+                LockerPool.set(types[i], LockerPool.WEB);
             }
         }
     }
     
-    var types = ['ClickCommand'];
-    for (var i = 0; i < types.length; i++) {
-        var uiCommands = uiController.popCommands(types[i]);
-        var webCommands = webController.popCommands(types[i]);
-        uiController.addCommands(types[i], webCommands);
-        webController.addCommands(types[i], uiCommands);
-    }
-    
-    uiController.executeCommands();
-    webController.executeCommands();
+    webController.executeCommands(function(webCommands) {
+        if (! webCommands)
+            return;
+        
+        var types = ['ScrollCommand', 'ClickCommand', 'EditCommand'];
+        for (var i = 0; i < types.length; i++) {
+            if (! LockerPool.isSet(types[i], LockerPool.WEB)) {
+                if (webCommands[types[i]]) {
+                    uiController.addCommands(types[i], webCommands[types[i]]);
+                }
+            }
+        }
+        
+        uiController.executeCommands();
+    });
 }
 
 function StudentStrategy() {
@@ -561,37 +645,31 @@ StudentStrategy.prototype = Object.create(Strategy.prototype);
 StudentStrategy.prototype.constructor = StudentStrategy;
 
 StudentStrategy.prototype.act = function(uiController, webController) {
-    var types = ['ScrollCommand', 'LockCommand', 'EditCommand'];
+    var types = ['ScrollCommand', 'ClickCommand', 'EditCommand'];
+    var uiCommands = {};
     for (var i = 0; i < types.length; i++) {
-        var webCommands = webController.popCommands(types[i]);
-        if (webCommands) {
-            uiController.addCommands(types[i], webCommands);
-            
-            if (types[i] === 'ScrollCommand') {
-                var lockCommand = new LockCommand({name: 'ScrollCommand', seconds: this.scrollWaitTime});
-                lockCommand.execute();
-            } else if (types[i] === 'EditCommand') {
-                var lockCommand = new LockCommand({name: 'EditCommand', seconds: this.editWaitTime});
-                lockCommand.execute();
-            }
-        } else {
-            var uiCommands = uiController.popCommands(types[i]);
-            if (uiCommands) {
-                webController.addCommands(types[i], uiCommands);
-            }
+        uiCommands[types[i]] = uiController.popCommands(types[i]);
+        if (uiCommands[types[i]]) {
+            webController.addCommands(types[i], uiCommands[types[i]]);
         }
     }
     
-    var types = ['ClickCommand'];
-    for (var i = 0; i < types.length; i++) {
-        var uiCommands = uiController.popCommands(types[i]);
-        var webCommands = webController.popCommands(types[i]);
-        uiController.addCommands(types[i], webCommands);
-        webController.addCommands(types[i], uiCommands);
-    }
-    
-    uiController.executeCommands();
-    webController.executeCommands();
+    webController.executeCommands(function(webCommands) {
+        if (! webCommands)
+            return;
+        
+        for (var i = 0; i < types.length; i++) {
+            if (webCommands[types[i]]) {
+                uiController.addCommands(types[i], webCommands[types[i]]);
+                
+                if (types[i] === 'ScrollCommand' || types[i] === 'EditCommand') {
+                    LockerPool.set(types[i], LockerPool.UI);
+                }
+            }
+        }
+        
+        uiController.executeCommands();
+    });
 }
 
 function Application(isTeacher, requestUrl) {
@@ -629,7 +707,10 @@ Application.prototype.act = function() {
     if (this.active) {
         var self = this;
         this.strategy.act(this.uiController, this.webController);
-        setTimeout(function() {self.act()}, 1000);
+        setTimeout(
+            function() {self.act()},
+            Params.reloadTimeout
+        );
     }
 }
 

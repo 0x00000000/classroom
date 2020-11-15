@@ -94,11 +94,7 @@ abstract class RequestBase extends Request {
         $this->_currentRequest->get = isset($_GET) ? $_GET : array();
         $this->_currentRequest->post = isset($_POST) ? $_POST : array();
         $this->_currentRequest->session = isset($_SESSION) ? $_SESSION : array();
-        if (function_exists('getallheaders')) {
-            $this->_currentRequest->headers = getallheaders();
-        } else {
-            $this->_currentRequest->headers = array();
-        }
+        $this->_currentRequest->headers = $this->getHeadersInner();
         if (array_key_exists('REMOTE_ADDR', $_SERVER)) {
             $this->_currentRequest->ip = $_SERVER['REMOTE_ADDR'];
         }
@@ -160,6 +156,20 @@ abstract class RequestBase extends Request {
         }
         
         return $url;
+    }
+    
+    protected function getHeadersInner(): array {
+        if (function_exists('getallheaders')) {
+            $headers = getallheaders();
+        } else {
+           $headers = array();
+           foreach ($_SERVER as $name => $value) {
+               if (substr($name, 0, 5) == 'HTTP_') {
+                   $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+               }
+           }
+       }
+       return $headers;
     }
     
 }

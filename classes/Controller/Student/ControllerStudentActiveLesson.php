@@ -45,7 +45,6 @@ class ControllerStudentActiveLesson extends ControllerStudentBase {
         parent::addJsAndCssFiles();
         
         $this->addCssFile('/css/ActiveLesson/ActiveLesson.css');
-        $this->addJsFile('/js/ActiveLesson/common.js');
     }
     
     protected function actionIndex() {
@@ -128,8 +127,6 @@ class ControllerStudentActiveLesson extends ControllerStudentBase {
             $this->getView()->setTemplate($this->_templateNames['lesson']);
         }
         
-        $this->addCssFile('/css/vendor/content-tools/content-tools.min.css');
-        $this->addJsFile('/js/vendor/content-tools/content-tools.js');
         $this->addJsFile('/js/ActiveLesson/lesson.js');
         
         $user = $this->getAuth()->getUser();
@@ -184,6 +181,8 @@ class ControllerStudentActiveLesson extends ControllerStudentBase {
         if (array_key_exists('waiting', $this->_templateNames)) {
             $this->getView()->setTemplate($this->_templateNames['waiting']);
         }
+        
+        $this->addJsFile('/js/ActiveLesson/waiting.js');
         
         $user = $this->getAuth()->getUser();
         
