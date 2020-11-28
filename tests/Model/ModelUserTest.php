@@ -2,9 +2,13 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace ClassroomTest\Model;
 
 use PHPUnit\Framework\TestCase;
+
+use Classroom\Module\Factory\Factory;
+
+use Classroom\Model\ModelUser;
 
 include_once(dirname(__FILE__) . '/../init.php');
 
@@ -255,9 +259,9 @@ final class ModelUserTest extends TestCase {
             'isTeacher' => false,
             'isStudent' => false,
         ));
-        $this->assertTrue($modelUser2 instanceof Model);
+        $this->assertTrue($modelUser2 instanceof \Classroom\Model\Model);
 
-        if ($modelUser2 instanceof Model) {
+        if ($modelUser2 instanceof \Classroom\Model\Model) {
             $this->assertEquals($modelUser2->name, $testName);
         }
 

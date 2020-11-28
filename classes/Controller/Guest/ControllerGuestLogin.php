@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Controller\Guest;
 
-include_once('ControllerGuestBase.php');
+use Classroom\Module\Factory\Factory;
 
 class ControllerGuestLogin extends ControllerGuestBase {
     

@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace classroom;
-
-include_once('ControllerAdminBase.php');
+namespace Classroom\Controller\Admin;
 
 class ControllerAdminIndex extends ControllerAdminBase {
     

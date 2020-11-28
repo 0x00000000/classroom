@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Controller\Teacher;
 
-include_once('ControllerTeacherManageBase.php');
+use Classroom\Module\Factory\Factory;
+
+use Classroom\Model\ModelDatabase;
 
 class ControllerTeacherManageLesson extends ControllerTeacherManageBase {
     

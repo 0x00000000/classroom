@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Controller\Admin;
 
-include_once('ControllerAdminBase.php');
+use Classroom\Module\Factory\Factory;
 
 class ControllerAdminVocabulary extends ControllerAdminBase {
     

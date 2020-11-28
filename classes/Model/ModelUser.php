@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Model;
 
-include_once('ModelDatabase.php');
+use Classroom\Module\Config\Config;
+use Classroom\Module\Factory\Factory;
 
 /**
  * Model user.

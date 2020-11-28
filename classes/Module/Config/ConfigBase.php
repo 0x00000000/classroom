@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace classroom;
-
-include_once('Config.php');
+namespace Classroom\Module\Config;
 
 /**
  * Stores configuration data for other modules.

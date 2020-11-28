@@ -2,7 +2,11 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Module\Auth;
+
+use Classroom\Module\Request\Request;
+
+use Classroom\Model\ModelUser;
 
 /**
  * Allows to get authorized user information.

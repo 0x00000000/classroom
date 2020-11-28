@@ -2,7 +2,23 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Module\Factory;
+
+use Classroom\Module\Application\Application;
+use Classroom\Module\Auth\Auth;
+use Classroom\Module\Config\Config;
+use Classroom\Module\Database\Database;
+use Classroom\Module\Factory\Factory;
+use Classroom\Module\Logger\Logger;
+use Classroom\Module\Registry\Registry;
+use Classroom\Module\Request\Request;
+use Classroom\Module\Response\Response;
+use Classroom\Module\Router\Router;
+use Classroom\Module\View\View;
+
+use Classroom\Model\Model;
+
+use Classroom\Controller\Controller;
 
 /**
  * Creates modules and models.

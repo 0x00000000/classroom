@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace classroom;
-
-include_once('ModelAbstract.php');
+namespace Classroom\Model;
 
 /**
  * Abstract model class.

@@ -2,7 +2,12 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Controller;
+
+use Classroom\Module\Auth\Auth;
+use Classroom\Module\Request\Request;
+use Classroom\Module\Response\Response;
+use Classroom\Module\View\View;
 
 /**
  * Executes actions and renders page.

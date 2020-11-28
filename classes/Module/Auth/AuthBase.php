@@ -2,9 +2,12 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Module\Auth;
 
-include_once('Auth.php');
+use Classroom\Module\Factory\Factory;
+use Classroom\Module\Request\Request;
+
+use Classroom\Model\ModelUser;
 
 /**
  * Allows to get authorized user information.

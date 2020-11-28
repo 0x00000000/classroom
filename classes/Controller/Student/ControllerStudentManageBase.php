@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Controller\Student;
 
-Factory::instance()->loadController('ControllerManageBase');
+use Classroom\Controller\ControllerManageBase;
 
 class ControllerStudentManageBase extends ControllerManageBase {
     

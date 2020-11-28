@@ -2,9 +2,27 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Module\Factory;
 
-include_once('Factory.php');
+use Classroom\System\Core;
+use Classroom\System\FileSystem;
+
+use Classroom\Module\Application\Application;
+use Classroom\Module\Auth\Auth;
+use Classroom\Module\Config\Config;
+use Classroom\Module\Database\Database;
+use Classroom\Module\Factory\Factory;
+use Classroom\Module\Logger\Logger;
+use Classroom\Module\Registry\Registry;
+use Classroom\Module\Request\Request;
+use Classroom\Module\Response\Response;
+use Classroom\Module\Router\Router;
+use Classroom\Module\View\View;
+
+use Classroom\Model\Model;
+use Classroom\Model\ModelDatabase;
+
+use Classroom\Controller\Controller;
 
 /**
  * Creates modules and models.
@@ -137,9 +155,8 @@ abstract class FactoryBase extends Factory {
     public function createModule(string $moduleName, string $moduleBaseName = null): ?object {
         $result = null;
         
-        $loaded = $this->loadModule($moduleName, $moduleBaseName);
-        if ($loaded) {
-            $className = Core::getNamespace() . $moduleName;
+        $className = Core::getModuleClassName($moduleName, $moduleBaseName);
+        if (class_exists($className)) {
             $result = new $className();
         }
         
@@ -166,10 +183,8 @@ abstract class FactoryBase extends Factory {
     public function createModel(string $modelName): ?Model {
         $model = null;
         
-        $loaded = $this->loadModel($modelName);
-        $modelClassName = 'Model' . $modelName;
-        if ($loaded) {
-            $className = Core::getNamespace() . $modelClassName;
+        $className = Core::getModelClassName($modelName);
+        if (class_exists($className)) {
             $model = new $className();
             
             if ($model instanceof ModelDatabase) {
@@ -185,20 +200,11 @@ abstract class FactoryBase extends Factory {
     /**
      * Creates controller object.
      */
-    public function createController(string $nameAndPath, Request $request, Response $response): ?Controller {
+    public function createController(string $controllerPostfix, Request $request, Response $response): ?Controller {
         $result = null;
         
-        $separatorPosition = strrpos($nameAndPath, '/');
-        if ($separatorPosition !== false) {
-            $localPath = substr($nameAndPath, 0, $separatorPosition);
-            $name = substr($nameAndPath, $separatorPosition + 1);
-        } else {
-            $localPath = null;
-            $name = $nameAndPath;
-        }
-        $loaded = $this->loadController($name, $localPath);
-        if ($loaded) {
-            $className = Core::getNamespace() . $name;
+        $className = Core::getControllerClassName($controllerPostfix);
+        if ($className) {
             $result = new $className();
             if ($result instanceof Controller) {
                 $result->init($request, $response);

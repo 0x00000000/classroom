@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace classroom;
-
-include_once('ControllerAdminManageBase.php');
+namespace Classroom\Controller\Admin;
 
 class ControllerAdminManageMenuItem extends ControllerAdminManageBase {
     

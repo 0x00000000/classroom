@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\System;
 
 /**
  * Functionality for work with file system.

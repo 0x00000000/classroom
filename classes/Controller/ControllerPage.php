@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Controller;
 
-include_once('ControllerBase.php');
+use Classroom\Module\Factory\Factory;
+
+use Classroom\Model\ModelPage;
 
 class ControllerPage extends ControllerBase {
     

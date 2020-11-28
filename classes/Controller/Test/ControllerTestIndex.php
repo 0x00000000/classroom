@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Controller\Test;
 
-Factory::instance()->loadController('ControllerBase');
+use Classroom\Controller\ControllerBase;
 
 class ControllerTestIndex extends ControllerBase {
     

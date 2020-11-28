@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Module\Logger;
+
+use Classroom\Module\Factory\Factory;
+use Classroom\Module\Request\Request;
 
 /**
  * Log errors and notices. Set handlers for php errors and uncaught exceptions.

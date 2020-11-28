@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Model;
 
-include_once('ModelAccessRights.php');
+use Classroom\Module\Factory\Factory;
 
 /**
  * Model menu.

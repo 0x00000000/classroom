@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace classroom;
-
-include_once('ModelDatabase.php');
+namespace Classroom\Model;
 
 /**
  * Model lesson's template.

@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace classroom;
-
-include_once('Response.php');
+namespace Classroom\Module\Response;
 
 /**
  * Constructs and sends response to UA.

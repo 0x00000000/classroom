@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Module\Request;
 
-include_once('RequestBase.php');
+use Classroom\Module\Factory\Factory;
 
 /**
  * Allows to get test request information.

@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Module\Request;
+
+use Classroom\Model\ModelRequest;
 
 /**
  * Allows to get current request information.

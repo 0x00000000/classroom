@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Module\Config;
 
 /**
  * Stores configuration data for other modules.

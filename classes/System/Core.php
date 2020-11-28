@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\System;
+
+use Classroom\Module\Factory\Factory;
 
 include_once('FileSystem.php');
 
@@ -22,9 +24,9 @@ class Core {
     private static $_isTestMode = false;
     
     /**
-     * @var string $_namespace Script's namespace.
+     * @var string $_namespacePrefix Namespace prefix.
      */
-    private static $_namespace = 'classroom\\';
+    private static $_namespacePrefix = 'Classroom\\';
     
     /**
      * Sets application type.
@@ -60,12 +62,53 @@ class Core {
     }
     
     /**
-     * Gets namespace.
+     * Gets namespace prefix.
      * 
-     * @return string Current namespace.
+     * @return string Namespace prefix.
      */
-    public static function getNamespace(): string {
-        return self::$_namespace;
+    public static function getNamespacePrefix(): string {
+        return self::$_namespacePrefix;
+    }
+    
+    /**
+     * Gets module class name.
+     * 
+     * @param string $moduleName Module's name.
+     * @param string|null $moduleBaseName Module section name.
+     * @return string|null Class name if class exists.
+     */
+    public static function getModuleClassName(string $moduleName, string $moduleBaseName = null): ?string {
+        if (! $moduleBaseName) {
+            $moduleBaseName = $moduleName;
+        }
+        
+        $className = self::getNamespacePrefix() . 'Module\\' . $moduleBaseName . '\\' . $moduleName;
+        
+        return $className;
+    }
+    
+    /**
+     * Gets controller class name.
+     * 
+     * @param string $controllerPostfix Controller's class controller.
+     * @return string|null Class name if class exists.
+     */
+    public static function getControllerClassName(string $controllerPostfix): ?string {
+        $className = self::getNamespacePrefix() . 'Controller\\' . str_replace('/', '\\', $controllerPostfix);
+        
+        return $className;
+    }
+    
+    /**
+     * Gets model class name.
+     * 
+     * @param string $modelName Model's name.
+     * @return string|null Class name if class exists.
+     */
+    public static function getModelClassName(string $modelName): ?string {
+        $className = self::getNamespacePrefix() . 'Model\\Model' . $modelName;
+        
+        return $className;
     }
     
     /**
@@ -115,6 +158,8 @@ class Core {
     private static function init(): bool {
         $result = false;
         
+        self::setAutoloader();
+        
         if (self::getApplicationType()) {
             $result = true;
             
@@ -134,6 +179,40 @@ class Core {
         }
         
         return $result;
+    }
+    
+   /**
+     * Register classes autoload function.
+     */
+    private static function setAutoloader(): void {
+        spl_autoload_register(function($class) {
+            $namespacesList = [
+                'ClassroomTest\\' => '/tests/',
+                'Classroom\\' => '/classes/',
+            ];
+            
+            $root = FileSystem::getRoot();
+            $ds = FileSystem::getDirectorySeparator();
+            
+            $found = false;
+            foreach ($namespacesList as $prefix => $path) {
+                $length = strlen($prefix);
+                if (strncmp($prefix, $class, $length) === 0) {
+                    $found = true;
+                    
+                    // Get the relative class name.
+                    $relativeClass = substr($class, $length);
+                    
+                    $file = $root . $path . str_replace('\\', $ds, $relativeClass) . '.php';
+                    if (file_exists($file)) {
+                        require $file;
+                    }
+                }
+            }
+            
+            if (! $found)
+                return; // Move to the next registered autoloader.
+        });
     }
     
 }

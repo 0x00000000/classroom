@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Module\Database;
 
-include_once('Database.php');
+use Classroom\Module\Config\Config;
 
 /**
  * Allow get and save data from/in mysql database.

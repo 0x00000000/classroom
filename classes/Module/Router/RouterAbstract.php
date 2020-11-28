@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Module\Router;
+
+use Classroom\Module\Request\Request;
+use Classroom\Module\Response\Response;
 
 /**
  * Routes UA.

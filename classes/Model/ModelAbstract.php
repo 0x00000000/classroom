@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Model;
+
+use Classroom\Module\Database\Database;
 
 /**
  * Abstract model class.

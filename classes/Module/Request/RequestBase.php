@@ -2,9 +2,12 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Module\Request;
 
-include_once('Request.php');
+use Classroom\Module\Config\Config;
+use Classroom\Module\Factory\Factory;
+
+use Classroom\Model\ModelRequest;
 
 /**
  * Allows to get current request information.

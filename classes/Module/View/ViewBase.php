@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Module\View;
 
-include_once('View.php');
+use Classroom\System\FileSystem;
+
+use Classroom\Module\Factory\Factory;
 
 /**
  * Routes UA.

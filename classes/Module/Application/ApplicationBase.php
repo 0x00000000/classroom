@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace classroom;
-
-include_once('Application.php');
+namespace Classroom\Module\Application;
 
 /**
  * Facade for other modules.
@@ -18,6 +16,7 @@ abstract class ApplicationBase extends Application {
     public function __construct() {
         
         error_reporting(E_ALL);
+        ini_set('display_errors', '1');
         
         $this->initSession();
         

@@ -2,9 +2,12 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Model;
 
-include_once('Model.php');
+use Classroom\System\Core;
+
+use Classroom\Module\Database\Database;
+use Classroom\Module\Factory\Factory;
 
 /**
  * Abstract model class that stores data in database.
@@ -628,7 +631,7 @@ abstract class ModelDatabase extends Model {
      */
     public function getModelName(): string {
         $className = get_class($this);
-        $modelName = preg_replace('/^' . Core::getNamespace() . '\\Model/', '', $className, 1);
+        $modelName = preg_replace('/^' . Core::getNamespacePrefix() . '\\Model\\\\Model/', '', $className, 1);
         return $modelName;
     }
     

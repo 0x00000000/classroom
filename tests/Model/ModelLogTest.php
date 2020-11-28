@@ -2,9 +2,13 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace ClassroomTest\Model;
 
 use PHPUnit\Framework\TestCase;
+
+use Classroom\Module\Factory\Factory;
+
+use Classroom\Model\ModelLog;
 
 include_once(dirname(__FILE__) . '/../init.php');
 

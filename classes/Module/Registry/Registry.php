@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Module\Registry;
 
 /**
  * Allow set variables and then get them back.

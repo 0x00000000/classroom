@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace classroom;
-
-include_once('ConfigSingleton.php');
+namespace Classroom\Module\Config;
 
 /**
  * Stores configuration data for other modules.

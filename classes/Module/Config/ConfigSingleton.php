@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Module\Config;
 
-include_once('ConfigAbstract.php');
+use Classroom\System\Core;
 
 /**
  * Stores configuration data for other modules.
@@ -68,11 +68,8 @@ abstract class ConfigSingleton extends ConfigAbstract {
      */
     public static function instance(): Config {
         if (! self::$_instance && self::$_type) {
-            $moduleName = self::getModuleName();
-            $baseModuleName = self::getBaseModuleName();
-            $loaded = Core::loadClass($moduleName, 'Module/' . $baseModuleName);
-            if ($loaded) {
-                $className = Core::getNamespace() . $moduleName;
+            $className = 'Classroom\\Module\\' . self::getBaseModuleName() . '\\' . self::getModuleName();
+            if (class_exists($className)) {
                 self::$_instance = new $className();
             }
         }

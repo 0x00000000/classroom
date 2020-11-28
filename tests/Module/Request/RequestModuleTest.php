@@ -2,9 +2,13 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace ClassroomTest\Request\Request;
 
 use PHPUnit\Framework\TestCase;
+
+use Classroom\Module\Factory\Factory;
+
+use Classroom\Module\Request\RequestTest;
 
 include_once(dirname(__FILE__) . '/../../init.php');
 
@@ -21,7 +25,7 @@ final class RequestModuleTest extends TestCase {
     
     public function testGetCurrentRequest(): void {
         $currentRequest = $this->_request->getCurrentRequest();
-        $this->assertTrue($currentRequest instanceof ModelRequest);
+        $this->assertTrue($currentRequest instanceof \Classroom\Model\ModelRequest);
         $this->assertEquals($currentRequest->url, RequestTest::TEST_URL);
         $this->assertEquals($currentRequest->get, RequestTest::TEST_GET);
         $this->assertEquals($currentRequest->post, RequestTest::TEST_POST);

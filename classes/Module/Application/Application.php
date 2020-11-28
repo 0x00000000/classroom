@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace classroom;
-
-include_once('ApplicationAbstract.php');
+namespace Classroom\Module\Application;
 
 /**
  * Facade for other modules.

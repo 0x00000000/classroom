@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace classroom;
-
-include_once('ControllerAbstract.php');
+namespace Classroom\Controller;
 
 /**
  * Executes actions and renders page.

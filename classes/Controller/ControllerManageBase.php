@@ -2,9 +2,12 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Controller;
 
-include_once('ControllerBase.php');
+use Classroom\Module\Factory\Factory;
+
+use Classroom\Model\Model;
+use Classroom\Model\ModelDatabase;
 
 /**
  * Renders pages for managing database model items.

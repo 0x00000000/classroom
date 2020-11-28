@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Module\Application;
 
-include_once('ApplicationBase.php');
+use Classroom\Module\Factory\Factory;
 
 /**
  * Facade for other modules.

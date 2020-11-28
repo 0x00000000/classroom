@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace classroom;
-
-include_once('RequestAbstract.php');
+namespace Classroom\Module\Request;
 
 /**
  * Allows to get current request information.

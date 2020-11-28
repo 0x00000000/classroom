@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace classroom;
-
-include_once('Database.php');
+namespace Classroom\Module\Database;
 
 /**
  * Allow get and save data from/in in ram. Used for unit tests.

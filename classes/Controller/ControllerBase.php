@@ -2,9 +2,16 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Controller;
 
-include_once('Controller.php');
+use Classroom\System\FileSystem;
+
+use Classroom\Module\Auth\Auth;
+use Classroom\Module\Config\Config;
+use Classroom\Module\Factory\Factory;
+use Classroom\Module\Request\Request;
+use Classroom\Module\Response\Response;
+use Classroom\Module\View\View;
 
 /**
  * Executes actions and renders page.

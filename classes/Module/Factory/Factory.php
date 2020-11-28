@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace classroom;
-
-include_once('FactorySingleton.php');
+namespace Classroom\Module\Factory;
 
 /**
  * Creates modules and models.

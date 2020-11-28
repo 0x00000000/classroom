@@ -2,9 +2,15 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Module\Router;
 
-include_once('Router.php');
+use Classroom\System\Core;
+
+use Classroom\Module\Factory\Factory;
+use Classroom\Module\Request\Request;
+use Classroom\Module\Response\Response;
+
+use Classroom\Controller\Controller;
 
 /**
  * Routes UA.

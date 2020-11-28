@@ -2,13 +2,15 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace ClassroomTest\Model;
 
 use PHPUnit\Framework\TestCase;
 
-include_once(dirname(__FILE__) . '/../init.php');
+use Classroom\Module\Factory\Factory;
 
-Factory::instance()->loadModel('Request');
+use Classroom\Model\ModelRequest;
+
+include_once(dirname(__FILE__) . '/../init.php');
 
 final class ModelRequestTest extends TestCase {
     protected $_modelRequest = null;

@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace classroom;
-
-include_once('RouterAbstract.php');
+namespace Classroom\Module\Router;
 
 /**
  * Routes UA.

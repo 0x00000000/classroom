@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Model;
 
-include_once('ModelDatabase.php');
-include_once('ModelUser.php');
+use Classroom\Model\ModelDatabase;
+use Classroom\Module\Auth\Auth;
 
 /**
  * Model with user access property.

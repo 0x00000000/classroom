@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace Classroom\Controller\Admin;
 
-include_once('ControllerAdminManageBase.php');
+use Classroom\Model\ModelDatabase;
 
 class ControllerAdminManageTeacher extends ControllerAdminManageBase {
     

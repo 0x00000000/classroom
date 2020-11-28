@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-namespace classroom;
+namespace ClassroomTest\System;
 
 use PHPUnit\Framework\TestCase;
+
+use Classroom\System\Filesystem;
 
 include_once(dirname(__FILE__) . '/../init.php');
 
