@@ -7,7 +7,7 @@ namespace Classroom\Controller\Admin;
 class ControllerAdminManagePage extends ControllerAdminManageBase {
     
     /**
-     * @var string $_modelName Name of manaaged model class.
+     * @var string $_modelName Name of managed model class.
      */
     protected $_modelName = 'Page';
     

@@ -34,6 +34,7 @@ class ControllerAdminVocabulary extends ControllerAdminBase {
             $itemsPerPage,
             ((int) $currentPage - 1) * (int) $itemsPerPage
         );
+        $currentPage = (string) $currentPage;
         
         $pagesCount = $modelWord->getCount(
             array('image' => '0')
@@ -41,7 +42,7 @@ class ControllerAdminVocabulary extends ControllerAdminBase {
         
         $pagesList = array();
         if ($pagesCount > 1) {
-            $pagesCount = floor(($pagesCount - 1) / $itemsPerPage);
+            $pagesCount = ceil($pagesCount / $itemsPerPage);
             for ($i = 1; $i <= $pagesCount; $i++) {
                 $pagesList[] = (string) $i;
             }

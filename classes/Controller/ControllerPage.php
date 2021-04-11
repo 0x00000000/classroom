@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Classroom\Controller;
 
+use Classroom\Module\Config\Config;
 use Classroom\Module\Factory\Factory;
 
 use Classroom\Model\ModelPage;
@@ -34,7 +35,11 @@ class ControllerPage extends ControllerBase {
     
     protected function actionIndex() {
         
-        $url = str_replace($this->getRootUrl(), '', $this->getRequest()->url);
+        $url = $this->getRequest()->url;
+        $urlPrefix = Config::instance()->get('application', 'urlPrefix');
+        if ($urlPrefix) { // If application is not in site's root.
+            $url = preg_replace('|^' . $urlPrefix . '|', '', $url);
+        }
         
         $condition = array_merge($this->_conditionsList, array('url' => $url));
         $page = Factory::instance()->createModel('Page')
@@ -67,10 +72,19 @@ class ControllerPage extends ControllerBase {
      * Adds varibles to page's view.
      */
     protected function setPageViewVariablesInner(ModelPage $page): void {
-        $this->getPageView()->set('pageCaption', $page->caption);
-        $this->getPageView()->set('pageTitle', $page->title);
-        $this->getPageView()->set('pageKeywords', $page->keywords);
-        $this->getPageView()->set('pageDescription', $page->description);
+        $config = Config::instance();
+        if ($page->caption) {
+            $this->getPageView()->set('pageCaption', $page->caption);
+        }
+        if ($page->title) {
+            $this->getPageView()->set('pageTitle', $page->title . '. ' . $config->get('site', 'title'));
+        }
+        if ($page->keywords) {
+            $this->getPageView()->set('pageKeywords', $page->keywords . ', ' . $config->get('site', 'keywords'));
+        }
+        if ($page->description) {
+            $this->getPageView()->set('pageDescription', $page->description . '. ' . $config->get('site', 'description'));
+        }
     }
     
     /**
@@ -81,6 +95,7 @@ class ControllerPage extends ControllerBase {
         
         $this->getView()->setTemplate($this->_templateName);
         
+        $this->getView()->set('caption', $page->caption);
         $this->getView()->set('content', $page->content);
         
         $content = $this->getView()->render();

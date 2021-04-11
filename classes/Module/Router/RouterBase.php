@@ -7,6 +7,7 @@ namespace Classroom\Module\Router;
 use Classroom\System\Core;
 
 use Classroom\Module\Factory\Factory;
+use Classroom\Module\Config\Config;
 use Classroom\Module\Request\Request;
 use Classroom\Module\Response\Response;
 
@@ -180,6 +181,10 @@ abstract class RouterBase extends Router {
         $result = false;
         
         $url = $this->getRequest()->url;
+        $urlPrefix = Config::instance()->get('application', 'urlPrefix');
+        if ($urlPrefix) { // If application is not in site's root.
+            $url = preg_replace('|^' . $urlPrefix . '|', '', $url);
+        }
         $pattern = '|[^<]*<([\w_]+)>[^<]*|';
         if (preg_match($pattern, $rule)) {
             $namesList = array();

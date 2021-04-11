@@ -1,3 +1,5 @@
+/* Common styles */
+
 body, html {
     font-family: Arial;
     margin: 0;
@@ -67,20 +69,30 @@ ol {
 }
 
 table {
-    border: 1px solid black;
+    border: 1px solid gray;
     margin: 5px 2px 10px 2px;
     border-collapse: collapse;
 }
 
 table th {
-    border: 1px solid black;
+    border: 1px solid gray;
     font-weight: bold;
     padding: 5px;
+    text-align: center;
+    vertical-align: middle;
 }
 
 table td {
-    border: 1px solid black;
+    border: 1px solid gray;
     padding: 5px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+table td.alignLeft,
+table.alignLeft td,
+.alignLeft {
+    text-align: left;
 }
 
 form {
@@ -88,17 +100,16 @@ form {
     padding: 0;
 }
 
-input[type="text"], input[type="password"], select {
+input[type="text"], input[type="password"], select,
+form input[type="text"], form input[type="password"], form select {
     width: 200px;
     height: 30px;
     border: 1px solid #222;
-    font-size: 18px;
-    padding-left: 5px;
-    padding-right: 5px;
+    padding: 0 5px;
 }
 
 textarea {
-    width: 200px;
+    width: 600px;
     height: 200px;
     border: 1px solid #222;
     font-size: 18px;
@@ -107,6 +118,7 @@ textarea {
 }
 
 input[type="button"], input[type="submit"] {
+    width: auto;
     height: 30px;
     margin: 0 5px;
     font-size: 18px;
@@ -130,7 +142,7 @@ table.listTable {
 table.listTable th,
 table.listTable td {
     padding: 5px 10px;
-    vertical-align: top;
+    vertical-align: middle;
 }
 
 table.viewTable {
@@ -163,7 +175,8 @@ table.formTable td:nth-child(2) {
     width: 100%;
 }
 
-table.formTable input,
+table.formTable input[type="text"],
+table.formTable input[type="password"],
 table.formTable textarea {
     width: 100%;
 }
@@ -171,6 +184,29 @@ table.formTable textarea {
 table.smallTable {
     max-width: 800px;
 }
+
+table.smallestTable {
+    max-width: 400px;
+}
+
+.hidden {
+    display: none;
+}
+
+.singleLine {
+    white-space: nowrap;
+}
+
+.message {
+    color: gray;
+}
+
+.errorMessage,
+.message.errorMessage {
+    color: red;
+}
+
+/* Html textarea styles */
 
 .htmlContentToolsControlBox {
     border: 1px solid #222;
@@ -189,14 +225,19 @@ table.smallTable {
     background: white;
 }
 
+/* Special page styles */
+
 .whiteBoardContainer textarea{
     width: 100%;
 }
 
-body .ct-widget.ct-ignition {
-    left: 5px;
-    top: 5px;
+/* Page content styles */
+
+.pageContent {
+    font-size: 14px;
 }
+
+/* Page blocks styles */
 
 .all {
     margin: 0 10px;

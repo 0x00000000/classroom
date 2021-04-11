@@ -40,9 +40,9 @@ class ControllerGuestLogin extends ControllerGuestBase {
     }
     
     protected function postActionLogin() {
-        if ($this->getPost('login') && $this->getPost('password')) {
+        if ($this->getFromPost('login') && $this->getFromPost('password')) {
             sleep(1);
-            if ($this->getAuth()->login($this->getPost('login'), $this->getPost('password'))) {
+            if ($this->getAuth()->login($this->getFromPost('login'), $this->getFromPost('password'))) {
                 $this->setStashData('messageType', '');
                 $this->redirect();
             } else {
@@ -70,7 +70,7 @@ class ControllerGuestLogin extends ControllerGuestBase {
     }
     
     protected function postActionLogout() {
-        if ($this->getPost('logout')) {
+        if ($this->getFromPost('logout')) {
             if ($this->getAuth()->logout()) {
                 $this->redirect();
             }

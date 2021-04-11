@@ -12,6 +12,7 @@ namespace Classroom\Model;
  * @property string|null $url Request's url.
  * @property array|null $get Request's get data.
  * @property array|null $post Request's post data.
+ * @property array|null $files Request's files data.
  * @property array|null $session Request's session data.
  * @property array|null $headers Request's headers.
  * @property string|null $ip User ip.
@@ -32,6 +33,7 @@ class ModelRequest extends ModelDatabase {
         array('name' => 'url'),
         array('name' => 'get'),
         array('name' => 'post'),
+        array('name' => 'files'),
         array('name' => 'session'),
         array('name' => 'headers'),
         array('name' => 'ip'),
@@ -63,6 +65,7 @@ class ModelRequest extends ModelDatabase {
         
         $this->get = $_GET;
         $this->post = $_POST;
+        $this->files = $_FILES;
         if (! empty($_SESSION)) {
             $this->session = $_SESSION;
         }
@@ -115,6 +118,26 @@ class ModelRequest extends ModelDatabase {
     public function setPost(?array $value): void {
         $post = json_encode($value);
         $this->setRawProperty('post', $post);
+    }
+    
+    /**
+     * Gets request's files data.
+     */
+    public function getFiles(): ?array {
+        $files = $this->getRawProperty('files');
+        if ($files) {
+            $files = json_decode($files, true);
+        }
+
+        return $files;
+    }
+    
+    /**
+     * Sets request's files data.
+     */
+    public function setFiles(?array $value): void {
+        $files = json_encode($value);
+        $this->setRawProperty('files', $files);
     }
     
     /**

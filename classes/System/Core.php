@@ -169,13 +169,12 @@ class Core {
                 Factory::instance()->setTestMode();
             }
             
-            Factory::instance()->createRegistry();
-            
+            // This code will include static classes Config and Registry.
             Factory::instance()->createConfig();
+            Factory::instance()->createRegistry();
             
             $database = Factory::instance()->createDatabase();
             Factory::instance()->setDatabase($database);
-            
         }
         
         return $result;

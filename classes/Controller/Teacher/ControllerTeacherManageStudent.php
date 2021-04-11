@@ -9,7 +9,7 @@ use Classroom\Model\ModelDatabase;
 class ControllerTeacherManageStudent extends ControllerTeacherManageBase {
     
     /**
-     * @var string $_modelName Name of manaaged model class.
+     * @var string $_modelName Name of managed model class.
      */
     protected $_modelName = 'User';
     
@@ -77,6 +77,7 @@ class ControllerTeacherManageStudent extends ControllerTeacherManageBase {
         } else {
             $currentPage = 1;
         }
+        $currentPage = (string) $currentPage;
         
         $user = $this->getAuth()->getUser();
         $itemsList = $user->getStudentsList(
@@ -90,7 +91,7 @@ class ControllerTeacherManageStudent extends ControllerTeacherManageBase {
         
         $pagesList = array();
         if ($itemsCount > 1) {
-            $pagesCount = floor(($itemsCount - 1) / $this->_itemsPerPage);
+            $pagesCount = ceil($itemsCount / $this->_itemsPerPage);
             for ($i = 1; $i <= $pagesCount; $i++) {
                 $pagesList[] = (string) $i;
             }

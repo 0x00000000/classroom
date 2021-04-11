@@ -15,6 +15,7 @@ use Classroom\Model\ModelRequest;
  * @property string|null $url Request's url (readonly).
  * @property array|null $get Request's get data (readonly).
  * @property array|null $post Request's post data (readonly).
+ * @property array|null $files Request's files data (readonly).
  * @property array|null $session Request's session data (readonly).
  * @property array|null $headers Request's headers (readonly).
  * @property string|null $ip User ip (readonly).
@@ -47,6 +48,7 @@ abstract class RequestBase extends Request {
      * @property string|null $url Request's url (readonly).
      * @property array|null $get Request's get data (readonly).
      * @property array|null $post Request's post data (readonly).
+     * @property array|null $files Request's files data (readonly).
      * @property array|null $session Request's session data (readonly).
      * @property array|null $headers Request's headers (readonly).
      * @property string|null $ip User ip (readonly).
@@ -64,6 +66,9 @@ abstract class RequestBase extends Request {
                 break;
             case 'post':
                 $result = $this->getCurrentRequest()->post;
+                break;
+            case 'files':
+                $result = $this->getCurrentRequest()->files;
                 break;
             case 'session':
                 $result = $this->getCurrentRequest()->session;
@@ -96,6 +101,7 @@ abstract class RequestBase extends Request {
         }
         $this->_currentRequest->get = isset($_GET) ? $_GET : array();
         $this->_currentRequest->post = isset($_POST) ? $_POST : array();
+        $this->_currentRequest->files = isset($_FILES) ? $_FILES : array();
         $this->_currentRequest->session = isset($_SESSION) ? $_SESSION : array();
         $this->_currentRequest->headers = $this->getHeadersInner();
         if (array_key_exists('REMOTE_ADDR', $_SERVER)) {
@@ -140,22 +146,33 @@ abstract class RequestBase extends Request {
     
     /**
      * Gets page's full url.
-     * f. e. http://example.com
+     * f. e. http://example.com/site_root/site_page1?arg=3
      */
     public function getUrl(): string {
-        $url = $this->getRootUrl() . $this->getCurrentRequest()->url;
+        $url = $this->getHostUrl() . $this->getCurrentRequest()->url;
+        
+        return $url;
+    }
+    
+    /**
+     * Gets server's host url.
+     * f. e. http://example.com
+     */
+    protected function getHostUrl(): string {
+        $url = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'];
         
         return $url;
     }
     
     /**
      * Gets site's root url.
+     * f. e. http://example.com/site_root
      */
     public function getRootUrl(): string {
         if (Config::instance()->get('application', 'baseUrl')) {
             $url = Config::instance()->get('application', 'baseUrl');
         } else {
-            $url = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'];
+            $url = $this->getHostUrl();
         }
         
         return $url;

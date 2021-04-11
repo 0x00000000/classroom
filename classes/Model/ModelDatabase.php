@@ -20,6 +20,11 @@ abstract class ModelDatabase extends Model {
     protected $_table = null;
     
     /**
+     * @var string $_pkFieldName Primary key field name.
+     */
+    protected $_pkFieldName = 'id';
+    
+    /**
      * @var array $_propertiesList List of properties.
      */
     protected $_propertiesList = array();
@@ -54,7 +59,7 @@ abstract class ModelDatabase extends Model {
         
         if ($this->getDatabase()) {
             if ($this->_table && $pk) {
-                $dbData = $this->getDatabase()->getByPk($this->_table, $pk);
+                $dbData = $this->getDatabase()->getByPk($this->_table, $pk, $this->_pkFieldName);
                 if ($dbData) {
                     $result = $this->setDataFromDB($dbData);
                 }
@@ -70,9 +75,13 @@ abstract class ModelDatabase extends Model {
     protected function getDataList(
         array $conditionsList,
         ?int $limit = 0, ?int $offset = 0,
-        ?array $sortingList = array('id' => 'desc')
+        ?array $sortingList = array()
     ): array {
         $result = array();
+        
+        if (empty($sortingList)) {
+            $sortingList[$this->_pkFieldName] = 'desc';
+        }
         
         if ($this->getDatabase()) {
             if ($this->_table) {
@@ -124,9 +133,13 @@ abstract class ModelDatabase extends Model {
     public function getModelsList(
         array $conditionsList,
         ?int $limit = 0, ?int $offset = 0,
-        ?array $sortingList = array('id' => 'desc')
+        ?array $sortingList = array()
     ): array {
         $result = array();
+        
+        if (empty($sortingList)) {
+            $sortingList[$this->_pkFieldName] = 'desc';
+        }
         
         $dbDataList = $this->getDataList(
             $conditionsList,
@@ -200,9 +213,38 @@ abstract class ModelDatabase extends Model {
                             $result = $pk;
                         }
                     } else {
-                        $this->getDatabase()->updateRecord($this->_table, $data);
+                        $this->getDatabase()->updateRecord($this->_table, $data, $this->_pkFieldName);
                         $result = $this->getPk();
                     }
+                }
+            }
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Adds several recurds to database.
+     */
+    public function saveMultiple($data): bool {
+        $result = false;
+        if ($this->getDatabase()) {
+            if ($this->_table) {
+                if (count($data)) {
+                    foreach ($data as $rowNumber => $row) {
+                        foreach ($row as $key => $value) {
+                            if ($key !== $this->_propertiesList[$key]['dbField']) {
+                                unset($data[$rowNumber][$key]);
+                                $data[$rowNumber][$this->_propertiesList[$key]['dbField']] = $value;
+                            }
+                        }
+                    }
+                    
+                    $result = $this->getDatabase()->addMultipleRecord(
+                        $this->_table,
+                        $data,
+                        array('recordsSetCount' => 100)
+                    );
                 }
             }
         }
@@ -217,7 +259,7 @@ abstract class ModelDatabase extends Model {
         $result = false;
         
         if ($this->getDatabase()) {
-            if ($this->_table && $pk) {
+            if ($this->_table) {
                 if ($conditionsList) {
                     $result = $this->getDatabase()->delete($this->_table, $conditionsList);
                 }
@@ -235,7 +277,7 @@ abstract class ModelDatabase extends Model {
         
         if ($this->getDatabase()) {
             if ($this->_table && $pk) {
-                $result = $this->getDatabase()->deleteRecord($this->_table, $pk);
+                $result = $this->getDatabase()->deleteRecord($this->_table, $pk, $this->_pkFieldName);
             }
         }
         
@@ -340,6 +382,13 @@ abstract class ModelDatabase extends Model {
     }
     
     /**
+     * Model properties can be checked for existing by this magic meghod.
+     */
+    public function __isset(string $propertyName) {
+        return ! is_null($this->$propertyName);
+    }
+    
+    /**
      * Model properties can be get by this magic meghod.
      */
     public function __get(string $propertyName) {
@@ -430,24 +479,24 @@ abstract class ModelDatabase extends Model {
     }
     
     /**
-     * Gets promary key value.
+     * Gets primary key value.
      */
     public function getPk() {
-        return $this->id;
+        return $this->{$this->_pkFieldName};
     }
     
     /**
-     * Sets promary key value.
+     * Sets primary key value.
      */
     protected function setPk($pk) {
-        $this->id = $pk;
+        $this->{$this->_pkFieldName} = $pk;
     }
     
     /**
      * Checks if property is primary key.
      */
     public function isPk($propertyName) {
-        return $propertyName === 'id';
+        return $propertyName === $this->_pkFieldName;
     }
     
     /**
@@ -468,8 +517,8 @@ abstract class ModelDatabase extends Model {
             }
         }
         
-        if (! array_key_exists('id', $extendedList)) {
-            $property = array('name' => 'id',);
+        if (! array_key_exists($this->_pkFieldName, $extendedList)) {
+            $property = array('name' => $this->_pkFieldName,);
             $extended = $this->getExtendedProperty($property);
             if ($extended) {
                 $extendedList[$extended['name']] = $extended;
@@ -633,6 +682,13 @@ abstract class ModelDatabase extends Model {
         $className = get_class($this);
         $modelName = preg_replace('/^' . Core::getNamespacePrefix() . '\\Model\\\\Model/', '', $className, 1);
         return $modelName;
+    }
+    
+    /**
+     * Format number with two decimal places.
+     */
+    protected function formatAsMoney($number) {
+        return number_format((float) $number, 2, '.', '');
     }
     
 }

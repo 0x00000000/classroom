@@ -6,16 +6,16 @@
     <link rel="stylesheet" type="text/css" href="{$rootUrl}{$cssFile}" />
     {/foreach}
     
+    <script stype="text/javascript">
+        var rootUrl = '{$rootUrl}';
+    </script>
+    
     {foreach from=$jsFiles item=jsFile}
     <script type="text/javascript" src="{$rootUrl}{$jsFile}"></script>
     {/foreach}
 </head>
 
 <body class="{$bodyClass}">
-
-<script stype="text/javascript">
-    var rootUrl = '{$rootUrl}';
-</script>
 
 <div class="all">
     <div class="header">

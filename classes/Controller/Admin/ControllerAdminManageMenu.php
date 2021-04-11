@@ -7,7 +7,7 @@ namespace Classroom\Controller\Admin;
 class ControllerAdminManageMenu extends ControllerAdminManageBase {
     
     /**
-     * @var string $_modelName Name of manaaged model class.
+     * @var string $_modelName Name of managed model class.
      */
     protected $_modelName = 'Menu';
     

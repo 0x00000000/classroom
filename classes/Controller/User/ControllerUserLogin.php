@@ -33,9 +33,9 @@ class ControllerUserLogin extends ControllerBase {
     }
     
     protected function innerActionDoLogin() {
-        if ($this->getPost('login') && $this->getPost('password')) {
+        if ($this->getFromPost('login') && $this->getFromPost('password')) {
             sleep(1);
-            if ($this->getAuth()->login($this->getPost('login'), $this->getPost('password'))) {
+            if ($this->getAuth()->login($this->getFromPost('login'), $this->getFromPost('password'))) {
                 $this->setStashData('messageType', '');
                 $this->redirect($this->getRootUrl());
             } else {
@@ -61,7 +61,7 @@ class ControllerUserLogin extends ControllerBase {
     }
     
     protected function innerActionDoLogout() {
-        if ($this->getPost('logout')) {
+        if ($this->getFromPost('logout')) {
             if ($this->getAuth()->logout()) {
                 $this->redirect($this->getRootUrl());
             }

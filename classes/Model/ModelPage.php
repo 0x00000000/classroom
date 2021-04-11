@@ -9,6 +9,7 @@ namespace Classroom\Model;
  * 
  * @property string|null $id Id.
  * @property string|null $caption Caption.
+ * @property string|null $comment Comment.
  * @property string|null $url Url, started from "/" .
  * @property string|null $title Title. 
  * @property string|null $keywords Meta keywords. 
@@ -34,6 +35,7 @@ class ModelPage extends ModelAccessRights {
     protected $_propertiesList = array(
         array('name' => 'id'),
         array('name' => 'caption'),
+        array('name' => 'comment'),
         array('name' => 'url'),
         array('name' => 'title'),
         array('name' => 'keywords'),

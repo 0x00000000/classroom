@@ -32,7 +32,7 @@
 {/if}
 </div>
 
-{if $pagesList}
+{if $pagesCount > 1}
 <div class="pages">
 {foreach $pagesList as $page}
 {if $page === $currentPage}
@@ -44,9 +44,9 @@
 </div>
 {/if}
 
-<p><a href="{$baseUrl}/add">Create new</a></a>
+{if ! empty($canAdd)}<p><a href="{$baseUrl}/add">Create new</a></a>{/if}
         
-<table class="listTable"><tbody>
+<table class="listTable">
     <tr>
     {foreach $propertiesList as $propertyName => $property}
     {if $controlsList[$propertyName] === 'none'}
@@ -81,10 +81,13 @@
     {/if}
     {/foreach}
     <td>
-        <a href="{$baseUrl}/edit/{$item->id}">edit</a>&nbsp;<a href="{$baseUrl}/view/{$item->id}">view</a>&nbsp;<a href="{$baseUrl}/delete/{$item->id}">delete</a>&nbsp;<a href="{$baseUrl}/disable/{$item->id}">{if $item->disabled}enable{else}disable{/if}</a>
+        {if ! empty($canView)}<a href="{$baseUrl}/view/{$item->id}">view</a>&nbsp;&nbsp;&nbsp;{/if}
+        {if ! empty($canEdit)}<a href="{$baseUrl}/edit/{$item->id}">edit</a>&nbsp;&nbsp;&nbsp;{/if}
+        {if ! empty($canDelete)}<a href="{$baseUrl}/delete/{$item->id}" onClick="return confirm('Confirm deletion?');">delete</a>&nbsp;&nbsp;&nbsp;{/if}
+        {if ! empty($canDisable)}<a href="{$baseUrl}/disable/{$item->id}" onClick="return confirm('Confirm action?');">{if $item->disabled}enable{else}disable{/if}</a>{/if}
     </td>
     </tr>
     {/foreach}
-</tbody></table>
+</table>
 
 </div>

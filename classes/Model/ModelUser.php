@@ -108,6 +108,27 @@ class ModelUser extends ModelDatabase {
     }
     
     /**
+     * Checks existing inactive user with login and password.
+     */
+    public function checkInactive($login, $password) {
+        $result = false;
+        
+        $dbData = $this->getDataRecord(
+            array(
+                'login' => $login,
+                'password' => $this->encodePassword($password),
+                'disabled' => '1',
+                'deleted' => '0'
+            )
+        );
+        if ($dbData && count($dbData)) {
+            $result = true;
+        }
+        
+        return $result;
+    }
+    
+    /**
      * Password can't be gotten.
      */
     public function getPassword() {
@@ -139,8 +160,8 @@ class ModelUser extends ModelDatabase {
      * Encodes password.
      */
     protected function encodePassword($password) {
-        $salt1 = Config::instance()->get('user', 'salt1');;
-        $salt2 = Config::instance()->get('user', 'salt2');;
+        $salt1 = Config::instance()->get('user', 'salt1');
+        $salt2 = Config::instance()->get('user', 'salt2');
         return hash('sha512', $salt1 . $password . $salt2);
     }
     

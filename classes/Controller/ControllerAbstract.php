@@ -23,6 +23,8 @@ abstract class ControllerAbstract {
     public const CONTROL_HTML = 'html';
     public const CONTROL_SELECT_BOOL = 'selectBool';
     public const CONTROL_SELECT = 'select';
+    public const CONTROL_FILE = 'file';
+    public const CONTROL_LABEL = 'label';
     public const CONTROL_NONE = 'none';
     
     /**
@@ -56,14 +58,29 @@ abstract class ControllerAbstract {
     abstract protected function after(): void;
     
     /**
+     * Renders and prints page.
+     */
+    abstract protected function printPage(): void;
+    
+    /**
      * Gets request.
      */
     abstract protected function getRequest(): ?Request;
     
     /**
+     * Sets request.
+     */
+    abstract protected function setRequest(Request $request);
+    
+    /**
      * Gets response.
      */
     abstract protected function getResponse(): ?Response;
+    
+    /**
+     * Sets response.
+     */
+    abstract protected function setResponse(Response $response);    
     
     /**
      * Sets data for key. Can be gotten later.
@@ -76,16 +93,6 @@ abstract class ControllerAbstract {
     abstract protected function popStashData(string $key);
     
     /**
-     * Gets $_POST variable by key.
-     */
-    abstract protected function getPost(string $key);
-    
-    /**
-     * Gets $_GET variable by key.
-     */
-    abstract protected function getGet(string $key);
-    
-    /**
      * Gets page url.
      */
     abstract protected function getUrl(): string;
@@ -94,5 +101,35 @@ abstract class ControllerAbstract {
      * Gets site root url.
      */
     abstract protected function getRootUrl(): string;
+    
+    /**
+     * Gets url to controller's root page.
+     */
+    abstract public function getBaseUrl(): string;
+    
+    /**
+     * Gets variable value from $_GET.
+     */
+    abstract protected function getFromGet(string $name, string $defaultValue = null): ?string;
+    
+    /**
+     * Gets variable value from $_POST.
+     */
+    abstract protected function getFromPost(string $name, string $defaultValue = null): ?string;
+    
+    /**
+     * Gets variable value from $_SESSION.
+     */
+    abstract protected function getFromSession(string $name, string $defaultValue = null): ?string;
+    
+    /**
+     * Sets variable value to $_SESSION.
+     */
+    abstract protected function setToSession(string $name, string $value): bool;
+    
+    /**
+     * Unsets variable value from $_SESSION.
+     */
+    abstract protected function unsetFromSession(string $name): bool;
     
 }

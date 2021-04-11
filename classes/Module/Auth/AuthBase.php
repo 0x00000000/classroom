@@ -45,12 +45,8 @@ abstract class AuthBase extends Auth {
      * Check user by user auth information.
      */
     public function check($login, $password): bool {
-        $result = false;
-        
-        if (! $this->getUser()) {
-            $user = Factory::instance()->createModel('User');
-            $result = $user->check($login, $password);
-        }
+        $user = Factory::instance()->createModel('User');
+        $result = $user->check($login, $password);
         
         return $result;
     }
@@ -61,14 +57,12 @@ abstract class AuthBase extends Auth {
     public function login(string $login, string $password): bool {
         $result = false;
         
-        if (! $this->getUser()) {
-            if ($this->check($login, $password)) {
-                $user = Factory::instance()->createModel('User');
-                if ($user->loadByLogin($login, $password)) {
-                    $this->_user = $user;
-                    $this->setUserToSession($user);
-                    $result = true;
-                }
+        if ($this->check($login, $password)) {
+            $user = Factory::instance()->createModel('User');
+            if ($user->loadByLogin($login, $password)) {
+                $this->_user = $user;
+                $this->setUserToSession($user);
+                $result = true;
             }
         }
         
@@ -86,6 +80,16 @@ abstract class AuthBase extends Auth {
             $this->setUserToSession($this->_user);
             $result = true;
         }
+        
+        return $result;
+    }
+    
+    /**
+     * Checks if user is inactive.
+     */
+    public function isInactive(string $login, string $password): bool {
+        $user = Factory::instance()->createModel('User');
+        $result = $user->checkInactive($login, $password);
         
         return $result;
     }

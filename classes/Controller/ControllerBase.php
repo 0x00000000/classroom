@@ -13,6 +13,9 @@ use Classroom\Module\Request\Request;
 use Classroom\Module\Response\Response;
 use Classroom\Module\View\View;
 
+use Classroom\Model\Model;
+use Classroom\Model\ModelDatabase;
+
 /**
  * Executes actions and renders page.
  */
@@ -97,11 +100,15 @@ abstract class ControllerBase extends Controller {
         $methodName = 'action' . ucfirst($action);
         if (strlen($action) && method_exists($this, $methodName)) {
             $this->before();
+            
+            // Should be called before rendering content.
+            // In that case controller will be able reset page view variables.
+            $this->setPageViewVariables();
+            
             $this->setContentViewVariables();
             $content = $this->$methodName();
             
             $this->addJsAndCssFiles();
-            $this->setPageViewVariables();
             $this->setPageViewMenuVariables();
             $this->getPageView()->set('content', $content);
             $this->after();
@@ -155,6 +162,8 @@ abstract class ControllerBase extends Controller {
      * Renders and prints page.
      */
     protected function printPage(): void {
+        $this->getPageView()->set('cssFiles', $this->_cssFiles);
+        $this->getPageView()->set('jsFiles', $this->_jsFiles);
         if ($this->getAjaxMode()) {
             $this->getPageView()->setTemplate($this->_ajaxTemplate);
         } else {
@@ -251,7 +260,7 @@ abstract class ControllerBase extends Controller {
      */
     protected function setPageViewVariables(): void {
         $this->getPageView()->set('user', $this->getAuth()->getUser());
-        $this->getPageView()->set('url', $this->getUrl());
+        $this->getPageView()->set('currentUrl', $this->getUrl());
         $this->getPageView()->set('rootUrl', $this->getRootUrl());
         $this->getPageView()->set('baseTemplatePath', $this->getBaseTemplatePath());
         $this->getPageView()->set('bodyClass', '');
@@ -261,9 +270,6 @@ abstract class ControllerBase extends Controller {
         $this->getPageView()->set('pageTitle', $config->get('site', 'title'));
         $this->getPageView()->set('pageKeywords', $config->get('site', 'keywords'));
         $this->getPageView()->set('pageDescription', $config->get('site', 'description'));
-        
-        $this->getPageView()->set('cssFiles', $this->_cssFiles);
-        $this->getPageView()->set('jsFiles', $this->_jsFiles);
     }
     
     protected function setContentViewVariables() {
@@ -314,42 +320,6 @@ abstract class ControllerBase extends Controller {
                 $result = $stash[$key];
                 unset($stash[$key]);
                 $this->getRequest()->setSessionVariable('stash', $stash);
-            }
-        }
-        
-        return $result;
-    }
-    
-    /**
-     * Gets $_POST variable by key.
-     */
-    protected function getPost(string $key) {
-        $result = null;
-        
-        if ($this->getRequest()) {
-            if (
-                is_array($this->getRequest()->post)
-                && array_key_exists($key, $this->getRequest()->post)
-            ) {
-                $result = $this->getRequest()->post[$key];
-            }
-        }
-        
-        return $result;
-    }
-    
-    /**
-     * Gets $_GET variable by key.
-     */
-    protected function getGet(string $key) {
-        $result = null;
-        
-        if ($this->getRequest()) {
-            if (
-                is_array($this->getRequest()->get)
-                && array_key_exists($key, $this->getRequest()->get)
-            ) {
-                $result = $this->getRequest()->get[$key];
             }
         }
         
@@ -414,6 +384,32 @@ abstract class ControllerBase extends Controller {
         return $url;
     }
     
+    protected function getProfileUrl(): string {
+        $url = '';
+        
+        if ($this->getRequest()) {
+            $url = $this->getRequest()->getRootUrl() . '/profile';
+        }
+        
+        return $url;
+    }
+    
+    /**
+     * Gets variable value from $_GET.
+     */
+    protected function getFromGet(string $name, string $defaultValue = null): ?string {
+        if (array_key_exists($name, $this->getRequest()->get)) {
+            $value = (string) $this->getRequest()->get[$name];
+        } else {
+            $value = $defaultValue;
+        }
+        
+        return $value;
+    }
+    
+    /**
+     * Gets variable value from $_POST.
+     */
     protected function getFromPost(string $name, string $defaultValue = null): ?string {
         if (array_key_exists($name, $this->getRequest()->post)) {
             $value = (string) $this->getRequest()->post[$name];
@@ -422,6 +418,33 @@ abstract class ControllerBase extends Controller {
         }
         
         return $value;
+    }
+    
+    /**
+     * Gets variable value from $_SESSION.
+     */
+    protected function getFromSession(string $name, string $defaultValue = null): ?string {
+        if (array_key_exists($name, $this->getRequest()->session)) {
+            $value = (string) $this->getRequest()->session[$name];
+        } else {
+            $value = $defaultValue;
+        }
+        
+        return $value;
+    }
+    
+    /**
+     * Sets variable value to $_SESSION.
+     */
+    protected function setToSession(string $name, string $value): bool {
+        return $this->getRequest()->setSessionVariable($name, $value);
+    }
+    
+    /**
+     * Unsets variable value from $_SESSION.
+     */
+    protected function unsetFromSession(string $name): bool {
+        return $this->getRequest()->unsetSessionVariable($name);
     }
     
     protected function setAjaxMode(bool $value): void {
@@ -449,6 +472,88 @@ abstract class ControllerBase extends Controller {
         $this->addJsFile('/vendor/jquery/jquery-3.3.1.js');
         $this->addJsFile('/vendor/nicEdit/nicEdit.js');
         $this->addJsFile('/js/common.js');
+    }
+    
+    protected function setPropertiesFromPost(ModelDatabase $model): bool {
+        $canSave = false;
+        $propertiesList = $model->getPropertiesList();
+        $controlsList = $this->getModelControlsList($model);
+        
+        foreach ($propertiesList as $propertyName => $propertyData) {
+            if (! $model->isPk($propertyName)) {
+                if ($controlsList[$propertyName] !== self::CONTROL_NONE) {
+                    $value = $this->getFromPost($propertyName);
+                    if (! is_null($value) && ($controlsList[$propertyName] !== self::CONTROL_PASSWORD || $value !== '')) {
+                        $value = $this->convertFromPost($value, $propertyData);
+                        $model->$propertyName = $value;
+                        $canSave = true;
+                    }
+                }
+            }
+        }
+        return $canSave;
+    }
+    
+    protected function convertFromPost(?string $value, array $propertyData = array()) {
+        if (array_key_exists('type', $propertyData) && $propertyData['type'] === ModelDatabase::TYPE_BOOL) {
+            if ($value === '') {
+                $preparedValue = null;
+            } else if ($value === '1') {
+                $preparedValue = true;
+            } else {
+                $preparedValue = false;
+            }
+        } else {
+            $preparedValue = $value;
+        }
+        
+        return $preparedValue;
+    }
+    
+    protected function getModelControlsList(ModelDatabase $model) {
+        $propertiesList = $model->getPropertiesList();
+        
+        $controlsList = $this->getControlsList($model);
+        
+        foreach ($propertiesList as $propertyName => $property) {
+            if (! array_key_exists($propertyName, $controlsList)) {
+                if (! empty($property['skipControl'])) {
+                    $controlType = self::CONTROL_NONE;
+                } else {
+                    switch ($property['type']) {
+                        case Model::TYPE_TEXT:
+                        case Model::TYPE_INT:
+                            $controlType = self::CONTROL_INPUT;
+                            break;
+                        case Model::TYPE_BOOL:
+                            $controlType = self::CONTROL_SELECT_BOOL;
+                            break;
+                        case Model::TYPE_FK:
+                            $controlType = self::CONTROL_SELECT;
+                            break;
+                        case Model::TYPE_ENUM:
+                            $controlType = self::CONTROL_SELECT;
+                            break;
+                        default:
+                            $controlType = self::CONTROL_INPUT;
+                            break;
+                    }
+                }
+                $controlsList[$propertyName] = $controlType;
+            }
+        }
+        return $controlsList;
+    }
+    
+    /**
+     * @var array $_modelControlsList Defines controls for model properties.
+     * 
+     * propertyName => controlType
+     * f. e.
+     * 'deleted' => self::CONTROL_NONE,
+     */
+    protected function getControlsList(ModelDatabase $model) {
+        return array();
     }
     
 }

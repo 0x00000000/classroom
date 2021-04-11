@@ -15,13 +15,15 @@ class ConfigCommon extends ConfigBase {
     protected $_data = array(
         'application' => array(
             'session_name' => 'sid',
+            // Must be set if application is not in site's root. F e '/b2b/public'
+            'urlPrefix' => '',
             // Must be set if application is not in site's root.
-            // 'baseUrl' => 'http://example.com',
+            // 'baseUrl' => 'http://example.com/b2b/public',
         ),
         'database' => array(
             'server' => 'localhost',
             'login' => 'mysql',
-            'password' => '',
+            'password' => 'localpass',
             'name' => 'classroom',
             'prefix' => 'classroom_',
         ),
@@ -30,18 +32,23 @@ class ConfigCommon extends ConfigBase {
             'title' => 'Learn English',
             'keywords' => '',
             'description' => '',
+            'sessionLifeTime' => '86400',
+            'redirectAfterLoginLifeTime' => '600',
         ),
         'user' => array(
-            'salt1' => 'DKfoA.d,XO',
-            'salt2' => 'cqPdMs!oee',
+            'salt1' => 'abcdefghij',
+            'salt2' => 'klmnopqrst',
         ),
         'admin' => array(
+            'mainPageUrl' => '/admin',
             'itemsPerPage' => 20,
         ),
         'teacher' => array(
+            'mainPageUrl' => '/teacher',
             'itemsPerPage' => 20,
         ),
         'student' => array(
+            'mainPageUrl' => '',
             'itemsPerPage' => 20,
         ),
     );

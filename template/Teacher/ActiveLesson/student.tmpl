@@ -4,7 +4,7 @@
 
 <h3>Lessons for student {$student->name}</h3>
 
-{if $pagesList}
+{if $pagesCount > 1}
 <div class="pages">
 {foreach $pagesList as $page}
 {if $page === $currentPage}

@@ -200,6 +200,7 @@ class ControllerTeacherActiveLesson extends ControllerTeacherBase {
         } else {
             $currentPage = 1;
         }
+        $currentPage = (string) $currentPage;
         
         $user = $this->getAuth()->getUser();
         $sortingList = array('disabled' => 'asc', 'name' => 'asc');
@@ -215,7 +216,7 @@ class ControllerTeacherActiveLesson extends ControllerTeacherBase {
         
         $pagesList = array();
         if ($itemsCount > 1) {
-            $pagesCount = floor(($itemsCount - 1) / $this->_itemsPerPage);
+            $pagesCount = ceil($itemsCount / $this->_itemsPerPage);
             for ($i = 1; $i <= $pagesCount; $i++) {
                 $pagesList[] = (string) $i;
             }
@@ -246,6 +247,7 @@ class ControllerTeacherActiveLesson extends ControllerTeacherBase {
         } else {
             $currentPage = 1;
         }
+        $currentPage = (string) $currentPage;
         
         $studentConditionsList = $this->_conditionsList;
         $studentConditionsList['id'] = $this->_studentId;
@@ -268,7 +270,7 @@ class ControllerTeacherActiveLesson extends ControllerTeacherBase {
         
         $pagesList = array();
         if ($lessonsCount > 1) {
-            $pagesCount = floor(($lessonsCount - 1) / $this->_itemsPerPage);
+            $pagesCount = ceil($lessonsCount / $this->_itemsPerPage);
             for ($i = 1; $i <= $pagesCount; $i++) {
                 $pagesList[] = (string) $i;
             }

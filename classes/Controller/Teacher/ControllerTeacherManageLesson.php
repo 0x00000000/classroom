@@ -11,7 +11,7 @@ use Classroom\Model\ModelDatabase;
 class ControllerTeacherManageLesson extends ControllerTeacherManageBase {
     
     /**
-     * @var string $_modelName Name of manaaged model class.
+     * @var string $_modelName Name of managed model class.
      */
     protected $_modelName = 'Lesson';
     

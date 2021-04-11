@@ -58,7 +58,7 @@ class DatabaseMysql extends Database {
         
         $query = 'select * from `' . $this->escape($this->_prefix . $table) . '`' 
             . ' where `' . $this->escape($primaryKey) . '` = "'
-            . $this->escape($pk) . '"';
+            . $this->escape((string) $pk) . '"';
         $this->_lastQuery = $query;
         
         $res = $this->_mysqli->query($query);
@@ -91,7 +91,7 @@ class DatabaseMysql extends Database {
                     $value = 'asc';
                 }
                 $sortingQueryList[] = '`' . $this->escape($key) . '` '
-                    . $this->escape($value);
+                    . $this->escape((string) $value);
             }
             
             $sortingQuery = ' order by ' . implode(', ', $sortingQueryList);
@@ -146,21 +146,18 @@ class DatabaseMysql extends Database {
     }
     
     /**
-     * Saves the record in the database.
+     * Saves the record to the database.
      */
     public function addRecord(string $table, array $data): ?string {
         $result = null;
         
-        if ($table == 'template_id') {
-            echo '###';
-        }
         if (is_array($data) && count($data)) {
             $query = 'insert into ' . $this->escape($this->_prefix . $table);
             $keysArray = array();
             $valsArray = array();
             foreach ($data as $key => $val) {
                 $keysArray[] = '`' . $this->escape($key) . '`';
-                $valsArray[] = '"' . $this->escape($val) . '"';
+                $valsArray[] = '"' . $this->escape((string) $val) . '"';
             }
             
             $query .= ' (' . implode(', ', $keysArray) . ') ' . 
@@ -172,6 +169,57 @@ class DatabaseMysql extends Database {
             }
         }
         
+        return $result;
+    }
+    
+    /**
+     * Insert several records to the database.
+     */
+    public function addMultipleRecord(string $table, array $data, array $params): bool {
+        $result = false;
+        
+        
+        if (is_array($data) && is_array($data[0]) && count($data[0])) {
+            $keysList = array();
+            $keysQueryData = array();
+            $valsQueryData = array();
+            
+            $recordsSetCount = ! empty($params['recordsSetCount']) ? $params['recordsSetCount'] : count($data);
+            
+            foreach ($data[0] as $key => $val) {
+                $keysList[] = $key;
+                $keysQueryData[] = '`' . $this->escape($key) . '`';
+            }
+            foreach ($data as $recordNumber => $recordData) {
+                $recordSetKey = floor($recordNumber % $recordsSetCount);
+                $valsQueryRow = array();
+                foreach ($keysList as $key) {
+                    if (isset($recordData[$key])) {
+                        $valsQueryRow[] = '"' . $this->escape((string) $recordData[$key]) . '"';
+                    } else {
+                        $valsQueryRow[] = '""';
+                    }
+                }
+                $valsQueryData[$recordSetKey][] = '(' . implode(', ', $valsQueryRow) . ')';
+            }
+            
+            foreach ($valsQueryData as $valsQueryDataSet) {
+                $result = true;
+                $query = 'insert into ' . $this->escape($this->_prefix . $table);
+                $query .= ' (' . implode(', ', $keysQueryData) . ') ' . 
+                    ' values ' . implode(', ', $valsQueryDataSet);
+                $this->_lastQuery = $query;
+                if (! $this->_mysqli->query($query)) {
+                    $result = false;
+                    break;
+                }
+            }
+        }
+        
+        if (! $result) {
+            var_export($this->getLastError()); exit;
+            echo $this->_lastQuery;
+        }
         return $result;
     }
     
@@ -189,7 +237,7 @@ class DatabaseMysql extends Database {
                     if (! is_null($val)) {
                         $valsArray[] = '`' . $this->escape($key) . '`'
                             . ' = '
-                            . '"' . $this->escape($val) . '"';
+                            . '"' . $this->escape((string) $val) . '"';
                     } else {
                         $valsArray[] = '`' . $this->escape($key) . '`' . ' = NULL';
                     }
@@ -199,7 +247,7 @@ class DatabaseMysql extends Database {
             if (count($valsArray)) {
                 $query .= ' set ' . implode(', ', $valsArray)
                     . ' where `' . $this->escape($primaryKey)
-                    . '` = "' . $data[$primaryKey] . '"';
+                    . '` = "' . $this->escape((string) $data[$primaryKey]) . '"';
                 $this->_lastQuery = $query;
                 
                 if ($this->_mysqli->query($query)) {
@@ -222,10 +270,10 @@ class DatabaseMysql extends Database {
             $conditionQueryList = array();
             foreach ($conditionsList as $key => $value) {
                 $conditionQueryList[] = '`' . $this->escape($key) . '` = "'
-                    . $this->escape($value) . '"';
+                    . $this->escape((string) $value) . '"';
             }
             
-            $conditionQuery = ' where (' . implode(' and ', $conditionQueryList) . ')';
+            $conditionQuery = '(' . implode(' and ', $conditionQueryList) . ')';
             
             $query = 'delete from `'
                 . $this->escape($this->_prefix . $table)
@@ -248,7 +296,7 @@ class DatabaseMysql extends Database {
         $query = 'delete from `'
             . $this->escape($this->_prefix . $table)
             . '` where `' . $this->escape($primaryKey)
-            . '` = "' . $this->escape($pk) . '"';
+            . '` = "' . $this->escape((string) $pk) . '"';
         $this->_lastQuery = $query;
         if ($this->_mysqli->query($query)) {
             $result = true;
@@ -301,7 +349,7 @@ class DatabaseMysql extends Database {
                 ) {
                     $conditionQueryList[] = '`' . $this->escape($key) . '`'
                         . ' ' . $value['condition'] . ' '
-                        . '"' . $this->escape($value['value']) . '"';
+                        . '"' . $this->escape((string) $value['value']) . '"';
                 }
             }
             
