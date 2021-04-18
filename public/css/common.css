@@ -48,11 +48,6 @@ pre {
     padding: 0;
 }
 
-img {
-    float: left;
-    margin: 0 3px 0 3px;
-}
-
 hr {
     margin-top: 10px;
     margin-bottom: 10px;
@@ -303,8 +298,24 @@ table.smallestTable {
     padding: 0 5px;
 }
 
-.content {
+.content,
+.nicEdit-main {
     width: 980px;
     margin: 0px auto;
+    text-align: justify;
+}
+
+.content img,
+.nicEdit-main img {
+    margin: 0 3px 0 3px;
+}
+
+.content .nicContentImageBox,
+.nicEdit-main .nicContentImageBox {
+    text-align: center;
+}
+
+.content .nicContentImage,
+.nicEdit-main .nicContentImage {
 }
 

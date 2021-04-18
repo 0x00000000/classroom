@@ -54,6 +54,8 @@ class ApplicationCommon extends ApplicationBase {
         
         $router->setRule('/teacher/activeLesson[/<action>][/<studentId>][/<lessonId>]', 'Teacher/ControllerTeacherActiveLesson', 'index');
         
+        $router->setRule('/teacher/contentImage', 'Teacher/ControllerTeacherContentImage', 'index');
+        
         $router->setRule('/student', 'Student/ControllerStudentIndex', 'index');
         
         $router->setRule('/student/lesson[/<action>][/<id>]', 'Student/ControllerStudentManageLesson', 'index');

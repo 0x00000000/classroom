@@ -259,20 +259,25 @@ abstract class ControllerBase extends Controller {
      * Adds common varibles to page's view.
      */
     protected function setPageViewVariables(): void {
+        $config = Config::instance();
+        
         $this->getPageView()->set('user', $this->getAuth()->getUser());
         $this->getPageView()->set('currentUrl', $this->getUrl());
         $this->getPageView()->set('rootUrl', $this->getRootUrl());
         $this->getPageView()->set('baseTemplatePath', $this->getBaseTemplatePath());
         $this->getPageView()->set('bodyClass', '');
         
-        $config = Config::instance();
         $this->getPageView()->set('pageCaption', $config->get('site', 'caption'));
         $this->getPageView()->set('pageTitle', $config->get('site', 'title'));
         $this->getPageView()->set('pageKeywords', $config->get('site', 'keywords'));
         $this->getPageView()->set('pageDescription', $config->get('site', 'description'));
+        
+        $this->getPageView()->set('nicEditConfig', $config->get('nicEdit'));
     }
     
     protected function setContentViewVariables() {
+        $config = Config::instance();
+        
         $this->getView()->set('currentUrl', $this->getUrl());
         $this->getView()->set('rootUrl', $this->getRootUrl());
         $this->getView()->set('baseUrl', $this->getBaseUrl());
@@ -281,6 +286,8 @@ abstract class ControllerBase extends Controller {
         
         $messageType = $this->popStashData('messageType');
         $this->getView()->set('messageType', $messageType);
+        
+        $this->getView()->set('nicEditConfig', $config->get('nicEdit'));
     }
         
     /**
@@ -471,6 +478,9 @@ abstract class ControllerBase extends Controller {
         $this->addCssFile('/css/common.css');
         $this->addJsFile('/vendor/jquery/jquery-3.3.1.js');
         $this->addJsFile('/vendor/nicEdit/nicEdit.js');
+        $this->addJsFile('/js/nicEdit/nicUpload.js');
+        $this->addJsFile('/js/nicEdit/nicYoutube.js');
+        $this->addJsFile('/js/nicEdit/nicHtml.js');
         $this->addJsFile('/js/common.js');
     }
     

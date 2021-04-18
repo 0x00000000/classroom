@@ -20,6 +20,15 @@ class ConfigCommon extends ConfigBase {
             // Must be set if application is not in site's root.
             // 'baseUrl' => 'http://example.com/b2b/public',
         ),
+        'contentImage' => array(
+            // Should be in public directory.
+            'uploadPath' => '/public/media/images',
+        ),
+        'nicEdit' => array(
+            'nicUploadPath' => '/public/media/nicUpload',
+            'nicYoutubeWidth' => '560',
+            'nicYoutubeHeight' => '315',
+        ),
         'database' => array(
             'server' => 'localhost',
             'login' => 'mysql',
