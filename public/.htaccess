@@ -2,7 +2,7 @@
 RewriteEngine On
 
 # Installation directory
-RewriteBase /
+# RewriteBase /
 
 # Protect hidden files from being viewed
 <Files .*>
@@ -17,6 +17,7 @@ RewriteRule ^css/.*\.css$ - [L]
 
 RewriteRule ^js/.*\.js$ - [L]
 
+RewriteRule ^media/.*\.((jpg)|(jpeg)|(gif)|(ico)|(png)|(svg)|(woff))$ - [L]
 RewriteRule ^images/.*\.((jpg)|(jpeg)|(gif)|(ico)|(png)|(svg)|(woff))$ - [L]
 RewriteRule ^vendor/.*\.((js)|(css)|(jpg)|(jpeg)|(gif)|(ico)|(png)|(svg)|(woff))$ - [L]
 

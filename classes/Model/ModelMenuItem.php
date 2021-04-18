@@ -43,4 +43,32 @@ class ModelMenuItem extends ModelAccessRights {
         array('name' => 'deleted', 'type' => self::TYPE_BOOL, 'skipControl' => true),
     );
     
+    /**
+     * @var string|null $_rootUrl Url to site root.
+     */
+    private $_rootUrl = '';
+    
+    /**
+     * Gets request's get data.
+     */
+    public function getLink(): ?string {
+        return $this->getRawProperty('link')
+            ? $this->getRootUrl() . $this->getRawProperty('link')
+            : $this->getRawProperty('link');
+    }
+    
+    /**
+     * Sets site`s root url.
+     */
+    public function setRootUrl(string $rootUrl) {
+        $this->_rootUrl = $rootUrl;
+    }
+    
+    /**
+     * Gets site`s root url.
+     */
+    private function getRootUrl(): ?string {
+        return $this->_rootUrl;
+    }
+    
 }

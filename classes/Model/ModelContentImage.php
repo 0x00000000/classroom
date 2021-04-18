@@ -161,7 +161,7 @@ class ModelContentImage extends ModelDatabase {
     }
     
     private function getRootUrl(): ?string {
-        return $this->rootUrl;
+        return $this->_rootUrl;
     }
     
     public function setUploadPath(string $path) {

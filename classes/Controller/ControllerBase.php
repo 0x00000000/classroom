@@ -245,6 +245,7 @@ abstract class ControllerBase extends Controller {
             if ($menu->userHasAccess($this->getAuth())) {
                 foreach ($menu->getItems() as $item) {
                     if ($item->userHasAccess($this->getAuth())) {
+                        $item->setRootUrl($this->getRootUrl());
                         $menuItems[] = $item;
                     }
                 }

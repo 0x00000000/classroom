@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Classroom\Module\Config;
 
+use Classroom\System\FileSystem;
+
 /**
  * Stores configuration data for other modules.
  */
@@ -24,6 +26,10 @@ class ConfigBase extends Config {
      */
     public function get(string $section, string $name = null) {
         $result = null;
+        
+        if (! array_key_exists($section, $this->_data)) {
+            $this->_data[$section] = $this->loadConfigFromFile($section);
+        }
         
         if (
             array_key_exists($section, $this->_data)
@@ -61,6 +67,20 @@ class ConfigBase extends Config {
             $this->_data[$section][$name] = $value;
             
             $result = true;
+        }
+        
+        return $result;
+    }
+    
+    protected function getConfigDirectory(): string {
+        return FileSystem::getRoot() . FileSystem::getDS() . 'config';
+    }
+    
+    protected function loadConfigFromFile(string $section): ?array {
+        $result = null;
+        $path = $this->getConfigDirectory() . FileSystem::getDS() . $section . '.php';
+        if (is_file($path)) {
+            $result = @include($path);
         }
         
         return $result;
