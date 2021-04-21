@@ -5,7 +5,7 @@ body, html {
     margin: 0;
     height: 100%;
     font-size: 16px;
-    background: #eee;
+    background: #fff;
 }
 
 h1 {
@@ -61,6 +61,16 @@ ul {
 ol {
     padding: 10px 5px 10px 24px;
     margin: 0px;
+}
+
+a, a:visited {
+    color: #0065B3;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #58AE2D;
+    text-decoration: underline;
 }
 
 table {
@@ -244,7 +254,7 @@ table.smallestTable {
 .headerTop {
     display: table;
     width: 100%;
-    height: 55px;
+    height: 40px;
 }
 
 .headerLogo {
@@ -265,11 +275,16 @@ table.smallestTable {
 }
 
 .header {
+    padding: 0 0 10px;
+    -moz-box-shadow: 0 6px 4px -4px rgba(0, 0, 0, 0.2);
+    -webkit-box-shadow: 0 6px 4px -4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 4px -4px rgba(0, 0, 0, 0.2);
 }
 
 .body {
     display: table;
     width: 100%;
+    padding: 10px 0;
 }
 
 .bodyLeft {
@@ -295,7 +310,12 @@ table.smallestTable {
 }
 
 .mainMenu > span {
-    padding: 0 5px;
+    padding: 5px;
+    font-size: 18px;
+}
+
+.mainMenu > span:hover {
+    background: #eee;
 }
 
 .content,

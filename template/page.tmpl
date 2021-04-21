@@ -26,11 +26,11 @@
                 {if $user}
                 <form action="{$rootUrl}/login" method="POST" class="headerForm">
                     <input name="logout" value="1" type="hidden" />
-                    Здравствуйте, {$user->name}.
-                    <input type="submit" value="Выйти" />
+                    Hello, {$user->name}.
+                    <input type="submit" value="Logout" />
                 </form>
                 {else}
-                <a href="{$rootUrl}/login">Войти</a>
+                <a href="{$rootUrl}/login">Login</a>
                 {/if}
             </div>
         </div>
@@ -40,7 +40,7 @@
                 <span><a href="{$item->link}">{$item->caption}</a></span>
             {/foreach}
         </div>
-    </header>
+    </div>
     
     <div class="body">
         <div class="bodyLeft">
@@ -56,6 +56,7 @@
     
     <div class="footer">
         <div class="copyright">
+            
         </div>
     </div>
 </div>
