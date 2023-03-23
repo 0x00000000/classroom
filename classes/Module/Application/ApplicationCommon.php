@@ -50,6 +50,10 @@ class ApplicationCommon extends ApplicationBase {
         
         $router->setRule('/teacher/lessonTemplate[/<action>][/<id>]', 'Teacher/ControllerTeacherManageLessonTemplate', 'index');
         
+        $router->setRule('/teacher/homework[/<action>][/<id>]', 'Teacher/ControllerTeacherManageHomework', 'index');
+        
+        $router->setRule('/teacher/homeworkTemplate[/<action>][/<id>]', 'Teacher/ControllerTeacherManageHomeworkTemplate', 'index');
+        
         $router->setRule('/teacher/student[/<action>][/<id>]', 'Teacher/ControllerTeacherManageStudent', 'index');
         
         $router->setRule('/teacher/activeLesson[/<action>][/<studentId>][/<lessonId>]', 'Teacher/ControllerTeacherActiveLesson', 'index');
@@ -59,6 +63,8 @@ class ApplicationCommon extends ApplicationBase {
         $router->setRule('/student', 'Student/ControllerStudentIndex', 'index');
         
         $router->setRule('/student/lesson[/<action>][/<id>]', 'Student/ControllerStudentManageLesson', 'index');
+        
+        $router->setRule('/student/homework[/<action>][/<id>]', 'Student/ControllerStudentManageHomework', 'index');
         
         $router->setRule('/student/activeLesson[/<action>][/<teacherId>][/<lessonId>]', 'Student/ControllerStudentActiveLesson', 'index');
         
