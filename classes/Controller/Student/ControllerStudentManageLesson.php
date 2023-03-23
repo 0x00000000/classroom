@@ -29,6 +29,7 @@ class ControllerStudentManageLesson extends ControllerStudentManageBase {
         'teacherId' => self::CONTROL_NONE,
         'studentId' => self::CONTROL_NONE,
         'keywords' => self::CONTROL_NONE,
+        'content' => self::CONTROL_HTML_SIMPLE,
         'disabled' => self::CONTROL_NONE,
         'deleted' => self::CONTROL_NONE,
     );
@@ -50,27 +51,7 @@ class ControllerStudentManageLesson extends ControllerStudentManageBase {
         return false;
     }
     
-    protected function setContentViewVariables() {
-        $get = $this->getRequest()->get;
-        $_action = null;
-        if (array_key_exists('action', $get)) {
-            $_action = $get['action'];
-        }
-        if ($this->_action === 'list' || empty($this->_action)) {
-            $this->_modelControlsList['content'] = self::CONTROL_NONE;
-        }
-        
-        parent::setContentViewVariables();
-        
-        $user = $this->getAuth()->getUser();
-        
-        $condition = array();
-        $teacherIdValues = $this->getFkValues('teacherId', $condition, 'name');
-        $this->getView()->set('teacherIdValues', $teacherIdValues);
-    }
-    
     protected function actionIndex() {
-        
         $get = $this->getRequest()->get;
         if (array_key_exists('action', $get)) {
             $this->_action = $get['action'];
@@ -91,6 +72,18 @@ class ControllerStudentManageLesson extends ControllerStudentManageBase {
         }
         
         return $content;
+    }
+    
+    protected function innerActionView() {
+        $this->_conditionsList['studentId'] = $this->getAuth()->getUser()->id;
+        
+        return parent::innerActionView();
+    }
+    
+    protected function innerActionList() {
+        $this->_conditionsList['studentId'] = $this->getAuth()->getUser()->id;
+        
+        return parent::innerActionList();
     }
     
 }

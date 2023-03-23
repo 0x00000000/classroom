@@ -34,7 +34,7 @@ class ControllerTeacherManageLesson extends ControllerTeacherManageBase {
      * @var array $_templateNames View templates' names.
      */
     protected $_templateNames = array(
-        'add' => 'Teacher/ManageLesson/add',
+        'add' => 'Common/ManageBase/add',
         'list' => 'Common/ManageBase/list',
         'view' => 'Common/ManageBase/view',
         'edit' => 'Common/ManageBase/edit',
@@ -51,6 +51,17 @@ class ControllerTeacherManageLesson extends ControllerTeacherManageBase {
     }
     
     protected function setContentViewVariables() {
+        if (
+            array_key_exists('action', $this->getRequest()->get) &&
+            $this->getRequest()->get['action'] === 'add'
+        ) {
+            $this->_modelControlsList['caption'] = self::CONTROL_NONE;
+            $this->_modelControlsList['subject'] = self::CONTROL_NONE;
+            $this->_modelControlsList['keywords'] = self::CONTROL_NONE;
+            $this->_modelControlsList['content'] = self::CONTROL_NONE;
+            $this->_modelControlsList['deleted'] = self::CONTROL_NONE;
+        }
+
         parent::setContentViewVariables();
         
         $user = $this->getAuth()->getUser();

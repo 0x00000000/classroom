@@ -21,6 +21,7 @@ abstract class ControllerAbstract {
     public const CONTROL_PASSWORD = 'password';
     public const CONTROL_TEXTAREA = 'textarea';
     public const CONTROL_HTML = 'html';
+    public const CONTROL_HTML_SIMPLE = 'htmlSimple';
     public const CONTROL_SELECT_BOOL = 'selectBool';
     public const CONTROL_SELECT = 'select';
     public const CONTROL_FILE = 'file';

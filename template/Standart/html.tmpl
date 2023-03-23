@@ -8,6 +8,9 @@
             iconsPath: iconsPath,
         };
         {/literal}
+        {if ! empty($simpleView)}
+            params.buttonList = [];
+        {/if}
         var nicEdit = new nicEditor(params).panelInstance('{$name}NicEditPanel');
         var htmlContainer = document.getElementById('{$name}NicEditPanelContainer');
         if (htmlContainer) {

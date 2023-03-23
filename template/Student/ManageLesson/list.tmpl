@@ -8,16 +8,21 @@
 {if $page === $currentPage}
     <strong>{$page}</strong>
 {else}
-    <a href="{$baseUrl}/{$page}">{$page}</a>
+    <a href="{$baseUrl}/list/{$page}">{$page}</a>
 {/if}
 {/foreach}
 </div>
 {/if}
 
-<table class="listTable"><tbody>
+<table class="listTable">
     <tr>
     {foreach $propertiesList as $propertyName => $property}
-    {if $controlsList[$propertyName] !== 'none'}
+    {if $controlsList[$propertyName] === 'none'}
+    {else if $controlsList[$propertyName] === 'textarea'}
+    {else if $controlsList[$propertyName] === 'html'}
+    {else if $controlsList[$propertyName] === 'htmlSimple'}
+    {else if $controlsList[$propertyName] === 'password'}
+    {else}
         <th>{$property['caption']}</th>
     {/if}
     {/foreach}
@@ -27,7 +32,12 @@
     {foreach $itemsList as $item}
     <tr>
     {foreach $propertiesList as $propertyName => $property}
-    {if $controlsList[$propertyName] !== 'none'}
+    {if $controlsList[$propertyName] === 'none'}
+    {else if $controlsList[$propertyName] === 'textarea'}
+    {else if $controlsList[$propertyName] === 'html'}
+    {else if $controlsList[$propertyName] === 'htmlSimple'}
+    {else if $controlsList[$propertyName] === 'password'}
+    {else}
         <td>
         {if $propertyName === 'caption'}
             {include file="$baseTemplatePath/viewText.tmpl" value="{$item->{$propertyName}}" href="{$baseUrl}/view/{$item->id}"}
@@ -43,6 +53,6 @@
     {/foreach}
     </tr>
     {/foreach}
-</tbody></table>
+</table>
 
 </div>
