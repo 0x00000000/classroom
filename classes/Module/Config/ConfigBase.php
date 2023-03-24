@@ -49,29 +49,6 @@ class ConfigBase extends Config {
         return $result;
     }
     
-    /**
-     * Adds data from configuration.
-     * Existed data con't be rewrited.
-     */
-    public function add(string $section, string $name, $value): bool {
-        $result = false;
-
-        if ($section && $name) {
-            if (
-                ! array_key_exists($section, $this->_data)
-                || ! is_array($this->_data[$section])
-            ) {
-                $this->_data[$section] = array();
-            }
-            
-            $this->_data[$section][$name] = $value;
-            
-            $result = true;
-        }
-        
-        return $result;
-    }
-    
     protected function getConfigDirectory(): string {
         return FileSystem::getRoot() . FileSystem::getDS() . 'config';
     }

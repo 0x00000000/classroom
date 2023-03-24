@@ -14,14 +14,11 @@ final class ResponseModuleTest extends TestCase {
     
     protected $_response;
     
-    public function __construct() {
-        parent::__construct();
-        
+    public function setUp(): void {
         $this->_response = Factory::instance()->createResponse();
-        
     }
     
-    public function testHeader(): void {
+    public function testGetSetHeader(): void {
         $this->_response->setHeader('Location', 'http://test.example.com/');
         $this->_response->setHeader('Content-Type', 'application/pdf');
         $this->_response->setHeader('HTTP/1.0 404 Not Found');
@@ -30,7 +27,7 @@ final class ResponseModuleTest extends TestCase {
         $this->assertNull($this->_response->getHeader('HTTP/1.0 404 Not Found'));
     }
     
-    public function testBody(): void {
+    public function testGetSetBody(): void {
         $body = '<html>
 <body>
 <div class="test">

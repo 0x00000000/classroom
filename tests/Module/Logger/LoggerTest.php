@@ -14,15 +14,12 @@ final class LoggerTest extends TestCase {
     protected $_logger = null;
     
     protected $_request = null;
-    
-    public function __construct() {
-        parent::__construct();
-        
+
+    protected function setUp(): void {
         $this->_request = Factory::instance()->createRequest();
-        
         $this->_logger = Factory::instance()->createLogger($this->_request);
     }
-    
+
     public function testLogCritical(): void {
         $result = $this->_logger->logCritical(
             'Testing log critical caption', 'Testing log critical caption description'
@@ -57,7 +54,7 @@ final class LoggerTest extends TestCase {
     
     public function testSetRequest(): void {
         $logger = Factory::instance()->createModule('Logger');
-        
+
         $this->assertTrue($logger->setRequest($this->_request));
     }
     

@@ -15,14 +15,11 @@ include_once(dirname(__FILE__) . '/../../init.php');
 final class RequestModuleTest extends TestCase {
     
     protected $_request;
-    
-    public function __construct() {
-        parent::__construct();
-        
+
+    protected function setUp(): void {
         $this->_request = Factory::instance()->createRequest();
-        
     }
-    
+
     public function testGetCurrentRequest(): void {
         $currentRequest = $this->_request->getCurrentRequest();
         $this->assertTrue($currentRequest instanceof \Classroom\Model\ModelRequest);
@@ -36,7 +33,7 @@ final class RequestModuleTest extends TestCase {
         $this->assertNull($currentRequest->info);
     }
     
-    public function testData(): void {
+    public function testRequestData(): void {
         $this->assertEquals($this->_request->url, RequestTest::TEST_URL);
         $this->assertEquals($this->_request->get, RequestTest::TEST_GET);
         $this->assertEquals($this->_request->post, RequestTest::TEST_POST);
@@ -46,5 +43,59 @@ final class RequestModuleTest extends TestCase {
         $this->assertEquals($this->_request->userAgent, RequestTest::TEST_USER_AGENT);
         $this->assertNull($this->_request->info);
     }
-    
+
+    public function testSetSessionVariable(): void {
+        $falseKeysList = ['', '0'];
+        $valueCommon = 'valueCommon';
+        foreach ($falseKeysList as $key) {
+            $result = $this->_request->setSessionVariable($key, $valueCommon);
+            $this->assertFalse($result);
+        }
+
+        $data = [
+            'keyString' => 'valueString',
+            'keyStringEmpty' => 'valueString',
+            'keyInt' => 15,
+            'keyInt0' => 15,
+            'keyTrue' => true,
+            'keyFalse' => false,
+            'keyNull' => null,
+        ];
+        foreach ($data as $key => $value) {
+            $result = $this->_request->setSessionVariable($key, $value);
+            $this->assertTrue($result);
+            $this->assertEquals($this->_request->session[$key], $value);
+        }
+    }
+
+    public function testUnsetSessionVariable(): void {
+        $falseKeysList = ['', '0'];
+        $valueCommon = 'valueCommon';
+        foreach ($falseKeysList as $key) {
+            $result = $this->_request->unsetSessionVariable($key);
+            $this->assertFalse($result);
+        }
+
+        $notExistedKey = 'notExistedKey';
+        $result = $this->_request->unsetSessionVariable($notExistedKey);
+        $this->assertTrue($result);
+
+        $data = [
+            'keyString' => 'valueString',
+            'keyStringEmpty' => 'valueString',
+            'keyInt' => 15,
+            'keyInt0' => 15,
+            'keyTrue' => true,
+            'keyFalse' => false,
+            'keyNull' => null,
+        ];
+
+        foreach ($data as $key => $value) {
+            $this->_request->setSessionVariable($key, $value);
+            $result = $this->_request->unsetSessionVariable($key);
+            $this->assertTrue($result);
+            $this->assertFalse(array_key_exists($key, $this->_request->session));
+        }
+    }
+
 }

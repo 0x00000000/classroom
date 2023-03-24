@@ -24,6 +24,10 @@ final class FileSystemTest extends TestCase {
         $this->assertEquals(FileSystem::getDirectorySeparator(), DIRECTORY_SEPARATOR);
     }
     
+    public function testGetDS(): void {
+        $this->assertEquals(FileSystem::getDS(), DIRECTORY_SEPARATOR);
+    }
+
     public function testGetScriptExtension(): void {
         $this->assertEquals(FileSystem::getScriptExtension(), '.php');
     }

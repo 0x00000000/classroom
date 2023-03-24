@@ -53,11 +53,9 @@ abstract class FactorySingleton extends FactoryAbstract {
     public static function setType(string $type): bool {
         $result = false;
         
-        if (! self::$_type) {
-            if ($type) {
-                $result = true;
-                self::$_type = $type;
-            }
+        if (! self::$_type && $type) {
+            $result = true;
+            self::$_type = $type;
         }
         
         return $result;

@@ -19,9 +19,7 @@ final class ModelLogTest extends TestCase {
     protected $_request = null;
     protected $_logData = null;
     
-    public function __construct() {
-        parent::__construct();
-        
+    public function setUp(): void {
         $this->_request = Factory::instance()->createRequest();
         
         $this->_modelLog = Factory::instance()->createModel('Log');
@@ -49,7 +47,7 @@ final class ModelLogTest extends TestCase {
         $this->assertEquals($this->_modelLog->requestId, $this->_request->getCurrentRequest()->id);
     }
     
-    public function testData(): void {
+    public function testSetGetData(): void {
         $this->_modelLog->create(
             $this->_logData['level'], $this->_logData['message'], $this->_logData['description'],
             $this->_logData['data'],
@@ -77,7 +75,7 @@ final class ModelLogTest extends TestCase {
         $this->assertEquals($data, $testData);
     }
     
-    public function testCritical(): void {
+    public function testCreateCritical(): void {
         $this->_modelLog->createCritical(
             $this->_logData['message'], $this->_logData['description'],
             $this->_logData['data'],
@@ -96,7 +94,7 @@ final class ModelLogTest extends TestCase {
         $this->assertEquals($this->_modelLog->code, E_USER_ERROR);
     }
     
-    public function testError(): void {
+    public function testCreateError(): void {
         $this->_modelLog->createError(
             $this->_logData['message'], $this->_logData['description'],
             $this->_logData['data'],
@@ -115,7 +113,7 @@ final class ModelLogTest extends TestCase {
         $this->assertEquals($this->_modelLog->code, E_USER_ERROR);
     }
     
-    public function testWarning(): void {
+    public function testCreateWarning(): void {
         $this->_modelLog->createWarning(
             $this->_logData['message'], $this->_logData['description'],
             $this->_logData['data'],
@@ -134,7 +132,7 @@ final class ModelLogTest extends TestCase {
         $this->assertEquals($this->_modelLog->code, E_USER_WARNING);
     }
     
-    public function testNotice(): void {
+    public function testCreateNotice(): void {
         $this->_modelLog->createNotice(
             $this->_logData['message'], $this->_logData['description'],
             $this->_logData['data'],
@@ -153,10 +151,8 @@ final class ModelLogTest extends TestCase {
         $this->assertEquals($this->_modelLog->code, E_USER_NOTICE);
     }
     
-    public function testRequest(): void {
-        $modelLog = Factory::instance()->createModel('Log');
-        
-        $this->assertTrue($modelLog->setRequest($this->_request));
+    public function testSetRequest(): void {
+        $this->assertTrue($this->_modelLog->setRequest($this->_request));
     }
     
     public function testDatabase(): void {
@@ -196,6 +192,13 @@ final class ModelLogTest extends TestCase {
         $this->assertEquals($dataAfterUpdated, $dataAfterUpdatedGet);
     }
     
+    public function testCostants(): void {
+        $this->assertTrue(! empty(ModelLog::LEVEL_CRITICAL));
+        $this->assertTrue(! empty(ModelLog::LEVEL_ERROR));
+        $this->assertTrue(! empty(ModelLog::LEVEL_WARNING));
+        $this->assertTrue(! empty(ModelLog::LEVEL_NOTICE));
+    }
+
     private function getTestData(): array {
         return array(
             'level' => ModelLog::LEVEL_ERROR,
@@ -208,12 +211,5 @@ final class ModelLogTest extends TestCase {
             'url' => 'http://test.example.com/',
         );
     }
-    
-    public function testCostants(): void {
-        $this->assertTrue(! empty(ModelLog::LEVEL_CRITICAL));
-        $this->assertTrue(! empty(ModelLog::LEVEL_ERROR));
-        $this->assertTrue(! empty(ModelLog::LEVEL_WARNING));
-        $this->assertTrue(! empty(ModelLog::LEVEL_NOTICE));
-    }
-    
+
 }

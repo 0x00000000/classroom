@@ -18,9 +18,7 @@ final class RouterModuleTest extends TestCase {
     
     protected $_response = null;
     
-    public function __construct() {
-        parent::__construct();
-        
+    public function setUp(): void {
         $this->_request = Factory::instance()->createRequest();
         
         $this->_response = Factory::instance()->createResponse();

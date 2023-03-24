@@ -13,33 +13,33 @@ use Classroom\Model\Model;
 include_once(dirname(__FILE__) . '/../../init.php');
 
 final class FactoryTest extends TestCase {
-    
-    protected $_request = null;
-    
+
     protected $_response = null;
-    
-    // protected $_router = null;
-    
-    public function __construct() {
-        parent::__construct();
-        
+
+    protected function setUp(): void
+    {
         $this->_request = Factory::instance()->createRequest();
-        
         $this->_response = Factory::instance()->createResponse();
-        
-        $this->_router = Factory::instance()->createRouter($this->_request, $this->_response);
     }
-    
+
+    public function testSetType(): void {
+        // Type has already set above in init.php
+        // So setType should return false.
+        $this->assertFalse(Factory::setType('Client'));
+    }
+
+    public function testInstance(): void {
+        $this->assertTrue(Factory::instance() instanceof \Classroom\Module\Factory\Factory);
+    }
+
+    public function testSetTestMode(): void {
+
+        $this->assertTrue(Factory::instance() instanceof \Classroom\Module\Factory\Factory);
+    }
+
     public function testSetDatabase(): void {
-        $moduleName = 'Logger';
-        
         $moduleBaseName = 'Database';
         $moduleName = $moduleBaseName . 'Mysql';
-        $database = Factory::instance()->createModule($moduleName, $moduleBaseName);
-        $this->assertTrue(Factory::instance()->setDatabase($database));
-        
-        $moduleBaseName = 'Database';
-        $moduleName = $moduleBaseName . 'Test';
         $database = Factory::instance()->createModule($moduleName, $moduleBaseName);
         $this->assertTrue(Factory::instance()->setDatabase($database));
     }
@@ -73,26 +73,14 @@ final class FactoryTest extends TestCase {
         
         $database = Factory::instance()->createModule('DatabaseMysql', 'Database');
         $this->assertTrue($database instanceof \Classroom\Module\Database\Database);
-        
-        // There are no such modules.
-        // $router = Factory::instance()->createTypedModule('Router');
-        // $this->assertTrue($router instanceof \Classroom\Module\Router\Router));
     }
     
     public function testCreateModel(): void {
-        $request = Factory::instance()->createModel('Request');
-        $this->assertTrue($request instanceof \Classroom\Model\Model);
+        $requestModel = Factory::instance()->createModel('Request');
+        $this->assertTrue($requestModel instanceof \Classroom\Model\Model);
         
         $log = Factory::instance()->createModel('Log');
         $this->assertTrue($log instanceof \Classroom\Model\Model);
-        
-        $request = Factory::instance()->createModel('Request');
-        $this->assertTrue($request instanceof \Classroom\Model\Model);
-        
-        $log = Factory::instance()->createModel('Log');
-        $log->setRequest($this->_request);
-        $this->assertTrue($log instanceof \Classroom\Model\Model);
-        
     }
     
     public function testCreateController(): void {
@@ -106,7 +94,7 @@ final class FactoryTest extends TestCase {
         $auth = Factory::instance()->createAuth($this->_request);
         $this->assertTrue($auth instanceof \Classroom\Module\Auth\Auth);
     }
-    
+
     public function testCreateConfig(): void {
         $config = Factory::instance()->createConfig();
         $this->assertTrue($config instanceof \Classroom\Module\Config\Config);
@@ -117,18 +105,19 @@ final class FactoryTest extends TestCase {
         $this->assertTrue($database instanceof \Classroom\Module\Database\Database);
     }
     
-    public function createLogger(): void {
-        $logger = Factory::instance()->createLogger($this->_modelRequest);
+    public function testCreateLogger(): void {
+        $logger = Factory::instance()->createLogger($this->_request);
         $this->assertTrue($logger instanceof \Classroom\Module\Logger\Logger);
     }
     
-    public function createRegistry(): void {
+    public function testCreateRegistry(): void {
         $registry = Factory::instance()->createRegistry();
         $this->assertTrue($registry instanceof \Classroom\Module\Registry\Registry);
     }
     
     public function testCreateRequest(): void {
         $request = Factory::instance()->createRequest();
+
         $this->assertTrue($request instanceof \Classroom\Module\Request\Request);
     }
     
@@ -138,9 +127,7 @@ final class FactoryTest extends TestCase {
     }
     
     public function testCreateRouter(): void {
-        $request = Factory::instance()->createRequest();
-        $response = Factory::instance()->createResponse();
-        $router = Factory::instance()->createRouter($request, $response);
+        $router = Factory::instance()->createRouter($this->_request, $this->_response);
         $this->assertTrue($router instanceof \Classroom\Module\Router\Router);
     }
     

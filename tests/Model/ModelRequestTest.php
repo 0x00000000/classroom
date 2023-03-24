@@ -15,9 +15,7 @@ include_once(dirname(__FILE__) . '/../init.php');
 final class ModelRequestTest extends TestCase {
     protected $_modelRequest = null;
     
-    public function __construct() {
-        parent::__construct();
-        
+    public function setUp(): void {
         $this->_modelRequest = Factory::instance()->createModel('Request');
     }
     
@@ -27,7 +25,7 @@ final class ModelRequestTest extends TestCase {
         $this->assertEquals($this->_modelRequest->url, ModelRequest::UNKNOWN_REQUEST_URI);
     }
     
-    public function testGet(): void {
+    public function testSetGetGet(): void {
         $data = array();
         $this->_modelRequest->setGet($data);
         $testData = $this->_modelRequest->getGet();
@@ -50,7 +48,7 @@ final class ModelRequestTest extends TestCase {
         
     }
     
-    public function testPost(): void {
+    public function testSetGetPost(): void {
         $data = array();
         $this->_modelRequest->setPost($data);
         $testData = $this->_modelRequest->getPost();
@@ -73,7 +71,7 @@ final class ModelRequestTest extends TestCase {
         
     }
     
-    public function testSession(): void {
+    public function testSetGetSession(): void {
         $data = array();
         $this->_modelRequest->setSession($data);
         $testData = $this->_modelRequest->getSession();
@@ -96,7 +94,7 @@ final class ModelRequestTest extends TestCase {
         
     }
     
-    public function testHeaders(): void {
+    public function testSetGetHeaders(): void {
         $data = array();
         $this->_modelRequest->setHeaders($data);
         $testData = $this->_modelRequest->getHeaders();

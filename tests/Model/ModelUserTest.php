@@ -16,57 +16,31 @@ Factory::instance()->loadModule('ModelUser');
 
 final class ModelUserTest extends TestCase {
 
-    public function testPassword(): void {
-        $uid = rand();
-        $testLogin = 'testLogin' . $uid;
-        $testName = 'Test Name';
-        $testPassword = 'Test password';
-        $modelUser = Factory::instance()->createModel('User');
-        $modelUser->login = $testLogin;
-        $modelUser->name = $testName;
-
-        $this->assertTrue($modelUser->password === null);
-
-        $modelUser->password = $testPassword;
-
-        $this->assertTrue($modelUser->password === null);
-    }
-
     public function testLoadByLogin(): void {
-        $uid = rand();
-        $testLogin = 'testLogin' . $uid;
-        $testLoginUnique = 'testLoginUnique' . $uid;
-        $testName = 'Test Name';
-        $testPassword = 'Test password';
+        $login = $this->getUniqueLogin();
+        $password = 'password';
+        $name = 'name';
+        $this->createUser($this->getUniqueLogin(), $password);
 
         $modelUser = Factory::instance()->createModel('User');
-        $modelUser->login = $testLogin;
-        $modelUser->name = $testName;
-        $modelUser->password = $testPassword;
-        $modelUser->disabled = false;
-        $modelUser->deleted = false;
-        $modelUser->save();
-
-        $modelUser = Factory::instance()->createModel('User');
-        $modelUser->login = $testLoginUnique;
-        $modelUser->name = $testName;
-        $modelUser->password = $testPassword;
+        $modelUser->login = $login;
+        $modelUser->name = $name;
+        $modelUser->password = $password;
         $modelUser->isAdmin = true;
         $modelUser->isTeacher = true;
         $modelUser->isStudent = true;
         $modelUser->disabled = false;
         $modelUser->deleted = false;
 
-        $this->assertFalse($modelUser->loadByLogin($testLoginUnique, $testPassword));
-
+        $this->assertFalse($modelUser->loadByLogin($login, $password));
         $modelUser->save();
 
         $modelUserLoaded = Factory::instance()->createModel('User');
-        $this->assertFalse($modelUserLoaded->loadByLogin($testLoginUnique, 'Another password'));
-        $this->assertFalse($modelUserLoaded->loadByLogin($testLoginUnique, ''));
-        $this->assertTrue($modelUserLoaded->loadByLogin($testLoginUnique, $testPassword));
-        $this->assertEquals($modelUserLoaded->login, $testLoginUnique);
-        $this->assertEquals($modelUserLoaded->name, $testName);
+        $this->assertFalse($modelUserLoaded->loadByLogin($login, 'Another password'));
+        $this->assertFalse($modelUserLoaded->loadByLogin($login, ''));
+        $this->assertTrue($modelUserLoaded->loadByLogin($login, $password));
+        $this->assertEquals($modelUserLoaded->login, $login);
+        $this->assertEquals($modelUserLoaded->name, $name);
         $this->assertEquals($modelUserLoaded->isAdmin, true);
         $this->assertEquals($modelUserLoaded->isTeacher, true);
         $this->assertEquals($modelUserLoaded->isStudent, true);
@@ -79,45 +53,98 @@ final class ModelUserTest extends TestCase {
         $modelUserLoaded->save();
 
         $modelUserLoaded2 = Factory::instance()->createModel('User');
-        $this->assertFalse($modelUserLoaded2->loadByLogin($testLoginUnique, $testPassword));
+        $this->assertFalse($modelUserLoaded2->loadByLogin($login, $password));
 
         $modelUserLoaded->disabled = false;
         $modelUserLoaded->deleted = true;
         $modelUserLoaded->save();
-        $this->assertFalse($modelUserLoaded2->loadByLogin($testLoginUnique, $testPassword));
+        $this->assertFalse($modelUserLoaded2->loadByLogin($login, $password));
 
         $modelUserLoaded->disabled = false;
         $modelUserLoaded->deleted = false;
         $modelUserLoaded->save();
-        $this->assertTrue($modelUserLoaded2->loadByLogin($testLoginUnique, $testPassword));
+        $this->assertTrue($modelUserLoaded2->loadByLogin($login, $password));
 
-        $this->assertEquals($modelUserLoaded2->login, $testLoginUnique);
-        $this->assertEquals($modelUserLoaded2->name, $testName);
+        $this->assertEquals($modelUserLoaded2->login, $login);
+        $this->assertEquals($modelUserLoaded2->name, $name);
         $this->assertEquals($modelUserLoaded2->isAdmin, false);
         $this->assertEquals($modelUserLoaded2->isTeacher, false);
         $this->assertEquals($modelUserLoaded2->isStudent, false);
     }
 
     public function testCheck(): void {
-        $uid = rand();
-        $testLogin = 'testLogin' . $uid;
+        $testLogin = $this->getUniqueLogin();
+        $testPassword = $this->getUniquePassword();
+        $modelUser = $this->createUser($testLogin, $testPassword);
 
-        $testName = 'Test Name';
-        $testPassword = 'Test password';
-        $modelUser = Factory::instance()->createModel('User');
-        $modelUser->login = $testLogin;
-        $modelUser->name = $testName;
-        $modelUser->password = $testPassword;
-        $modelUser->disabled = false;
-        $modelUser->deleted = false;
         $modelUser->save();
         $this->assertTrue($modelUser->check($testLogin, $testPassword));
         $this->assertFalse($modelUser->check('Another login', $testPassword));
         $this->assertFalse($modelUser->check($testLogin, 'Another password'));
         $this->assertFalse($modelUser->check($testLogin, ''));
 
-        $modelUser->login = $testLogin;
-        $modelUser->name = $testName;
+        $modelUser->disabled = true;
+        $modelUser->deleted = false;
+        $modelUser->save();
+        $this->assertFalse($modelUser->check($testLogin, $testPassword));
+
+        $modelUser->disabled = false;
+        $modelUser->deleted = true;
+        $modelUser->save();
+        $this->assertFalse($modelUser->check($testLogin, $testPassword));
+
+        $modelUser->disabled = true;
+        $modelUser->deleted = true;
+        $modelUser->save();
+        $this->assertFalse($modelUser->check($testLogin, $testPassword));
+    }
+
+    public function testCheckInactive(): void {
+        $testLogin = $this->getUniqueLogin();
+        $testPassword = $this->getUniquePassword();
+        $modelUser = $this->createUser($testLogin, $testPassword);
+        $modelUser->disabled = true;
+        $modelUser->save();
+
+        $this->assertTrue($modelUser->checkInactive($testLogin, $testPassword));
+        $this->assertFalse($modelUser->checkInactive('Another login', $testPassword));
+        $this->assertFalse($modelUser->checkInactive($testLogin, 'Another password'));
+        $this->assertFalse($modelUser->checkInactive($testLogin, ''));
+
+        $modelUser->disabled = false;
+        $modelUser->deleted = false;
+        $modelUser->save();
+        $this->assertFalse($modelUser->checkInactive($testLogin, $testPassword));
+
+        $modelUser->disabled = true;
+        $modelUser->deleted = true;
+        $modelUser->save();
+        $this->assertFalse($modelUser->checkInactive($testLogin, $testPassword));
+
+        $modelUser->disabled = false;
+        $modelUser->deleted = false;
+        $modelUser->save();
+        $this->assertFalse($modelUser->checkInactive($testLogin, $testPassword));
+    }
+
+    public function testGetPassword(): void {
+        $testLogin = $this->getUniqueLogin();
+        $testPassword = $this->getUniquePassword();
+        $modelUser = $this->createUser($testLogin, $testPassword);
+
+        $this->assertEquals($modelUser->password, null);
+
+        $modelUser->password = $testPassword;
+        $this->assertEquals($modelUser->password, null);
+        $modelUser->save();
+        $this->assertEquals($modelUser->password, null);
+    }
+
+    public function testSetPassword(): void {
+        $testLogin = $this->getUniqueLogin();
+        $testPassword = $this->getUniquePassword();
+        $modelUser = $this->createUser($testLogin, $testPassword);
+
         $modelUser->password = 'Another password';
         $modelUser->save();
         $this->assertFalse($modelUser->check($testLogin, $testPassword));
@@ -125,8 +152,6 @@ final class ModelUserTest extends TestCase {
         $modelUser->save();
         $this->assertTrue($modelUser->check($testLogin, $testPassword));
 
-        $modelUser->login = $testLogin;
-        $modelUser->name = $testName;
         $modelUser->password = '';
         $modelUser->save();
         $this->assertFalse($modelUser->check($testLogin, $testPassword));
@@ -135,13 +160,20 @@ final class ModelUserTest extends TestCase {
         $this->assertTrue($modelUser->check($testLogin, $testPassword));
     }
 
-    public function testSetRole(): void {
-        $uid = rand();
-        $testLogin = 'testLogin' . $uid;
+    public function testGetTeacherId(): void {
+        $testLogin = $this->getUniqueLogin();
+        $testPassword = $this->getUniquePassword();
+        $modelUser = $this->createUser($testLogin, $testPassword);
+        $modelUser->isStudent = true;
+        $modelUser->save();
 
-        $modelUser = Factory::instance()->createModel('User');
-        $modelUser->login = $testLogin;
-        $modelUser->name = 'Test Name';
+        $this->assertEquals($modelUser->teacherId, null);
+    }
+
+    public function testSetRole(): void {
+        $testLogin = $this->getUniqueLogin();
+        $testPassword = $this->getUniquePassword();
+        $modelUser = $this->createUser($testLogin, $testPassword);
 
         $modelUser->isAdmin = true;
         $this->assertEquals($modelUser->isAdmin, true);
@@ -178,13 +210,10 @@ final class ModelUserTest extends TestCase {
 
         $modelUser->isStudent = 0;
         $this->assertEquals($modelUser->isStudent, false);
-
     }
 
     public function testDatabase(): void {
-        $uid = rand();
-        $testLogin = 'testLogin' . $uid;
-
+        $testLogin = $this->getUniqueLogin();
         $modelUserSave = Factory::instance()->createModel('User');
         $modelUserSave->login = $testLogin;
         $modelUserSave->name = 'Test Name';
@@ -192,11 +221,7 @@ final class ModelUserTest extends TestCase {
         $this->assertTrue(boolval($idSave));
         $dataAfterSave = $modelUserSave->getDataAssoc();
 
-        $uid = rand();
-        $testLogin = 'testLogin' . $uid;
-
-        $uid = rand();
-        $testLogin = 'testLogin' . $uid;
+        $testLogin = $this->getUniqueLogin();
 
         $modelUserGet = Factory::instance()->createModel('User');
         $modelUserSave->login = $testLogin;
@@ -211,8 +236,7 @@ final class ModelUserTest extends TestCase {
         $idGet = $modelUserGet->save();
         $dataAfterUpdated = $modelUserGet->getDataAssoc();
 
-        $uid = rand();
-        $testLogin = 'testLogin' . $uid;
+        $testLogin = $this->getUniqueLogin();
 
         $modelUserUpdatedGet = Factory::instance()->createModel('User');
         $modelUserSave->login = $testLogin;
@@ -225,22 +249,13 @@ final class ModelUserTest extends TestCase {
     }
 
     public function testGetOneModel(): void {
-
-        $uid = rand();
-        $testLogin = 'testLogin' . $uid;
-        $testLoginUnique = 'testLoginUnique' . $uid;
-        $testName = 'Test Name' . $uid;
-        $testPassword = 'Test password';
-
-        $modelUser = Factory::instance()->createModel('User');
-        $modelUser->login = $testLogin;
-        $modelUser->name = $testName;
-        $modelUser->password = $testPassword;
+        $testLogin = $this->getUniqueLogin();
+        $testPassword = $this->getUniquePassword();
+        $testName = 'name';
+        $modelUser = $this->createUser($testLogin, $testPassword, $testName);
         $modelUser->isAdmin = true;
         $modelUser->isTeacher = false;
         $modelUser->isStudent = false;
-        $modelUser->disabled = false;
-        $modelUser->deleted = false;
         $modelUser->save();
 
         $modelAnotherUser = Factory::instance()->createModel('User');
@@ -264,7 +279,92 @@ final class ModelUserTest extends TestCase {
         if ($modelUser2 instanceof \Classroom\Model\Model) {
             $this->assertEquals($modelUser2->name, $testName);
         }
-
     }
 
+    public function testGetStudentsList(): void {
+        $users = $this->createTeacherAndStudents();
+        $teacher = $users['teacher'];
+        $studentsList = $users['studentsList'];
+
+        $gotList = $teacher->getStudentsList();
+        $this->assertEquals(count($gotList), count($studentsList));
+    }
+
+    public function testGetStudentsCount(): void {
+        $users = $this->createTeacherAndStudents();
+        $teacher = $users['teacher'];
+        $studentsList = $users['studentsList'];
+
+        $count = $teacher->getStudentsCount();
+        $this->assertEquals($count, count($studentsList));
+    }
+
+    public function testGetTeachersList(): void {
+        $users = $this->createTeacherAndStudents();
+        $teacher = $users['teacher'];
+        $studentsList = $users['studentsList'];
+
+        $gotList = $studentsList[0]->getTeachersList();
+        $this->assertEquals(count($gotList), 1);
+        $this->assertEquals($gotList[0]->login, $teacher->login);
+    }
+
+    public function testGetTeachersCount(): void {
+        $users = $this->createTeacherAndStudents();
+        $teacher = $users['teacher'];
+        $studentsList = $users['studentsList'];
+
+        $count = $teacher->getTeachersCount();
+        $this->assertEquals($count, 1);
+    }
+
+    private function getUniqueLogin(): string {
+        static $loginCounter = 0;
+        $loginCounter++;
+        return 'login' . $loginCounter;
+    }
+
+    private function getUniquePassword(): string {
+        static $passwordCounter = 0;
+        $passwordCounter++;
+        return 'password' . $passwordCounter;
+    }
+
+    private function createUser($login, $password, $name = 'name') {
+        $modelUser = Factory::instance()->createModel('User');
+        $modelUser->login = $login;
+        $modelUser->name = $name;
+        $modelUser->password = $password;
+        $modelUser->disabled = false;
+        $modelUser->deleted = false;
+        $modelUser->save();
+        return $modelUser;
+    }
+
+    private function createTeacherAndStudents(): array {
+        $teacher = $this->createUser($this->getUniqueLogin(), $this->getUniquePassword());
+        $teacher->isTeacher = true;
+        $teacher->save();
+
+        $studentsList = [];
+        $modelUser = $this->createUser($this->getUniqueLogin(), $this->getUniquePassword());
+        $modelUser->isStudent = true;
+        $modelUser->setTeacher($teacher);
+        $modelUser->save();
+        $studentsList[] = $modelUser;
+
+        $modelUser = $this->createUser($this->getUniqueLogin(), $this->getUniquePassword());
+        $modelUser->isStudent = true;
+        $modelUser->setTeacher($teacher);
+        $modelUser->save();
+        $studentsList[] = $modelUser;
+
+        $modelUser = $this->createUser($this->getUniqueLogin(), $this->getUniquePassword());
+        $modelUser->isStudent = true;
+        $modelUser->setTeacher($teacher);
+        $modelUser->save();
+        $studentsList[] = $modelUser;
+
+        return ['teacher' => $teacher, 'studentsList' => $studentsList];
+    }
 }

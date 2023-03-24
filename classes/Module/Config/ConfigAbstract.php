@@ -14,10 +14,4 @@ abstract class ConfigAbstract {
      */
     abstract public function get(string $section, string $name = null);
     
-    /**
-     * Adds data from configuration.
-     * Existed data con't be rewrited.
-     */
-    abstract public function add(string $section, string $name, $value): bool;
-    
 }
