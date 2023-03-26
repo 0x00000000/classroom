@@ -57,9 +57,45 @@ class DatabaseTest extends Database {
             foreach ($this->_data[$table] as $pk => $record) {
                 $fit = true;
                 foreach ($conditionsList as $key => $value) {
-                    if (! array_key_exists($key, $record) || $record[$key] !== $value['value']) {
+                    if (! array_key_exists($key, $record)) {
                         $fit = false;
                         break;
+                    } else {
+                        switch ($value['condition']) {
+                            case '=':
+                                if ($record[$key] != $value['value']) {
+                                    $fit = false;
+                                    break;
+                                }
+                                break;
+                            case '>=':
+                                if ($record[$key] < $value['value']) {
+                                    $fit = false;
+                                    break;
+                                }
+                                break;
+                            case '<=':
+                                if ($record[$key] > $value['value']) {
+                                    $fit = false;
+                                    break;
+                                }
+                                break;
+                            case '>':
+                                if ($record[$key] <= $value['value']) {
+                                    $fit = false;
+                                    break;
+                                }
+                                break;
+                            case '<':
+                                if ($record[$key] >= $value['value']) {
+                                    $fit = false;
+                                    break;
+                                }
+                                break;
+                            default:
+                                $fit = false;
+                                break;
+                        }
                     }
                 }
                 

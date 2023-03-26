@@ -8,17 +8,16 @@ use PHPUnit\Framework\TestCase;
 
 use Classroom\Module\Factory\Factory;
 use Classroom\System\FileSystem;
+use ClassroomTest\UsesModelUserTrait;
 
 include_once(dirname(__FILE__) . '/../../init.php');
 
 final class NicImageUploaderTest extends TestCase {
+    use UsesModelUserTrait;
+
     private $_request = null;
 
     private $_auth = null;
-
-    private $_existingUserModel = null;
-
-    private $_existingPassword = null;
 
     public function setUp(): void {
         $this->_request = Factory::instance()->createRequest();
@@ -117,31 +116,5 @@ final class NicImageUploaderTest extends TestCase {
         $this->assertEquals($result['status'], 200);
         $this->assertFalse($result['success']);
         $this->assertTrue(! empty($result['error']));
-    }
-
-    private function getUniqueLogin(): string {
-        static $loginCounter = 0;
-        $loginCounter++;
-
-        return __CLASS__ . '_login_' . $loginCounter;
-    }
-
-    private function getUniquePassword(): string {
-        static $passwordCounter = 0;
-        $passwordCounter++;
-
-        return __CLASS__ . '_password_' . $passwordCounter;
-    }
-
-    private function createUser($login, $password, $name = 'name') {
-        $modelUser = Factory::instance()->createModel('User');
-        $modelUser->login = $login;
-        $modelUser->name = $name;
-        $modelUser->password = $password;
-        $modelUser->disabled = false;
-        $modelUser->deleted = false;
-        $modelUser->save();
-
-        return $modelUser;
     }
 }

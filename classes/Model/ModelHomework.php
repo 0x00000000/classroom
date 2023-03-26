@@ -40,12 +40,4 @@ class ModelHomework extends ModelDatabase {
         array('name' => 'disabled', 'type' => self::TYPE_BOOL),
         array('name' => 'deleted', 'type' => self::TYPE_BOOL, 'skipControl' => true),
     );
-    
-    /**
-     * Class constructor.
-     */
-    public function __construct() {
-        parent::__construct();
-    }
-    
 }

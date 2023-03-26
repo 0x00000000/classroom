@@ -205,7 +205,7 @@ class Core {
                     
                     $file = $root . $path . str_replace('\\', $ds, $relativeClass) . '.php';
                     if (file_exists($file)) {
-                        require $file;
+                        require_once $file;
                     }
                 }
             }

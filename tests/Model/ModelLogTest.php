@@ -4,17 +4,14 @@ declare(strict_types=1);
 
 namespace ClassroomTest\Model;
 
-use PHPUnit\Framework\TestCase;
-
 use Classroom\Module\Factory\Factory;
-
 use Classroom\Model\ModelLog;
 
 include_once(dirname(__FILE__) . '/../init.php');
 
-Factory::instance()->loadModel('Log');
+final class ModelLogTest extends ModelDatabase {
+    protected string $_modelName = 'Log';
 
-final class ModelLogTest extends TestCase {
     protected $_modelLog = null;
     protected $_request = null;
     protected $_logData = null;
@@ -24,12 +21,13 @@ final class ModelLogTest extends TestCase {
         
         $this->_modelLog = Factory::instance()->createModel('Log');
         $this->_modelLog->setRequest($this->_request);
-        
-        $this->_logData = $this->getTestData();
+
+        $testData = $this->getTestData();
+        $this->_logData = $testData[0];
     }
     
     public function testCreate(): void {
-        $id = $this->_modelLog->create(
+        $this->_modelLog->create(
             $this->_logData['level'], $this->_logData['message'], $this->_logData['description'],
             $this->_logData['data'],
             $this->_logData['code'], $this->_logData['file'], $this->_logData['line'], $this->_logData['url']
@@ -155,43 +153,6 @@ final class ModelLogTest extends TestCase {
         $this->assertTrue($this->_modelLog->setRequest($this->_request));
     }
     
-    public function testDatabase(): void {
-        $request = Factory::instance()->createRequest();
-        
-        $modelLogSave = Factory::instance()->createModel('Log');
-        $modelLogSave->setRequest($request);
-        
-        $modelLogSave->create(
-            $this->_logData['level'], $this->_logData['message'], $this->_logData['description'],
-            $this->_logData['data'],
-            $this->_logData['code'], $this->_logData['file'], $this->_logData['line'], $this->_logData['url']
-        );
-        
-        $idSave = $modelLogSave->save();
-        $this->assertTrue(boolval($idSave));
-        
-        $dataAfterSave = $modelLogSave->getDataAssoc();
-        
-        $modelLogGet = Factory::instance()->createModel('Log');
-        $modelLogGet->setRequest($request);
-        $modelLogGet->loadByPk($idSave);
-        $dataAfterGet = $modelLogGet->getDataAssoc();
-        
-        $this->assertEquals($dataAfterSave, $dataAfterGet);
-        
-        $modelLogGet->message .= '!';
-        $idGet = $modelLogGet->save();
-        $dataAfterUpdated = $modelLogGet->getDataAssoc();
-        
-        $modelLogUpdatedGet = Factory::instance()->createModel('Log');
-        $modelLogUpdatedGet->setRequest($request);
-        $modelLogUpdatedGet->loadByPk($idGet);
-        
-        $dataAfterUpdatedGet = $modelLogUpdatedGet->getDataAssoc();
-        
-        $this->assertEquals($dataAfterUpdated, $dataAfterUpdatedGet);
-    }
-    
     public function testCostants(): void {
         $this->assertTrue(! empty(ModelLog::LEVEL_CRITICAL));
         $this->assertTrue(! empty(ModelLog::LEVEL_ERROR));
@@ -199,17 +160,18 @@ final class ModelLogTest extends TestCase {
         $this->assertTrue(! empty(ModelLog::LEVEL_NOTICE));
     }
 
-    private function getTestData(): array {
-        return array(
-            'level' => ModelLog::LEVEL_ERROR,
-            'message' => 'Test message',
-            'description' => 'Test description',
-            'data' => array('test' => true),
-            'code' => E_ERROR,
-            'file' => 'log.php',
-            'line' => 255,
-            'url' => 'http://test.example.com/',
-        );
+    protected function getTestData(): array {
+        return [
+            [
+                'level' => ModelLog::LEVEL_ERROR,
+                'message' => 'Test message',
+                'description' => 'Test description',
+                'data' => array('test' => true),
+                'code' => E_ERROR,
+                'file' => 'log.php',
+                'line' => 255,
+                'url' => 'http://test.example.com/',
+            ],
+        ];
     }
-
 }

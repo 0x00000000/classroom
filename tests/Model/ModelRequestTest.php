@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace ClassroomTest\Model;
 
-use PHPUnit\Framework\TestCase;
-
 use Classroom\Module\Factory\Factory;
-
 use Classroom\Model\ModelRequest;
 
 include_once(dirname(__FILE__) . '/../init.php');
 
-final class ModelRequestTest extends TestCase {
-    protected $_modelRequest = null;
+final class ModelRequestTest extends ModelDatabase {
+    protected string $_modelName = 'Request';
+
+    private $_modelRequest = null;
     
     public function setUp(): void {
         $this->_modelRequest = Factory::instance()->createModel('Request');
@@ -117,35 +116,34 @@ final class ModelRequestTest extends TestCase {
         
     }
     
-    public function testDatabase(): void {
-        $modelRequestSave = Factory::instance()->createModel('Request');
-        $modelRequestSave->create();
-        
-        $idSave = $modelRequestSave->save();
-        $this->assertTrue(boolval($idSave));
-        
-        $dataAfterSave = $modelRequestSave->getDataAssoc();
-        
-        $modelRequestGet = Factory::instance()->createModel('Request');
-        $modelRequestGet->loadByPk($idSave);
-        $dataAfterGet = $modelRequestGet->getDataAssoc();
-        
-        $this->assertEquals($dataAfterSave, $dataAfterGet);
-        
-        $modelRequestGet->info = 'Test info.';
-        $idGet = $modelRequestGet->save();
-        $dataAfterUpdated = $modelRequestGet->getDataAssoc();
-        
-        $modelRequestUpdatedGet = Factory::instance()->createModel('Request');
-        $modelRequestUpdatedGet->loadByPk($idGet);
-        
-        $dataAfterUpdatedGet = $modelRequestUpdatedGet->getDataAssoc();
-        
-        $this->assertEquals($dataAfterUpdated, $dataAfterUpdatedGet);
-    }
-    
     public function testCostants(): void {
         $this->assertTrue(! empty(ModelRequest::UNKNOWN_REQUEST_URI));
     }
-    
+
+    protected function getTestData(): array {
+        return [
+            [
+                'url' => '/test1',
+                'get' => array('varGet' => 11),
+                'post' => array('varPost' => 12),
+                'files' => array('varFiles' => 13),
+                'session' => array('varSession' => 14),
+                'headers' => array('varHeaders' => 15),
+                'ip' => '192.168.0.1',
+                'userAgent' => 'Chrome',
+                'info' => 'Test info 1',
+            ],
+            [
+                'url' => '/test2',
+                'get' => array('varGet' => 21),
+                'post' => array('varPost' => 22),
+                'files' => array('varFiles' => 23),
+                'session' => array('varSession' => 24),
+                'headers' => array('varHeaders' => 25),
+                'ip' => '192.168.0.2',
+                'userAgent' => 'Firefox',
+                'info' => 'Test info 2',
+            ],
+        ];
+    }
 }

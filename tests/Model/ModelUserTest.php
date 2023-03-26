@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace ClassroomTest\Model;
 
-use PHPUnit\Framework\TestCase;
-
 use Classroom\Module\Factory\Factory;
+use ClassroomTest\UsesModelUserTrait;
 
 include_once(dirname(__FILE__) . '/../init.php');
 
-final class ModelUserTest extends TestCase {
+final class ModelUserTest extends ModelDatabase {
+    use UsesModelUserTrait;
+
+    protected string $_modelName = 'User';
 
     public function testLoadByLogin(): void {
         $login = $this->getUniqueLogin();
@@ -208,42 +210,6 @@ final class ModelUserTest extends TestCase {
         $this->assertEquals($modelUser->isStudent, false);
     }
 
-    public function testDatabase(): void {
-        $testLogin = $this->getUniqueLogin();
-        $modelUserSave = Factory::instance()->createModel('User');
-        $modelUserSave->login = $testLogin;
-        $modelUserSave->name = 'Test Name';
-        $idSave = $modelUserSave->save();
-        $this->assertTrue(boolval($idSave));
-        $dataAfterSave = $modelUserSave->getDataAssoc();
-
-        $testLogin = $this->getUniqueLogin();
-
-        $modelUserGet = Factory::instance()->createModel('User');
-        $modelUserSave->login = $testLogin;
-        $modelUserSave->name = 'Test Name 2';
-        $modelUserGet->loadByPk($idSave);
-        $dataAfterGet = $modelUserGet->getDataAssoc();
-
-        $this->assertEquals($dataAfterSave, $dataAfterGet);
-
-        $modelUserGet->login .= '3';
-        $modelUserGet->name .= '!';
-        $idGet = $modelUserGet->save();
-        $dataAfterUpdated = $modelUserGet->getDataAssoc();
-
-        $testLogin = $this->getUniqueLogin();
-
-        $modelUserUpdatedGet = Factory::instance()->createModel('User');
-        $modelUserSave->login = $testLogin;
-        $modelUserSave->name = 'Test Name 3';
-        $modelUserUpdatedGet->loadByPk($idGet);
-
-        $dataAfterUpdatedGet = $modelUserUpdatedGet->getDataAssoc();
-
-        $this->assertEquals($dataAfterUpdated, $dataAfterUpdatedGet);
-    }
-
     public function testGetOneModel(): void {
         $testLogin = $this->getUniqueLogin();
         $testPassword = $this->getUniquePassword();
@@ -314,29 +280,6 @@ final class ModelUserTest extends TestCase {
         $this->assertEquals($count, 1);
     }
 
-    private function getUniqueLogin(): string {
-        static $loginCounter = 0;
-        $loginCounter++;
-        return __CLASS__ . '_login_' . $loginCounter;
-    }
-
-    private function getUniquePassword(): string {
-        static $passwordCounter = 0;
-        $passwordCounter++;
-        return __CLASS__ . '_password_' . $passwordCounter;
-    }
-
-    private function createUser($login, $password, $name = 'name') {
-        $modelUser = Factory::instance()->createModel('User');
-        $modelUser->login = $login;
-        $modelUser->name = $name;
-        $modelUser->password = $password;
-        $modelUser->disabled = false;
-        $modelUser->deleted = false;
-        $modelUser->save();
-        return $modelUser;
-    }
-
     private function createTeacherAndStudents(): array {
         $teacher = $this->createUser($this->getUniqueLogin(), $this->getUniquePassword());
         $teacher->isTeacher = true;
@@ -362,5 +305,28 @@ final class ModelUserTest extends TestCase {
         $studentsList[] = $modelUser;
 
         return ['teacher' => $teacher, 'studentsList' => $studentsList];
+    }
+
+    protected function getTestData(): array {
+        return [
+            [
+                'login' => 'login1',
+                'name' => 'name1',
+                'isAdmin' => 1,
+                'isTeacher' => 1,
+                'isStudent' => 1,
+                'disabled' => 0,
+                'deleted' => 0,
+            ],
+            [
+                'login' => 'login2',
+                'name' => 'name2',
+                'isAdmin' => 0,
+                'isTeacher' => 0,
+                'isStudent' => 0,
+                'disabled' => 1,
+                'deleted' => 1,
+            ],
+        ];
     }
 }

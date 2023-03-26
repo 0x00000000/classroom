@@ -42,13 +42,6 @@ class ModelActiveLesson extends ModelDatabase {
     );
     
     /**
-     * Class constructor.
-     */
-    public function __construct() {
-        parent::__construct();
-    }
-    
-    /**
      * Gets existed or created new active lesson.
      */
     public function getActiveLesson(string $teacherId, string $studentId, string $lessonId): ?Model {
@@ -128,5 +121,4 @@ class ModelActiveLesson extends ModelDatabase {
         
         return $result;
     }
-    
 }
