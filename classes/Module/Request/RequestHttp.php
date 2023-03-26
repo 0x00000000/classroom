@@ -17,5 +17,32 @@ namespace Classroom\Module\Request;
  * @property string|null $userAgent Rser agent infoimation (readonly).
  */
 class RequestHttp extends RequestBase {
-    
+
+    protected function getSessionValuesList(): array {
+        if (isset($_SESSION) && is_array($_SESSION)) {
+            return $_SESSION;
+        } else {
+            return [];
+        }
+    }
+
+    protected function setSessionValue(string $key, $value): void {
+        if (isset($_SESSION) && is_array($_SESSION)) {
+            $_SESSION[$key] = $value;
+        }
+    }
+
+    protected function unsetSessionValue(string $key): void {
+        if (isset($_SESSION) && is_array($_SESSION)) {
+            unset($_SESSION[$key]);
+        }
+    }
+
+    protected function getSessionValue(string $key) {
+        if (isset($_SESSION) && is_array($_SESSION)) {
+            return isset($_SESSION[$key]) ? $_SESSION[$key] : null;
+        } else {
+            return null;
+        }
+    }
 }

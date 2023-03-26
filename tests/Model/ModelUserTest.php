@@ -8,11 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 use Classroom\Module\Factory\Factory;
 
-use Classroom\Model\ModelUser;
-
 include_once(dirname(__FILE__) . '/../init.php');
-
-Factory::instance()->loadModule('ModelUser');
 
 final class ModelUserTest extends TestCase {
 
@@ -321,13 +317,13 @@ final class ModelUserTest extends TestCase {
     private function getUniqueLogin(): string {
         static $loginCounter = 0;
         $loginCounter++;
-        return 'login' . $loginCounter;
+        return __CLASS__ . '_login_' . $loginCounter;
     }
 
     private function getUniquePassword(): string {
         static $passwordCounter = 0;
         $passwordCounter++;
-        return 'password' . $passwordCounter;
+        return __CLASS__ . '_password_' . $passwordCounter;
     }
 
     private function createUser($login, $password, $name = 'name') {

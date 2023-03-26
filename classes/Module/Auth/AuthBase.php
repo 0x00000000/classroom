@@ -97,46 +97,46 @@ abstract class AuthBase extends Auth {
     /**
      * Check if user is admin.
      */
-    public function isAdmin() {
+    public function isAdmin(): bool {
         $result = false;
         
         if ($this->getUser()) {
             $result = $this->getUser()->isAdmin;
         }
         
-        return $result;
+        return (bool) $result;
     }
     
     /**
      * Check if user is teacher.
      */
-    public function isTeacher() {
+    public function isTeacher(): bool {
         $result = false;
         
         if ($this->getUser()) {
             $result = $this->getUser()->isTeacher;
         }
         
-        return $result;
+        return (bool) $result;
     }
     
     /**
      * Check if user is student.
      */
-    public function isStudent() {
+    public function isStudent(): bool {
         $result = false;
         
         if ($this->getUser()) {
             $result = $this->getUser()->isStudent;
         }
         
-        return $result;
+        return (bool) $result;
     }
     
     /**
      * Check if user is guest.
      */
-    public function isGuest() {
+    public function isGuest(): bool {
         $result = false;
         
         if (! $this->getUser()) {

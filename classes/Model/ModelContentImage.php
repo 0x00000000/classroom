@@ -118,9 +118,9 @@ class ModelContentImage extends ModelDatabase {
                     $path = $this->getUploadPath() . FileSystem::getDS() . $filename;
                     $fullPath = FileSystem::getRoot() . $path;
                     
-                    if (move_uploaded_file($tmpName, $fullPath)) {
+                    if (FileSystem::moveUploadedFile($tmpName, $fullPath)) {
                         $this->filepath = $path;
-                        $this->size = filesize($fullPath);
+                        $this->size = FileSystem::getFileSize($fullPath);
                         $this->type = $size['mime'] ? $size['mime'] : $fileInfo['type'];
                         $this->width = $size[0];
                         $this->height = $size[1];

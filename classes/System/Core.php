@@ -43,6 +43,7 @@ class Core {
             if ($applicationType) {
                 if ($isTestMode) {
                     self::$_isTestMode = true;
+                    FileSystem::setTestMode(true);
                 }
                 self::$_applicationType = $applicationType;
                 $result = self::init();

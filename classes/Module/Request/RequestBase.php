@@ -102,7 +102,7 @@ abstract class RequestBase extends Request {
         $this->_currentRequest->get = isset($_GET) ? $_GET : array();
         $this->_currentRequest->post = isset($_POST) ? $_POST : array();
         $this->_currentRequest->files = isset($_FILES) ? $_FILES : array();
-        $this->_currentRequest->session = isset($_SESSION) ? $_SESSION : array();
+        $this->_currentRequest->session = $this->getSessionValuesList();
         $this->_currentRequest->headers = $this->getHeadersInner();
         if (array_key_exists('REMOTE_ADDR', $_SERVER)) {
             $this->_currentRequest->ip = $_SERVER['REMOTE_ADDR'];
@@ -121,8 +121,8 @@ abstract class RequestBase extends Request {
         $result = false;
         
         if ($key) {
-            $_SESSION[$key] = $value;
-            $this->_currentRequest->session = $_SESSION;
+            $this->setSessionValue($key, $value);
+            $this->_currentRequest->session = $this->getSessionValuesList();
             $result = true;
         }
         
@@ -136,8 +136,8 @@ abstract class RequestBase extends Request {
         $result = false;
         
         if ($key) {
-            unset($_SESSION[$key]);
-            $this->_currentRequest->session = $_SESSION;
+            $this->unsetSessionValue($key);
+            $this->_currentRequest->session = $this->getSessionValuesList();
             $result = true;
         }
         
@@ -191,5 +191,18 @@ abstract class RequestBase extends Request {
        }
        return $headers;
     }
-    
+
+    protected function getSessionValuesList(): array {
+        return [];
+    }
+
+    protected function setSessionValue(string $key, $value): void {
+    }
+
+    protected function unsetSessionValue(string $key): void {
+    }
+
+    protected function getSessionValue(string $key) {
+        return null;
+    }
 }

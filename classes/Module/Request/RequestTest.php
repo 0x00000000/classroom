@@ -19,7 +19,8 @@ use Classroom\Module\Factory\Factory;
  * @property string|null $userAgent Rser agent infoimation (readonly).
  */
 class RequestTest extends RequestBase {
-    
+
+    protected static $_session = [];
     /**
      * Test constants.
      */
@@ -59,5 +60,20 @@ class RequestTest extends RequestBase {
         
         return $url;
     }
-    
+
+    protected function getSessionValuesList(): array {
+        return static::$_session;
+    }
+
+    protected function setSessionValue(string $key, $value): void {
+        static::$_session[$key] = $value;
+    }
+
+    protected function unsetSessionValue(string $key): void {
+        unset(static::$_session[$key]);
+    }
+
+    protected function getSessionValue(string $key) {
+        return isset(static::$_session[$key]) ? static::$_session[$key] : null;
+    }
 }

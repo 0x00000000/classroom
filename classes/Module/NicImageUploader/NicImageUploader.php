@@ -45,17 +45,15 @@ class NicImageUploader extends NicImageUploaderAbstract {
         $uploadPath = FileSystem::getRoot() . $this->getUploadPath();
         
         if(! is_dir($uploadPath) || ! is_writable($uploadPath)) {
-            return $this->getErrorReoponse('Upload directory must exist and have write permissions on the server');
+            return $this->getErrorReoponse('Error. Upload directory must exist and have write permissions on the server');
         }
         
-        $file = $this->getRequest()->files['image'];
-        
-        if (! $contentImage->setFileInfo($file)) {
-            return $this->getErrorReoponse('Must be less than '.$this->bytesToReadable($this->getMaxUploadSize()));
+        if (! $contentImage->setFileInfo($fileInfo)) {
+            return $this->getErrorReoponse("Error. Can't upload the file.");
         }
         
         if (! $contentImage->save()) {
-            return $this->getErrorReoponse('Must be less than '.$this->bytesToReadable($this->getMaxUploadSize()));
+            return $this->getErrorReoponse("Error. Can't save the file.");
         }
         
         $status = array();
