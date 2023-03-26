@@ -1,9 +1,9 @@
 <?php
 
 return array(
-    'server' => 'localhost',
-    'login' => 'mysql',
-    'password' => 'localpass',
+    'server' => 'mysql',
+    'login' => 'developer',
+    'password' => 'password',
     'name' => 'classroom',
     'prefix' => 'classroom_',
 );
