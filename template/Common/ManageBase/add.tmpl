@@ -1,37 +1,35 @@
 <h3>Add</h3>
 
 <form action="{$currentUrl}" method="POST" enctype="multipart/form-data">
-<table class="formTable">
-{foreach $propertiesList as $propertyName => $property}
-{if ! $model->isPk($propertyName)}
-{if $controlsList[$propertyName] !== {$CONTROL_NONE}}
-    {if $controlsList[$propertyName] === {$CONTROL_SELECT}}
-        {include file="$baseTemplatePath/formSelect.tmpl" name="{$property['name']}" values=${$property['name']}Values caption="{$property['caption']}"}
-    {else if $controlsList[$propertyName] === {$CONTROL_SELECT_BOOL}}
-        {include file="$baseTemplatePath/formSelectBool.tmpl" name="{$property['name']}" caption="{$property['caption']}"}
-    {else if $controlsList[$propertyName] === {$CONTROL_TEXTAREA}}
-        {include file="$baseTemplatePath/formTextarea.tmpl" name="{$property['name']}" caption="{$property['caption']}"}
-    {else if $controlsList[$propertyName] === {$CONTROL_HTML}}
-        {include file="$baseTemplatePath/formHtml.tmpl" name="{$property['name']}" caption="{$property['caption']}"}
-    {else if $controlsList[$propertyName] === {$CONTROL_HTML_SIMPLE_PANEL}}
-        {include file="$baseTemplatePath/formHtml.tmpl" name="{$property['name']}" caption="{$property['caption']}" simplePanel={true}}
-    {else if $controlsList[$propertyName] === {$CONTROL_HTML_EMPTY_PANEL}}
-        {include file="$baseTemplatePath/formHtml.tmpl" name="{$property['name']}" caption="{$property['caption']}" emptyPanel={true}}
-    {else if $controlsList[$propertyName] === {$CONTROL_PASSWORD}}
-        {include file="$baseTemplatePath/formPassword.tmpl" name="{$property['name']}" caption="{$property['caption']}"}
-    {else if $controlsList[$propertyName] === {$CONTROL_FILE}}
-        {include file="$baseTemplatePath/formFile.tmpl" name="{$property['name']}" caption="{$property['caption']}"}
-    {else if $controlsList[$propertyName] === {$CONTROL_LABEL}}
-        {include file="$baseTemplatePath/formViewText.tmpl" caption="{$property['caption']}"}
-    {else}
-        {include file="$baseTemplatePath/formText.tmpl" name="{$property['name']}" caption="{$property['caption']}"}
-    {/if}
-{/if}
-{/if}
-{/foreach}
-</table>
-<p>
-    {include file="$baseTemplatePath/buttonSubmit.tmpl" value="Save"}
-    {include file="$baseTemplatePath/buttonCancel.tmpl" value="Cancel"}
-</p>
+    <table class="formTable">
+        {foreach $propertiesList as $propertyName => $property}
+            {if ! $model->isPk($propertyName)}
+                {if $controlsList[$propertyName] === {$CONTROL_SELECT}}
+                    {include file="$baseTemplatePath/formSelect.tmpl" name="{$property['name']}" values=${$property['name']}Values caption="{$property['caption']}"}
+                {else if $controlsList[$propertyName] === {$CONTROL_SELECT_BOOL}}
+                    {include file="$baseTemplatePath/formSelectBool.tmpl" name="{$property['name']}" caption="{$property['caption']}"}
+                {else if $controlsList[$propertyName] === {$CONTROL_TEXTAREA}}
+                    {include file="$baseTemplatePath/formTextarea.tmpl" name="{$property['name']}" caption="{$property['caption']}"}
+                {else if $controlsList[$propertyName] === {$CONTROL_HTML}}
+                    {include file="$baseTemplatePath/formHtml.tmpl" name="{$property['name']}" caption="{$property['caption']}"}
+                {else if $controlsList[$propertyName] === {$CONTROL_HTML_SIMPLE_PANEL}}
+                    {include file="$baseTemplatePath/formHtml.tmpl" name="{$property['name']}" caption="{$property['caption']}" simplePanel={true}}
+                {else if $controlsList[$propertyName] === {$CONTROL_HTML_EMPTY_PANEL}}
+                    {include file="$baseTemplatePath/formHtml.tmpl" name="{$property['name']}" caption="{$property['caption']}" emptyPanel={true}}
+                {else if $controlsList[$propertyName] === {$CONTROL_PASSWORD}}
+                    {include file="$baseTemplatePath/formPassword.tmpl" name="{$property['name']}" caption="{$property['caption']}"}
+                {else if $controlsList[$propertyName] === {$CONTROL_FILE}}
+                    {include file="$baseTemplatePath/formFile.tmpl" name="{$property['name']}" caption="{$property['caption']}"}
+                {else if $controlsList[$propertyName] === {$CONTROL_LABEL}}
+                    {include file="$baseTemplatePath/formViewText.tmpl" caption="{$property['caption']}"}
+                {else if $controlsList[$propertyName] === {$CONTROL_INPUT}}
+                    {include file="$baseTemplatePath/formText.tmpl" name="{$property['name']}" caption="{$property['caption']}"}
+                {/if}
+            {/if}
+        {/foreach}
+    </table>
+    <p>
+        {include file="$baseTemplatePath/buttonSubmit.tmpl" value="Save"}
+        {include file="$baseTemplatePath/buttonCancel.tmpl" value="Cancel"}
+    </p>
 </form>

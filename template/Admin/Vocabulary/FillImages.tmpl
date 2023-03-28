@@ -1,4 +1,3 @@
-<div class="pages">
 {foreach $pagesList as $page}
     {if $page === $currentPage}
         <strong>{$page}</strong>
@@ -7,16 +6,14 @@
     {/if}
 {/foreach}
 
-<table border="1"><tbody>
-{foreach $wordsList as $word}
-    <tr>
-        <td style="width: 50px; text-align: center;"><strong>{$word->id}</strong></td>
-        <td>{$word->english}</td>
-        <td>{$word->russian}</td>
-        <td><a href="https://yandex.ua/images/search?text={$word->english}" target="_blank" rel="noopener noreferrer">default</a></td>
-        <td><a href="https://yandex.ua/images/search?text={$word->english}%20cartoon" target="_blank" rel="noopener noreferrer">cartoon</a></td>
-    </tr>
-{/foreach}
-</tbody></table>
-
-</div>
+<table border="1">
+    {foreach $wordsList as $word}
+        <tr>
+            <td style="width: 50px; text-align: center;"><strong>{$word->id}</strong></td>
+            <td>{$word->english}</td>
+            <td>{$word->russian}</td>
+            <td><a href="https://yandex.ua/images/search?text={$word->english}" target="_blank" rel="noopener noreferrer">default</a></td>
+            <td><a href="https://yandex.ua/images/search?text={$word->english}%20cartoon" target="_blank" rel="noopener noreferrer">cartoon</a></td>
+        </tr>
+    {/foreach}
+</table>

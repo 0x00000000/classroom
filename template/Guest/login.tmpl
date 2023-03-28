@@ -1,9 +1,9 @@
 <h1>Login</h1>
 {if $messageType === 'loginFailed'}
-<p>Wrong login or password.</p>
+    <p>Wrong login or password.</p>
 {/if}
 <form action="{$currentUrl}" method="POST">
-<p>Login: <input name="login" type="text" maxlength="255" /></p>
-<p>Password: <input name="password" maxlength="255" type="password" /></p>
-<p><input type="submit" value="Login" /></p>
+    <p>Login: <input name="login" type="text" maxlength="255" /></p>
+    <p>Password: <input name="password" maxlength="255" type="password" /></p>
+    <p><input type="submit" value="Login" /></p>
 </form>

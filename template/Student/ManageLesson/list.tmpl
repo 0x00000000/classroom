@@ -1,60 +1,53 @@
-<div class="listContent">
-
 <h3>List</h3>
 
 {if $pagesCount > 1}
-<div class="pages">
-{foreach $pagesList as $page}
-{if $page === $currentPage}
-    <strong>{$page}</strong>
-{else}
-    <a href="{$baseUrl}/list/{$page}">{$page}</a>
-{/if}
-{/foreach}
-</div>
+    <div class="pages">
+        {foreach $pagesList as $page}
+            {if $page === $currentPage}
+                <strong>{$page}</strong>
+            {else}
+                <a href="{$baseUrl}/list/{$page}">{$page}</a>
+            {/if}
+        {/foreach}
+    </div>
 {/if}
 
 <table class="listTable">
     <tr>
-    {foreach $propertiesList as $propertyName => $property}
-    {if $controlsList[$propertyName] === {$CONTROL_NONE}}
-    {else if $controlsList[$propertyName] === {$CONTROL_TEXTAREA}}
-    {else if $controlsList[$propertyName] === {$CONTROL_HTML}}
-    {else if $controlsList[$propertyName] === {$CONTROL_HTML_SIMPLE_PANEL}}
-    {else if $controlsList[$propertyName] === {$CONTROL_HTML_EMPTY_PANEL}}
-    {else if $controlsList[$propertyName] === {$CONTROL_PASSWORD}}
-    {else}
-        <th>{$property['caption']}</th>
-    {/if}
-    {/foreach}
+        {foreach $propertiesList as $propertyName => $property}
+            {if
+                $controlsList[$propertyName] === {$CONTROL_INPUT} ||
+                $controlsList[$propertyName] === {$CONTROL_LABEL} ||
+                $controlsList[$propertyName] === {$CONTROL_SELECT_BOOL} ||
+                $controlsList[$propertyName] === {$CONTROL_SELECT}
+            }
+                <th>{$property['caption']}</th>
+            {/if}
+        {/foreach}
+    </tr>
 
-    </tr>
-    
     {foreach $itemsList as $item}
-    <tr>
-    {foreach $propertiesList as $propertyName => $property}
-    {if $controlsList[$propertyName] === {$CONTROL_NONE}}
-    {else if $controlsList[$propertyName] === {$CONTROL_TEXTAREA}}
-    {else if $controlsList[$propertyName] === {$CONTROL_HTML}}
-    {else if $controlsList[$propertyName] === {$CONTROL_HTML_SIMPLE_PANEL}}
-    {else if $controlsList[$propertyName] === {$CONTROL_HTML_EMPTY_PANEL}}
-    {else if $controlsList[$propertyName] === {$CONTROL_PASSWORD}}
-    {else}
-        <td>
-        {if $propertyName === 'caption'}
-            {include file="$baseTemplatePath/viewText.tmpl" value="{$item->{$propertyName}}" href="{$baseUrl}/view/{$item->id}"}
-        {else if $controlsList[$propertyName] === {$CONTROL_SELECT}}
-            {include file="$baseTemplatePath/viewSelect.tmpl" values=${$property['name']}Values value="{$item->{$propertyName}}"}
-        {else if $controlsList[$propertyName] === {$CONTROL_SELECT_BOOL}}
-            {include file="$baseTemplatePath/viewBool.tmpl" value="{$item->{$propertyName}}"}
-        {else}
-            {include file="$baseTemplatePath/viewText.tmpl" value="{$item->{$propertyName}}"}
-        {/if}
-        </td>
-    {/if}
-    {/foreach}
-    </tr>
+        <tr>
+            {foreach $propertiesList as $propertyName => $property}
+                {if
+                    $controlsList[$propertyName] === {$CONTROL_INPUT} ||
+                    $controlsList[$propertyName] === {$CONTROL_LABEL} ||
+                    $controlsList[$propertyName] === {$CONTROL_SELECT_BOOL} ||
+                    $controlsList[$propertyName] === {$CONTROL_SELECT}
+                }
+                    <td>
+                        {if $propertyName === 'caption'}
+                            {include file="$baseTemplatePath/viewText.tmpl" value="{$item->{$propertyName}}" href="{$baseUrl}/view/{$item->id}"}
+                        {else if $controlsList[$propertyName] === {$CONTROL_SELECT}}
+                            {include file="$baseTemplatePath/viewSelect.tmpl" values=${$property['name']}Values value="{$item->{$propertyName}}"}
+                        {else if $controlsList[$propertyName] === {$CONTROL_SELECT_BOOL}}
+                            {include file="$baseTemplatePath/viewBool.tmpl" value="{$item->{$propertyName}}"}
+                        {else}
+                            {include file="$baseTemplatePath/viewText.tmpl" value="{$item->{$propertyName}}"}
+                        {/if}
+                    </td>
+                {/if}
+            {/foreach}
+        </tr>
     {/foreach}
 </table>
-
-</div>

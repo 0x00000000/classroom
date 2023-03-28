@@ -1,22 +1,20 @@
 <link rel="stylesheet" type="text/css" href="{$rootUrl}/css/ActiveLesson/ActiveLesson.css" />
 
-<div class="listContent">
-
 <h3>Lessons for student {$student->name}</h3>
 
 {if $pagesCount > 1}
-<div class="pages">
-{foreach $pagesList as $page}
-{if $page === $currentPage}
-    <strong>{$page}</strong>
-{else}
-    <a href="{$baseUrl}/student/{$student->id}/{$page}">{$page}</a>
-{/if}
-{/foreach}
-</div>
+    <div class="pages">
+        {foreach $pagesList as $page}
+            {if $page === $currentPage}
+                <strong>{$page}</strong>
+            {else}
+                <a href="{$baseUrl}/student/{$student->id}/{$page}">{$page}</a>
+            {/if}
+        {/foreach}
+    </div>
 {/if}
 
-<table class="listTable"><tbody>
+<table class="listTable">
     <tr>
         <th>Caption</th>
         <th>Subject</th>
@@ -32,6 +30,4 @@
         </td>
     </tr>
     {/foreach}
-</tbody></table>
-
-</div>
+</table>
