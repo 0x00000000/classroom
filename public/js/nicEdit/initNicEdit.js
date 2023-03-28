@@ -1,8 +1,8 @@
 function initNicEdit(params) {
     bkLib.onDomLoaded(function() {
-        var iconsPath = (typeof rootUrl !== 'undefined' ? rootUrl : '')
+        let iconsPath = (typeof rootUrl !== 'undefined' ? rootUrl : '')
             + '/vendor/nicEdit/nicEditorIcons.gif';
-        var nicEditParams = {
+        let nicEditParams = {
             maxHeight : 400,
             iconsPath: iconsPath,
         };
@@ -11,15 +11,15 @@ function initNicEdit(params) {
         } else if (params.simplePanel) {
             nicEditParams.buttonList = ['bold','italic','underline','forecolor'];
         }
-        var nicEdit = new nicEditor(nicEditParams).panelInstance(params.panelId);
-        var htmlContainer = null;
-        var panelContainer = document.getElementById(params.panelContainerId);
+        let nicEdit = new nicEditor(nicEditParams).panelInstance(params.panelId);
+        let htmlContainer = null;
+        let panelContainer = document.getElementById(params.panelContainerId);
         if (panelContainer) {
             htmlContainer = panelContainer.querySelector('.nicEdit-main');
         }
 
         if (params.inputId) {
-            var input = document.getElementById(params.inputId);
+            let input = document.getElementById(params.inputId);
             if (input && htmlContainer) {
                 nicEdit.addEvent('blur', function() {
                     input.value = htmlContainer.innerHTML;

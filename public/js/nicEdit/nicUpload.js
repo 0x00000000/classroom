@@ -7,7 +7,7 @@
  * @version: 0.9.0
  */
 
-var nicUploadOptions = {
+let nicUploadOptions = {
     buttons : {
         'upload': {name: 'Upload Image', type: 'nicUploadButton'}
     },
@@ -25,7 +25,7 @@ var nicUploadButton = nicEditorAdvancedButton.extend({
         }
         this.im = this.ne.selectedInstance.selElm().parentTag('IMG');
 
-        var container = new bkElement('div')
+        let container = new bkElement('div')
             .setStyle({ padding: '10px' })
             .appendTo(this.pane.pane);
 
@@ -52,7 +52,7 @@ var nicUploadButton = nicEditorAdvancedButton.extend({
     },
 
     uploadFile: function() {
-        var file = this.fileInput.files[0];
+        let file = this.fileInput.files[0];
         if (! file || ! file.type.match(/image.*/)) {
             this.onError('Only image files can be uploaded');
             return;
@@ -61,15 +61,16 @@ var nicUploadButton = nicEditorAdvancedButton.extend({
         this.fileInput.setStyle({ display: 'none' });
         this.setProgress(0);
         
-        var fd = new FormData(); // https://hacks.mozilla.org/2011/01/how-to-develop-a-html5-image-uploader/
+        let fd = new FormData(); // https://hacks.mozilla.org/2011/01/how-to-develop-a-html5-image-uploader/
         fd.append('image', file);
         
-        var xhr = new XMLHttpRequest();
+        let xhr = new XMLHttpRequest();
         xhr.open("POST", this.ne.options.uploadURI || this.nicURI);
         
         xhr.onload = function() {
+            let response;
             try {
-                var response = JSON.parse(xhr.responseText);
+                response = JSON.parse(xhr.responseText);
             } catch(e) {
                 return this.onError();
             }
@@ -100,14 +101,13 @@ var nicUploadButton = nicEditorAdvancedButton.extend({
     
     onUploaded: function(options) {
         this.removePane();
-        var src = options.link;
+        let src = options.link;
         if(! this.im) {
             this.ne.selectedInstance.restoreRng();
-            var tmp = 'javascript:nicImTemp();';
             this.ne.nicCommand("insertImage", src);
             this.im = this.findElm('IMG','src', src);
         }
-        var w = parseInt(this.ne.selectedInstance.elm.getStyle('width'));
+        let w = parseInt(this.ne.selectedInstance.elm.getStyle('width'));
         if (this.im) {
             this.im.setAttributes({
                 src : src,

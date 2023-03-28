@@ -1,9 +1,10 @@
 function waitForActiveLesson(requestUrl, redirectUrl) {
 
     function ask() {
-        if (! requestUrl || ! redirectUrl)
+        if (! requestUrl || ! redirectUrl) {
             return;
-        
+        }
+
         $.ajax(
             requestUrl,
             {

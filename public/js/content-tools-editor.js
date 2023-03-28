@@ -1,5 +1,5 @@
 window.addEventListener('load', function() {
-    var editor;
+    let editor;
     
     editor = ContentTools.EditorApp.get();
     editor.init('*[data-editable]', 'data-name');
@@ -11,7 +11,7 @@ window.addEventListener('load', function() {
     // ]);
 
     editor.addEventListener('saved', function (ev) {
-        var name, payload, regions, xhr;
+        let name, payload, regions;
         
         // Check that something changed
         regions = ev.detail().regions;
@@ -25,8 +25,8 @@ window.addEventListener('load', function() {
         // Collect the contents of each region into a FormData instance
         payload = new FormData();
         for (name in regions) {
-            var elementName = name.replace(/-html$/, '');
-            var elements = document.getElementsByName(elementName);
+            let elementName = name.replace(/-html$/, '');
+            let elements = document.getElementsByName(elementName);
             if (elements.length === 1) {
                 elements[0].value = regions[name];
             }
@@ -36,4 +36,3 @@ window.addEventListener('load', function() {
     });
     
 });
-

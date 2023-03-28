@@ -1,4 +1,4 @@
-var nicYoutubeOptions = {
+let nicYoutubeOptions = {
     buttons : {
         'upload': {name: 'Youtube', type: 'nicYoutubeButton'}
     },
@@ -18,15 +18,15 @@ var nicYoutubeButton = nicEditorAdvancedButton.extend({
     },
     
     submit: function (e) {
-        var code = this.inputs['youTubeUrl'].value;
-        var width = this.inputs['height'].value;
-        var height = this.inputs['width'].value;
+        let code = this.inputs['youTubeUrl'].value;
+        let width = this.inputs['height'].value;
+        let height = this.inputs['width'].value;
 
         if (code.indexOf('watch?v=') > 0) {
             code = code.replace('watch?v=','embed/');
         }
         
-        var youTubeCode = '<p><br></p><iframe class="nicYoutubeIframe" width="' + width + '" height="' + height + '" src="' + code + '" frameborder="0" allowfullscreen></iframe><p><br></p>';
+        let youTubeCode = '<p><br></p><iframe class="nicYoutubeIframe" width="' + width + '" height="' + height + '" src="' + code + '" frameborder="0" allowfullscreen></iframe><p><br></p>';
         
         this.removePane();
         this.ne.nicCommand('insertHTML', youTubeCode);
