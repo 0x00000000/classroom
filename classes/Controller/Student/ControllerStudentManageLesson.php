@@ -29,7 +29,7 @@ class ControllerStudentManageLesson extends ControllerStudentManageBase {
         'teacherId' => self::CONTROL_NONE,
         'studentId' => self::CONTROL_NONE,
         'keywords' => self::CONTROL_NONE,
-        'content' => self::CONTROL_HTML_SIMPLE,
+        'content' => self::CONTROL_HTML_SIMPLE_PANEL,
         'disabled' => self::CONTROL_NONE,
         'deleted' => self::CONTROL_NONE,
     );

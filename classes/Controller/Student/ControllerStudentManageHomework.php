@@ -31,7 +31,7 @@ class ControllerStudentManageHomework extends ControllerStudentManageBase {
         'keywords' => self::CONTROL_NONE,
         'caption' => self::CONTROL_LABEL,
         'subject' => self::CONTROL_LABEL,
-        'content' => self::CONTROL_HTML_SIMPLE,
+        'content' => self::CONTROL_HTML_SIMPLE_PANEL,
         'disabled' => self::CONTROL_NONE,
         'deleted' => self::CONTROL_NONE,
     );

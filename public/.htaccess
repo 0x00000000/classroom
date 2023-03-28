@@ -10,6 +10,10 @@ RewriteEngine On
 	Deny From All
 </Files>
 
+# Uncomment next lines if https is available.
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
 # Protect application and system files from being viewed
 RewriteRule ^(?:application|modules|system)\b.* index.php/$0 [L]
 

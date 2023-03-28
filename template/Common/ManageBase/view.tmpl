@@ -2,13 +2,13 @@
 
 <table class="viewTable">
 {foreach $propertiesList as $propertyName => $property}
-{if $controlsList[$propertyName] !== 'none'}
-    {if $controlsList[$propertyName] === 'password'}
-    {else if $controlsList[$propertyName] === 'select'}
+{if $controlsList[$propertyName] !== {$CONTROL_NONE}}
+    {if $controlsList[$propertyName] === {$CONTROL_PASSWORD}}
+    {else if $controlsList[$propertyName] === {$CONTROL_SELECT}}
         {include file="$baseTemplatePath/formViewSelect.tmpl" values=${$property['name']}Values value="{$item->{$propertyName}}" caption="{$property['caption']}"}
-    {else if $controlsList[$propertyName] === 'selectBool'}
+    {else if $controlsList[$propertyName] === {$CONTROL_SELECT_BOOL}}
         {include file="$baseTemplatePath/formViewBool.tmpl" value="{$item->{$propertyName}}" caption="{$property['caption']}"}
-    {else if $controlsList[$propertyName] === 'html'}
+    {else if $controlsList[$propertyName] === {$CONTROL_HTML} || $controlsList[$propertyName] === {$CONTROL_HTML_SIMPLE_PANEL} || $controlsList[$propertyName] === {$CONTROL_HTML_EMPTY_PANEL}}
         {include file="$baseTemplatePath/formViewHtml.tmpl" value="{$item->{$propertyName}}" caption="{$property['caption']}"}
     {else}
         {include file="$baseTemplatePath/formViewText.tmpl" value="{$item->{$propertyName}}" caption="{$property['caption']}"}

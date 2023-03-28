@@ -20,7 +20,8 @@
     {if $controlsList[$propertyName] === 'none'}
     {else if $controlsList[$propertyName] === 'textarea'}
     {else if $controlsList[$propertyName] === 'html'}
-    {else if $controlsList[$propertyName] === 'htmlSimple'}
+    {else if $controlsList[$propertyName] === 'htmlSimplePanel'}
+    {else if $controlsList[$propertyName] === 'htmlEmptyPanel'}
     {else if $controlsList[$propertyName] === 'password'}
     {else}
         <th>{$property['caption']}</th>
@@ -32,18 +33,19 @@
     {foreach $itemsList as $item}
     <tr>
     {foreach $propertiesList as $propertyName => $property}
-    {if $controlsList[$propertyName] === 'none'}
-    {else if $controlsList[$propertyName] === 'textarea'}
-    {else if $controlsList[$propertyName] === 'html'}
-    {else if $controlsList[$propertyName] === 'htmlSimple'}
-    {else if $controlsList[$propertyName] === 'password'}
+    {if $controlsList[$propertyName] === {$CONTROL_NONE}}
+    {else if $controlsList[$propertyName] === {$CONTROL_TEXTAREA}}
+    {else if $controlsList[$propertyName] === {$CONTROL_HTML}}
+    {else if $controlsList[$propertyName] === {$CONTROL_HTML_SIMPLE_PANEL}}
+    {else if $controlsList[$propertyName] === {$CONTROL_HTML_EMPTY_PANEL}}
+    {else if $controlsList[$propertyName] === {$CONTROL_PASSWORD}}
     {else}
         <td>
         {if $propertyName === 'caption'}
             {include file="$baseTemplatePath/viewText.tmpl" value="{$item->{$propertyName}}" href="{$baseUrl}/edit/{$item->id}"}
-        {else if $controlsList[$propertyName] === 'select'}
+        {else if $controlsList[$propertyName] === {$CONTROL_SELECT}}
             {include file="$baseTemplatePath/viewSelect.tmpl" values=${$property['name']}Values value="{$item->{$propertyName}}"}
-        {else if $controlsList[$propertyName] === 'selectBool'}
+        {else if $controlsList[$propertyName] === {$CONTROL_SELECT_BOOL}}
             {include file="$baseTemplatePath/viewBool.tmpl" value="{$item->{$propertyName}}"}
         {else}
             {include file="$baseTemplatePath/viewText.tmpl" value="{$item->{$propertyName}}"}

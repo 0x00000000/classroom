@@ -13,24 +13,22 @@ if (! lessonParams)
 if (typeof lessonParams['requestUrl'] === 'undefined')
     return;
 
-bkLib.onDomLoaded(function() {
-    var iconsPath = (typeof rootUrl !== 'undefined' ? rootUrl : '')
-        + '/vendor/nicEdit/nicEditorIcons.gif';
-    var nicEditParams = {
-            maxHeight : 400,
-            iconsPath: iconsPath,
-            buttonList: ['bold','italic','underline','forecolor']};
-    nicEdit = new nicEditor(nicEditParams).panelInstance('lessonNicEditPanel');
-    var editorContainer = document.getElementById('lessonNicEditPanelContainer');
-    if (editorContainer) {
-        whiteBoard = editorContainer.querySelector('.nicEdit-main');
-        whiteBoard.classList.add('whiteBoard');
-    }
-    if (whiteBoard) {
-        bkLibReady = true;
-        initApplication();
-    }
-});
+let params = {
+    panelContainerId: 'lessonNicEditPanelContainer',
+    panelId: 'lessonNicEditPanel',
+    simplePanel: true,
+    onInit: function(data) {
+        nicEdit = data.nicEdit;
+        var panelContainer = document.getElementById('lessonNicEditPanelContainer');
+        if (panelContainer) {
+            whiteBoard = panelContainer.querySelector('.nicEdit-main');
+            whiteBoard.classList.add('whiteBoard');
+            bkLibReady = true;
+            initApplication();
+        }
+    },
+};
+initNicEdit(params);
 
 $(document).ready(function() {
     documentReady = true;

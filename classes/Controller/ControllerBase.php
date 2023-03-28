@@ -278,7 +278,9 @@ abstract class ControllerBase extends Controller {
     
     protected function setContentViewVariables() {
         $config = Config::instance();
-        
+
+        $this->setControlTypes();
+
         $this->getView()->set('currentUrl', $this->getUrl());
         $this->getView()->set('rootUrl', $this->getRootUrl());
         $this->getView()->set('baseUrl', $this->getBaseUrl());
@@ -479,6 +481,7 @@ abstract class ControllerBase extends Controller {
         $this->addCssFile('/css/common.css');
         $this->addJsFile('/vendor/jquery/jquery-3.3.1.js');
         $this->addJsFile('/vendor/nicEdit/nicEdit.js');
+        $this->addJsFile('/js/nicEdit/initNicEdit.js');
         $this->addJsFile('/js/nicEdit/nicUpload.js');
         $this->addJsFile('/js/nicEdit/nicYoutube.js');
         $this->addJsFile('/js/nicEdit/nicHtmlFragment.js');
@@ -567,5 +570,18 @@ abstract class ControllerBase extends Controller {
     protected function getControlsList(ModelDatabase $model) {
         return array();
     }
-    
+
+    private function setControlTypes() {
+        $this->getView()->set('CONTROL_INPUT', self::CONTROL_INPUT);
+        $this->getView()->set('CONTROL_PASSWORD', self::CONTROL_PASSWORD);
+        $this->getView()->set('CONTROL_TEXTAREA', self::CONTROL_TEXTAREA);
+        $this->getView()->set('CONTROL_HTML', self::CONTROL_HTML);
+        $this->getView()->set('CONTROL_HTML_SIMPLE_PANEL', self::CONTROL_HTML_SIMPLE_PANEL);
+        $this->getView()->set('CONTROL_HTML_EMPTY_PANEL', self::CONTROL_HTML_EMPTY_PANEL);
+        $this->getView()->set('CONTROL_SELECT_BOOL', self::CONTROL_SELECT_BOOL);
+        $this->getView()->set('CONTROL_SELECT', self::CONTROL_SELECT);
+        $this->getView()->set('CONTROL_FILE', self::CONTROL_FILE);
+        $this->getView()->set('CONTROL_LABEL', self::CONTROL_LABEL);
+        $this->getView()->set('CONTROL_NONE', self::CONTROL_NONE);
+    }
 }
