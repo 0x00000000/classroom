@@ -88,8 +88,7 @@ class ModelActiveLesson extends ModelDatabase {
                 'condition' => '>=',
             ),
         );
-        $activeLesson = Factory::instance()->createModel('ActiveLesson')
-            ->getOneModel($conditionsList);
+        $activeLesson = $this->getOneModel($conditionsList);
         
         return $activeLesson;
     }
