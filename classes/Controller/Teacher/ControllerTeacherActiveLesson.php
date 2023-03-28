@@ -85,7 +85,7 @@ class ControllerTeacherActiveLesson extends ControllerTeacherBase {
         if (array_key_exists('lessonId', $get)) {
             $this->_lessonId = $get['lessonId'];
         }
-        
+
         if ($this->_action === 'command' && $this->_studentId && $this->_lessonId) {
             $content = $this->innerActionCommand();
         } else if ($this->_action === 'lesson' && $this->_studentId && $this->_lessonId) {
@@ -203,7 +203,6 @@ class ControllerTeacherActiveLesson extends ControllerTeacherBase {
         $currentPage = (string) $currentPage;
         
         $user = $this->getAuth()->getUser();
-        $sortingList = array('disabled' => 'asc', 'name' => 'asc');
         $studentsList = $user->getStudentsList(
             $this->_itemsPerPage,
             ((int) $currentPage - 1) * (int) $this->_itemsPerPage,
@@ -238,7 +237,7 @@ class ControllerTeacherActiveLesson extends ControllerTeacherBase {
         if (array_key_exists('student', $this->_templateNames)) {
             $this->getView()->setTemplate($this->_templateNames['student']);
         }
-        
+
         if ($this->_lessonId) {
             $currentPage = (int) $this->_lessonId;
             if ($currentPage <= 0) {
@@ -247,8 +246,9 @@ class ControllerTeacherActiveLesson extends ControllerTeacherBase {
         } else {
             $currentPage = 1;
         }
+        $lessonsOffset = ($currentPage - 1) * $this->_itemsPerPage;
         $currentPage = (string) $currentPage;
-        
+
         $studentConditionsList = $this->_conditionsList;
         $studentConditionsList['id'] = $this->_studentId;
         $studentConditionsList['isStudent'] = true;
@@ -261,7 +261,10 @@ class ControllerTeacherActiveLesson extends ControllerTeacherBase {
         $lessonConditionsList['teacherId'] = $user->id;
         $modelLesson = Factory::instance()->createModel('Lesson');
         $lessonsList = $modelLesson->getModelsList(
-            $lessonConditionsList, 0, 0, $this->_lessonSortingList
+            $lessonConditionsList,
+            $this->_itemsPerPage,
+            $lessonsOffset,
+            $this->_lessonSortingList
         );
         
         $lessonsCount = $modelLesson->getCount(
