@@ -341,3 +341,18 @@ table.smallestTable {
 .nicEdit-main .nicContentImage {
 }
 
+.content table.nicTable,
+.nicEdit-main table.nicTable {
+    width: 50px;
+    border-collapse: collapse;
+}
+
+.content table.nicTable td,
+.nicEdit-main table.nicTable td{
+    min-width: 50px;
+    border: 1px solid;
+    text-align: justify;
+    padding: 5px;
+}
+
+

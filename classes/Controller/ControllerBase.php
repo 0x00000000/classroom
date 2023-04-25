@@ -486,6 +486,7 @@ abstract class ControllerBase extends Controller {
         $this->addJsFile('/js/nicEdit/nicYoutube.js');
         $this->addJsFile('/js/nicEdit/nicHtmlFragment.js');
         $this->addJsFile('/js/nicEdit/nicHtmlCode.js');
+        $this->addJsFile('/js/nicEdit/nicTable.js');
         $this->addJsFile('/js/common.js');
     }
     
