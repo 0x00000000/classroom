@@ -5,6 +5,6 @@ return array(
     'title' => 'Learn English',
     'keywords' => '',
     'description' => '',
-    'sessionLifeTime' => '86400',
+    'sessionLifeTime' => '2592000',
     'redirectAfterLoginLifeTime' => '600',
 );
