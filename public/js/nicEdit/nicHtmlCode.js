@@ -2,9 +2,14 @@
 var nicHtmlCode = (function() {
     let options = {
         buttons: {
-            'upload' : {name: 'Edit HTML', type: 'nicHtmlCode'},
+            upload: {
+                name: 'Edit HTML',
+                type: 'nicHtmlCode',
+            },
         },
-        iconFiles: {'upload': rootUrl + '/images/design/nicEdit/icons/nicHtmlCode.gif'},
+        iconFiles: {
+            upload: rootUrl + '/images/design/nicEdit/icons/nicHtmlCode.gif',
+        },
     };
 
     nicEditors.registerPlugin(nicPlugin, options);
@@ -15,11 +20,17 @@ var nicHtmlCode = (function() {
 
         addPane: function (bkElm) {
             this.addForm({
-              '': { type: 'title', txt: 'Insert Html' },
-              'code' : {
-                    type : 'content',
-                    'value' : this.ne.selectedInstance.getContent(),
-                    style : {width: '100%', height : '300px'}
+              '': {
+                  type: 'title',
+                  txt: 'Insert Html',
+              },
+              code: {
+                    type: 'content',
+                    value: this.ne.selectedInstance.getContent(),
+                    style: {
+                        width: '100%',
+                        height : '300px',
+                    },
                 },
             });
         },

@@ -2,9 +2,14 @@
 var nicHtmlFragment = (function() {
     let options = {
         buttons: {
-            'upload': {name: 'HTML fragment', type: 'nicHtmlFragment'},
+            upload: {
+                name: 'HTML fragment',
+                type: 'nicHtmlFragment',
+            },
         },
-        iconFiles: {'upload': rootUrl + '/images/design/nicEdit/icons/nicHtmlFragment.gif'},
+        iconFiles: {
+            upload: rootUrl + '/images/design/nicEdit/icons/nicHtmlFragment.gif',
+        },
     };
 
     nicEditors.registerPlugin(nicPlugin, options);
@@ -27,11 +32,14 @@ var nicHtmlFragment = (function() {
             }
             
             this.addForm({
-              '': { type: 'title', txt: 'Insert Html' },
-              'code' : {
-                    type : 'content',
-                    'value' : this.fragmentElement ? this.fragmentElement.innerHTML : '',
-                    style : {width: '100%', height : '300px'}
+                '': {
+                    type: 'title',
+                    txt: 'Insert Html',
+                },
+                code: {
+                    type: 'content',
+                    value: this.fragmentElement ? this.fragmentElement.innerHTML : '',
+                    style: {width: '100%', height : '300px'},
                 },
             });
         },

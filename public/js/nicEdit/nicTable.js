@@ -2,12 +2,14 @@
 var nicTable = (function() {
     let options = {
         buttons: {
-            'upload' : {
+            upload: {
                 name: 'Insert table',
                 type: 'nicTable',
             },
         },
-        iconFiles: {'upload': rootUrl + '/images/design/nicEdit/icons/nicTable.gif'},
+        iconFiles: {
+            upload: rootUrl + '/images/design/nicEdit/icons/nicTable.gif',
+        },
     };
 
     nicEditors.registerPlugin(nicPlugin, options);
@@ -45,17 +47,17 @@ var nicTable = (function() {
                     type: 'title',
                     txt: 'Insert table',
                 },
-                'rows' : {
+                rows : {
                       type: 'text',
                       txt: 'Rows',
                       value: '3',
-                      style: {width: '150px'}
+                      style: {width: '150px'},
                 },
-                'cols' : {
+                cols : {
                     type: 'text',
                     txt: 'Cols',
                     value: '3',
-                    style: {width: '150px'}
+                    style: {width: '150px'},
                 },
             });
         },
