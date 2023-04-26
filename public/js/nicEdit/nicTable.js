@@ -50,13 +50,13 @@ var nicTable = (function() {
                 rows : {
                       type: 'text',
                       txt: 'Rows',
-                      value: '3',
+                      value: nicTable.rows,
                       style: {width: '150px'},
                 },
                 cols : {
                     type: 'text',
                     txt: 'Cols',
-                    value: '3',
+                    value: nicTable.cols,
                     style: {width: '150px'},
                 },
             });
@@ -64,8 +64,10 @@ var nicTable = (function() {
         
         submit: function(e) {
             this.removePane();
+            nicTable.rows = this.inputs['rows'].value;
+            nicTable.cols = this.inputs['cols'].value;
             let html = '<br><div class="' + this.fragmentClassName + '">'
-                + this.getTableContent(this.inputs['rows'].value, this.inputs['cols'].value)
+                + this.getTableContent(nicTable.rows, nicTable.cols)
                 + '</div><br>';
             this.ne.nicCommand(
                 'insertHTML',
@@ -77,3 +79,7 @@ var nicTable = (function() {
     
     return pluginButton;
 })();
+
+// We will store last values in these properties.
+nicTable.rows = '3';
+nicTable.cols = '3';
