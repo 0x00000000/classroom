@@ -171,12 +171,14 @@ table.formTable td {
     border: 0;
 }
 
-table.formTable td:first-child {
+table.formTable > tr > td:first-child,
+table.formTable > tbody > tr > td:first-child {
     width: 10%;
     max-width: 200px;
 }
 
-table.formTable td:nth-child(2) {
+table.formTable > tr > td:nth-child(2),
+table.formTable > tbody > tr > td:nth-child(2) {
     width: 100%;
 }
 
@@ -341,18 +343,14 @@ table.smallestTable {
 .nicEdit-main .nicContentImage {
 }
 
-.content table.nicTable,
-.nicEdit-main table.nicTable {
-    width: 50px;
+.content table.nicTable {
+    width: auto;
     border-collapse: collapse;
 }
 
-.content table.nicTable td,
-.nicEdit-main table.nicTable td{
+.content table.nicTable td {
     min-width: 50px;
     border: 1px solid;
     text-align: justify;
     padding: 5px;
 }
-
-

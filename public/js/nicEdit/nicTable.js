@@ -18,9 +18,12 @@ var nicTable = (function() {
         
         fragmentClassName: 'nicMyhtmlFragment',
         
-        getTableContent: function(rows, cols) {
-            console.log(rows, cols);
+        getTableContent: function(rows, cols, fixedWidth) {
             let html = '';
+            
+            if (typeof fixedWidth === undefined) {
+                fixedWidth = false;
+            }
             
             rows = Number(rows);
             cols = Number(cols);
@@ -28,11 +31,16 @@ var nicTable = (function() {
                 return html;
             }
             
+            let widthAttr = '';
+            if (fixedWidth) {
+                widthAttr = ' width="' + Math.floor(100 / cols) + '%"'
+            }
+            
             html += '<table class="nicTable" cellspacing="0" cellpadding="0"><tbody>';
             for (let i = 0; i < rows; i++) {
                 html += '<tr>';
                 for (let j = 0; j < cols; j++) {
-                    html += '<td>&nbsp;</td>';
+                    html += '<td' + widthAttr + '></td>';
                 }
                 html += '</tr>';
             }
@@ -59,6 +67,15 @@ var nicTable = (function() {
                     value: nicTable.cols,
                     style: {width: '150px'},
                 },
+                width : {
+                    type: 'select',
+                    txt: 'Width',
+                    value: nicTable.width,
+                    options: {
+                        'auto': 'Auto',
+                        'fixed': 'Fixed',
+                    }
+                },
             });
         },
         
@@ -66,8 +83,10 @@ var nicTable = (function() {
             this.removePane();
             nicTable.rows = this.inputs['rows'].value;
             nicTable.cols = this.inputs['cols'].value;
+            nicTable.width = this.inputs['width'].value;
+            let fixedWidth = nicTable.width === 'fixed';
             let html = '<br><div class="' + this.fragmentClassName + '">'
-                + this.getTableContent(nicTable.rows, nicTable.cols)
+                + this.getTableContent(nicTable.rows, nicTable.cols, fixedWidth)
                 + '</div><br>';
             this.ne.nicCommand(
                 'insertHTML',
@@ -83,3 +102,4 @@ var nicTable = (function() {
 // We will store last values in these properties.
 nicTable.rows = '3';
 nicTable.cols = '3';
+nicTable.width = 'auto';
